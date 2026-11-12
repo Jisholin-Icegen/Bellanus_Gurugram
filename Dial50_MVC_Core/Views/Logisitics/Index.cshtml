@@ -1,0 +1,575 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Logistics ::";
+}
+
+<link rel="stylesheet" href="~/css/Logistics.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    html, body {
+        height: 100% !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        background: #f1f3f7 !important;
+    }
+
+    body {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .app-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+        padding-top: env(safe-area-inset-top) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+        .app-wrapper > .header,
+        .app-wrapper > header,
+        .app-wrapper > .mobile-header,
+        .app-wrapper > .bed-context,
+        .app-wrapper > #bedContext,
+        .app-wrapper > nav,
+        .app-wrapper > .nav {
+            flex: 0 0 auto !important;
+        }
+
+        #servicesContainer,
+        .app-wrapper > .content {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            width: 100% !important;
+            display: grid !important;
+            align-content: start !important;
+            align-items: start !important;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+            grid-auto-rows: auto !important;
+            gap: 16px !important;
+            padding: 16px !important;
+            padding-bottom: calc(32px + env(safe-area-inset-bottom)) !important;
+            box-sizing: border-box !important;
+        }
+
+        .app-wrapper > footer,
+        .app-wrapper > .footer {
+            flex: 0 0 auto !important;
+            margin-top: 0 !important;
+            width: 100% !important;
+            position: relative !important;
+            z-index: 20;
+        }
+
+    html body #servicesContainer > .card,
+    html body #servicesContainer > .care-card,
+    html body #servicesContainer > .service-card {
+        height: auto !important;
+        min-height: 160px !important;
+        aspect-ratio: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 24px 16px !important;
+        background-color: #ffffff !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        cursor: pointer !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+
+        html body #servicesContainer > .card:active,
+        html body #servicesContainer > .care-card:active,
+        html body #servicesContainer > .service-card:active {
+            transform: scale(0.98) !important;
+        }
+
+    @@media (min-width: 600px) {
+        #servicesContainer {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+            padding: 20px !important;
+            gap: 20px !important;
+        }
+
+        html body #servicesContainer > .card,
+        html body #servicesContainer > .care-card,
+        html body #servicesContainer > .service-card {
+            min-height: 180px !important;
+        }
+    }
+
+    @@media (min-width: 992px) {
+        #servicesContainer {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+            padding: 24px !important;
+            gap: 24px !important;
+        }
+    }
+</style>
+
+<div class="app-wrapper">
+    <partial name="_header"></partial>
+    <partial name="_BedContext" />
+    <partial name="_nav"></partial>
+
+    <input type="hidden" id="hdnTaskTypeId">
+    <div id="servicesContainer" class="content"></div>
+
+    <partial name="_footer"></partial>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <img id="modalIcon" src="" />
+        </div>
+        <div class="modal-body">
+            <h2 id="modalTitle"></h2>
+            <p>How can we help with this?</p>
+            <div class="details-label">Additional Details</div>
+            <textarea placeholder="Enter additional details" id="modalRemarks"></textarea>
+            <button class="confirm-btn" id="modalSubmit">Confirm Request</button>
+            <div class="cancel-btn" onclick="closeModal()">Cancel</div>
+        </div>
+    </div>
+</div>
+
+<div id="requestLoadingScreen" class="modal-overlay request-loading-overlay">
+    <div class="request-loading-modal">
+        <div class="loading-icon-wrapper">
+            <div class="loading-ring ring-1"></div>
+            <div class="loading-ring ring-2"></div>
+            <div class="loading-icon-circle"><i class="fa-solid fa-wrench"></i></div>
+        </div>
+        <div class="loading-title">Sending Request...</div>
+        <div class="loading-subtitle">Connecting to support station</div>
+    </div>
+</div>
+
+<div id="requestSuccessScreen" class="modal-overlay">
+    <div class="request-modal">
+        <button type="button" class="modal-close-btn" onclick="closeSuccessModal()" aria-label="Close">X</button>
+        <div class="modal-avatar">
+            <img src="/images/porter.png" alt="Staff" onerror="this.onerror=null;this.src='/images/porter.png';">
+        </div>
+        <div class="modal-request-id">Request Id: <strong id="successReqId">#-</strong></div>
+        <div class="modal-details">
+            <p>Support staff <strong id="successStaffName">-</strong> assigned.</p>
+            <p>Task Name: <strong id="successTaskName">-</strong></p>
+        </div>
+        <div class="eta-status-pill-box">
+            <div class="eta-item">
+                <div class="pill-icon"><i class="fa-regular fa-clock"></i></div>
+                <div class="pill-text"><small>ETA</small><strong id="successEta">-</strong></div>
+            </div>
+            <div class="pill-divider"></div>
+            <div class="eta-item">
+                <div class="pill-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="pill-text"><small>STATUS</small><strong id="successStatus" style="color:#00a86b;">-</strong></div>
+            </div>
+        </div>
+        <button type="button" class="success-track-btn" onclick="goToTracking()">Track Status</button>
+        <div class="modal-footer-pagination">
+            <span class="nav-link" id="btnPrevRequest" onclick="prevRequest()">&lt; Previous</span>
+            <div class="dots" id="dotsContainer"></div>
+            <span class="nav-link" id="btnNextRequest" onclick="nextRequest()">Next &gt;</span>
+        </div>
+    </div>
+</div>
+
+<div id="guestPassModal" class="guest-pass-modal">
+    <div class="guest-pass-sheet">
+        <button type="button" class="guest-cancel-btn" onclick="closeGuestPassModal()">
+            <span class="cancel-arrow">‹</span>
+            <span>Back</span>
+        </button>
+        <div class="guest-request-card">
+            <div class="guest-request-header">
+                <div class="guest-header-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="7" r="3.2" stroke="currentColor" stroke-width="1.8" />
+                        <path d="M5.5 19.5C5.5 15.9 8.4 13 12 13C15.6 13 18.5 15.9 18.5 19.5"
+                              stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    </svg>
+                </div>
+            </div>
+            <div class="guest-request-body">
+                <h2>Request Guest Pass</h2>
+                <p class="guest-subtitle">How can we help with this?</p>
+                <div class="guest-field" style="margin-bottom: 16px;">
+                    <label for="guestRequestDateInput">REQUEST DATE <span>*</span></label>
+                    <input type="date" id="guestRequestDateInput" />
+                </div>
+                <div class="guest-field" style="margin-bottom: 16px;">
+                    <label for="guestRequestTimeInput">REQUEST TIME <span>*</span></label>
+                    <input type="time" id="guestRequestTimeInput" />
+                </div>
+                <div class="guest-field">
+                    <label for="guestName">GUEST NAME <span>*</span></label>
+                    <input type="text" id="guestName" placeholder="Enter guest name" autocomplete="off" />
+                </div>
+                <div class="guest-member-row">
+                    <label>ADD-ON MEMBERS?</label>
+                    <button type="button" class="add-member-btn" onclick="addGuestMember()">
+                        <span>+</span> Add a member
+                    </button>
+                </div>
+                <div id="guestMembersContainer"></div>
+                <div class="guest-field phone-field">
+                    <label for="guestPhone">PHONE NUMBER <span>*</span></label>
+                    <input type="tel" id="guestPhone" placeholder="Enter phone number" maxlength="15" autocomplete="off" />
+                    <div class="phone-help">We'll text the pass and entry instructions to this number.</div>
+                </div>
+                <button type="button" class="request-pass-btn" onclick="requestGuestPass()">
+                    Request Guest Pass
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="guestPassSentModal" class="guest-pass-modal">
+    <div class="guest-pass-sheet guest-pass-sheet--wide">
+        <button type="button" class="guest-cancel-btn guest-cancel-btn--dark" onclick="closeGuestPassSentModal()">
+            <span class="cancel-arrow">‹</span>
+            <span>Cancel Request</span>
+        </button>
+        <div class="sent-banner">
+            <div class="sent-banner__icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M4 6h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H8l-4 4V7a1 1 0 0 1 1-1z"
+                          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M8 11h8M8 14h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="sent-banner__text">
+                <strong>Pass sent to guest via SMS</strong>
+                <span>Delivered to <b id="sentBannerPhone">-</b> · Show this to security</span>
+            </div>
+        </div>
+        <div class="vp-card">
+            <div class="vp-header">
+                <div class="vp-header__left">
+                    <div class="vp-logo">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M4 20V7l8-4 8 4v13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 20v-5h6v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="vp-header__titles">
+                        <span class="vp-hospital">DIAL50 · HOSPITAL</span>
+                        <span class="vp-title">Visitor Pass</span>
+                    </div>
+                </div>
+                <div class="vp-approved">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>APPROVED</span>
+                </div>
+            </div>
+            <div class="vp-body">
+                <div class="vp-left">
+                    <div class="vp-meta__col" style="margin-bottom: 12px;">
+                        <span class="vp-label">
+                            <svg viewBox="0 0 24 24" fill="none" style="width:12px; height:12px; margin-right:4px;">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            REQUEST TIME
+                        </span>
+                        <strong id="sentRequestTime">-</strong>
+                    </div>
+                    <span class="vp-label">GUEST</span>
+                    <div class="vp-guest-name" id="sentGuestName">-</div>
+                    <div class="vp-visiting">
+                        <span class="vp-label">VISITING</span>
+                        <div class="vp-visiting__name" id="sentVisitingName">-</div>
+                        <div class="vp-visiting__room">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <circle cx="12" cy="10" r="2.4" stroke="currentColor" stroke-width="1.6" />
+                            </svg>
+                            <span id="sentRoom">-</span>
+                        </div>
+                    </div>
+                    <div class="vp-meta vp-meta--three">
+                        <div class="vp-meta__col">
+                            <span class="vp-label">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                PHONE
+                            </span>
+                            <strong id="sentPhone">-</strong>
+                        </div>
+                        <div class="vp-meta__col">
+                            <span class="vp-label">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                                    <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                TIME IN
+                            </span>
+                            <strong id="sentTimeIn">-</strong>
+                        </div>
+                    </div>
+                    <div class="vp-valid">
+                        <span class="vp-label">
+                            <svg viewBox="0 0 24 24" fill="none">
+                                <rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                            </svg>
+                            VALID UNTIL
+                        </span>
+                        <strong id="sentValidUntil">-</strong>
+                    </div>
+                </div>
+                <div class="vp-divider"></div>
+                <div class="vp-middle">
+                    <div class="vp-instr-header">
+                        <svg viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2l8 3v6c0 5-3.5 9.2-8 11-4.5-1.8-8-6-8-11V5l8-3z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>ENTRY INSTRUCTIONS</span>
+                    </div>
+                    <ol class="vp-instr-list">
+                        <li>Show this pass <b>+ a valid photo ID</b> at the main security desk.</li>
+                        <li>Maximum <b>2 visitors at a time</b> with the patient.</li>
+                        <li>Single-use pass — valid <b>only inside the time window</b> shown.</li>
+                        <li>Follow ward staff instructions; no food/flowers without approval.</li>
+                    </ol>
+                </div>
+                <div class="vp-divider"></div>
+                <div class="vp-right">
+                    <span class="vp-label">PASS CODE</span>
+                    <div class="vp-passcode" id="sentPassCode">-</div>
+                    <div class="vp-qr">
+                        <svg viewBox="0 0 80 80" fill="currentColor" aria-hidden="true">
+                            <rect x="0" y="0" width="80" height="80" fill="#eef2f7" />
+                            <rect x="6" y="6" width="20" height="20" fill="#1e293b" />
+                            <rect x="10" y="10" width="12" height="12" fill="#eef2f7" />
+                            <rect x="54" y="6" width="20" height="20" fill="#1e293b" />
+                            <rect x="58" y="10" width="12" height="12" fill="#eef2f7" />
+                            <rect x="6" y="54" width="20" height="20" fill="#1e293b" />
+                            <rect x="10" y="58" width="12" height="12" fill="#eef2f7" />
+                            <rect x="32" y="6" width="4" height="4" fill="#1e293b" />
+                            <rect x="40" y="6" width="4" height="4" fill="#1e293b" />
+                            <rect x="32" y="16" width="4" height="4" fill="#1e293b" />
+                            <rect x="44" y="16" width="4" height="4" fill="#1e293b" />
+                            <rect x="32" y="32" width="4" height="4" fill="#1e293b" />
+                            <rect x="40" y="32" width="4" height="4" fill="#1e293b" />
+                            <rect x="48" y="32" width="4" height="4" fill="#1e293b" />
+                            <rect x="56" y="32" width="4" height="4" fill="#1e293b" />
+                            <rect x="64" y="32" width="4" height="4" fill="#1e293b" />
+                            <rect x="32" y="40" width="4" height="4" fill="#1e293b" />
+                            <rect x="48" y="40" width="4" height="4" fill="#1e293b" />
+                            <rect x="56" y="40" width="4" height="4" fill="#1e293b" />
+                            <rect x="32" y="48" width="4" height="4" fill="#1e293b" />
+                            <rect x="40" y="48" width="4" height="4" fill="#1e293b" />
+                            <rect x="48" y="48" width="4" height="4" fill="#1e293b" />
+                            <rect x="64" y="48" width="4" height="4" fill="#1e293b" />
+                            <rect x="32" y="56" width="4" height="4" fill="#1e293b" />
+                            <rect x="48" y="56" width="4" height="4" fill="#1e293b" />
+                            <rect x="56" y="56" width="4" height="4" fill="#1e293b" />
+                            <rect x="64" y="56" width="4" height="4" fill="#1e293b" />
+                            <rect x="40" y="64" width="4" height="4" fill="#1e293b" />
+                            <rect x="48" y="64" width="4" height="4" fill="#1e293b" />
+                            <rect x="64" y="64" width="4" height="4" fill="#1e293b" />
+                        </svg>
+                    </div>
+                    <span class="vp-scan">Scan at security</span>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="vp-done-btn" onclick="closeGuestPassSentModal()">
+            Done
+        </button>
+    </div>
+</div>
+
+<script>
+    var curpage = window.location.pathname.split("/").filter(Boolean).pop();
+
+    var urlParams = new URLSearchParams(window.location.search);
+    var urlBedInfo = urlParams.get('BedInfo');
+
+    if (urlBedInfo) {
+        sessionStorage.setItem('encryptedBedInfo', urlBedInfo);
+    }
+
+    function GoToCurrentRequest() {
+        BedContext.go('CurrentRequests/Index', { FromLoc: 'Logisitics' });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var buttons = document.querySelectorAll(".navBtn");
+
+        buttons.forEach(function (button) {
+            if (button.dataset.page === curpage)
+                button.classList.add("active");
+
+            button.addEventListener("click", function () {
+                var page = this.getAttribute("data-page");
+                if (!page) return;
+
+                var target = (page === 'FoodDining') ? 'FoodDining/FoodDining' : page;
+                BedContext.go(target);
+            });
+        });
+    });
+
+    window.__taskTypesRequest = fetch('/Logisitics/GetTaskTypes', { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .catch(function () { return []; });
+</script>
+
+<script src="~/js/layout_DailyCare.js" defer></script>
+<script src="~/js/Logistics.js" defer></script>
+
+<script>
+    (function () {
+        function stopEvent(e) {
+            if (!e) return;
+            e.preventDefault();
+            e.stopPropagation();
+            if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+        }
+
+        function isGuestPassCard(el) {
+            if (!el) return false;
+            if (el.dataset && el.dataset.action === "guest-pass") return true;
+            var titleEl = el.querySelector ? el.querySelector(".service-title") : null;
+            if (!titleEl) return false;
+            var text = (titleEl.textContent || "").trim().toUpperCase();
+            return text === "PREPARE GUEST PASS";
+        }
+
+        function pad(n) { return n < 10 ? "0" + n : "" + n; }
+
+        function nowTimeLabel() {
+            var d = new Date(), h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? "PM" : "AM";
+            h = h % 12; if (h === 0) h = 12;
+            return h + ":" + pad(m) + " " + ampm;
+        }
+
+        function validUntilLabel() {
+            var d = new Date();
+            d.setHours(d.getHours() + 4);
+            var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], h = d.getHours(), m = d.getMinutes(), ampm = h >= 12 ? "PM" : "AM";
+            h = h % 12; if (h === 0) h = 12;
+            return days[d.getDay()] + ", " + h + ":" + pad(m) + " " + ampm;
+        }
+
+        function randomPassCode() {
+            var chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", code = "";
+            for (var i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return "GP-" + code;
+        }
+
+        window.openGuestPassModal = function () {
+            var modal = document.getElementById("guestPassModal");
+            if (!modal) return;
+            modal.classList.add("is-open");
+            document.body.style.overflow = "hidden";
+            setTimeout(function () {
+                var g = document.getElementById("guestName");
+                if (g) g.focus();
+            }, 150);
+        };
+
+        window.closeGuestPassModal = function () {
+            var modal = document.getElementById("guestPassModal");
+            if (!modal) return;
+            modal.classList.remove("is-open");
+            document.body.style.overflow = "";
+            var name = document.getElementById("guestName"), phone = document.getElementById("guestPhone"), container = document.getElementById("guestMembersContainer");
+            if (name) name.value = "";
+            if (phone) phone.value = "";
+            if (container) container.innerHTML = "";
+        };
+
+        window.addGuestMember = function () {
+            var container = document.getElementById("guestMembersContainer");
+            if (!container) return;
+            var index = container.children.length + 1, id = "guestMember_" + index;
+            var div = document.createElement("div");
+            div.className = "guest-member-input";
+            div.id = id;
+            div.innerHTML = '<input type="text" placeholder="Member name" autocomplete="off">' +
+                '<button type="button" class="remove-member-btn" onclick="removeGuestMember(\'' + id + '\')">×</button>';
+            container.appendChild(div);
+        };
+
+        window.removeGuestMember = function (id) {
+            var m = document.getElementById(id);
+            if (m) m.remove();
+        };
+
+        window.requestGuestPass = function () {
+            var name = document.getElementById("guestName"), phone = document.getElementById("guestPhone");
+            if (!name || name.value.trim() === "") { if (name) name.focus(); return; }
+            if (!phone || phone.value.trim() === "") { if (phone) phone.focus(); return; }
+
+            var guestName = name.value.trim(), guestPhone = phone.value.trim(), passCode = randomPassCode();
+            var visitingName = sessionStorage.getItem("PatientName") || "Sarah Jenkins";
+            var roomLabel = sessionStorage.getItem("RoomBed") || sessionStorage.getItem("RoomNumber") || sessionStorage.getItem("BedNumber") || "Room 402";
+
+            if (roomLabel && roomLabel.indexOf("Room") !== 0 && roomLabel.indexOf("Bed") !== 0 && roomLabel.indexOf("Ward") !== 0) {
+                roomLabel = "Room " + roomLabel;
+            }
+
+            document.getElementById("sentGuestName").textContent = guestName;
+            document.getElementById("sentPhone").textContent = guestPhone;
+            document.getElementById("sentBannerPhone").textContent = guestPhone;
+            document.getElementById("sentPassCode").textContent = passCode;
+            document.getElementById("sentVisitingName").textContent = visitingName;
+            document.getElementById("sentRoom").textContent = roomLabel;
+            document.getElementById("sentTimeIn").textContent = nowTimeLabel();
+            document.getElementById("sentValidUntil").textContent = validUntilLabel();
+
+            window.closeGuestPassModal();
+
+            var sentModal = document.getElementById("guestPassSentModal");
+            if (sentModal) {
+                sentModal.classList.add("is-open");
+                document.body.style.overflow = "hidden";
+            }
+        };
+
+        window.closeGuestPassSentModal = function () {
+            var sentModal = document.getElementById("guestPassSentModal");
+            if (!sentModal) return;
+            sentModal.classList.remove("is-open");
+            document.body.style.overflow = "";
+        };
+
+        document.addEventListener("click", function (e) {
+            var card = e.target.closest(".service-card");
+            if (!card) return;
+            if (!isGuestPassCard(card)) return;
+            stopEvent(e);
+            window.openGuestPassModal();
+        }, true);
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key !== "Escape") return;
+            var modal = document.getElementById("guestPassModal"), sentModal = document.getElementById("guestPassSentModal");
+            if (modal && modal.classList.contains("is-open")) { window.closeGuestPassModal(); return; }
+            if (sentModal && sentModal.classList.contains("is-open")) window.closeGuestPassSentModal();
+        });
+    })();
+</script>

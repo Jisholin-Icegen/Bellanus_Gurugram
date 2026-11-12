@@ -1,0 +1,690 @@
+﻿@model Dial50_MVC_Core.Models.VerificationViewModel
+@{
+    Layout = null;
+
+    var statusRaw = (Model.Status ?? "INVALID").ToUpper();
+    var decisionRaw = (Model.Decision ?? "PENDING").ToUpper();
+
+    string statusColor;
+    string statusBg;
+    string statusBorder;
+    string statusIcon;
+
+    switch (statusRaw)
+    {
+        case "VALID":
+            statusColor = "#05603a"; statusBg = "#ecfdf3"; statusBorder = "#a6f4c5"; statusIcon = "✓"; break;
+        case "EXPIRED":
+            statusColor = "#912018"; statusBg = "#fef3f2"; statusBorder = "#fecdca"; statusIcon = "✕"; break;
+        case "ALREADY USED":
+            statusColor = "#93370d"; statusBg = "#fffaeb"; statusBorder = "#fedf89"; statusIcon = "!"; break;
+        case "REVOKED":
+            statusColor = "#7a271a"; statusBg = "#fef3f2"; statusBorder = "#fecdca"; statusIcon = "✕"; break;
+        case "NOT YET VALID":
+            statusColor = "#1849a9"; statusBg = "#eff8ff"; statusBorder = "#b2ddff"; statusIcon = "i"; break;
+        default:
+            statusColor = "#344054"; statusBg = "#f2f4f7"; statusBorder = "#d0d5dd"; statusIcon = "?"; break;
+    }
+
+    string decisionColor = "#344054";
+    string decisionBg = "#f9fafb";
+    string decisionBorder = "#eaecf0";
+    string decisionIcon = "";
+    string decisionLabel = "";
+
+    if (decisionRaw == "ALLOWED")
+    {
+        decisionColor = "#05603a";
+        decisionBg = "#ecfdf3";
+        decisionBorder = "#a6f4c5";
+        decisionIcon = "✓";
+        decisionLabel = "ENTRY ALLOWED";
+    }
+    else if (decisionRaw == "DENIED")
+    {
+        decisionColor = "#912018";
+        decisionBg = "#fef3f2";
+        decisionBorder = "#fecdca";
+        decisionIcon = "✕";
+        decisionLabel = "ENTRY DENIED";
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guest Pass Verification</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --ink-900: #101828;
+            --ink-700: #344054;
+            --ink-500: #667085;
+            --ink-400: #98a2b3;
+            --ink-200: #eaecf0;
+            --ink-100: #f2f4f7;
+            --ink-50: #f9fafb;
+            --brand-700: #6941c6;
+            --brand-600: #7f56d9;
+            --brand-500: #9b8afb;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background: #f7f9fc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--ink-900);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .page {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 24px 20px 48px;
+        }
+
+        /* ---------- STATUS BANNER ---------- */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 22px;
+            background: linear-gradient(180deg, @statusBg 0%, #ffffff 100%);
+            border: 1.5px solid @statusBorder;
+            border-radius: 16px;
+            margin-bottom: 22px;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.04);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .status::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 5px;
+                background: @statusColor;
+                opacity: 0.85;
+            }
+
+        .status__icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: @statusColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            flex-shrink: 0;
+            border: 2px solid @statusColor;
+            box-shadow: 0 4px 10px rgba(16,24,40,0.06);
+        }
+
+        .status__copy {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 0;
+        }
+
+        .status__label {
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: @statusColor;
+            opacity: 0.7;
+            font-weight: 700;
+        }
+
+        .status__value {
+            font-size: 19px;
+            font-weight: 800;
+            color: @statusColor;
+            letter-spacing: 0.3px;
+            margin-top: 4px;
+        }
+
+        /* ---------- CARD ---------- */
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--ink-200);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.04), 0 8px 24px rgba(16,24,40,0.04);
+        }
+
+        .card__bar {
+            background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+            padding: 18px 22px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand__mark {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+            .brand__mark svg {
+                width: 20px;
+                height: 20px;
+            }
+
+        .brand__text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+            min-width: 0;
+        }
+
+        .brand__hint {
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            opacity: 0.85;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .brand__name {
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255,255,255,0.16);
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.24);
+        }
+
+            .status-chip svg {
+                width: 12px;
+                height: 12px;
+            }
+
+        /* ---------- CARD BODY ---------- */
+        .card__body {
+            padding: 24px 22px 26px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+            .field:last-child {
+                margin-bottom: 0;
+            }
+
+        .field__label {
+            font-size: 10.5px;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--ink-400);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .field__value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--ink-900);
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .field__sub {
+            margin-top: 6px;
+            font-size: 12.5px;
+            color: var(--ink-500);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+            .field__sub .pill {
+                background: var(--ink-100);
+                color: var(--ink-700);
+                font-size: 12px;
+                padding: 3px 9px;
+                border-radius: 999px;
+                font-weight: 600;
+            }
+
+        .divider {
+            height: 1px;
+            background: var(--ink-200);
+            margin: 20px 0;
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+            .split .field {
+                margin-bottom: 0;
+            }
+
+            .split .field__value {
+                font-size: 15px;
+                font-weight: 600;
+            }
+
+        .passcode {
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', 'SF Mono', 'Courier New', monospace;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--brand-700);
+        }
+
+        /* ---------- ACTIONS ---------- */
+        .actions {
+            margin-top: 26px;
+        }
+
+        .actions__title {
+            font-size: 11px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: var(--ink-500);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+            .actions__title::before,
+            .actions__title::after {
+                content: "";
+                flex: 1;
+                height: 1px;
+                background: linear-gradient(90deg, transparent, var(--ink-200), transparent);
+            }
+
+        .actions__row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            font-size: 14.5px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.08s ease, box-shadow 0.2s ease, background 0.15s ease;
+            user-select: none;
+            width: 100%;
+        }
+
+            .btn svg {
+                width: 18px;
+                height: 18px;
+                stroke-width: 3;
+            }
+
+            .btn:hover {
+                transform: translateY(-1px);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn--allow {
+            background: linear-gradient(180deg, #12b76a 0%, #079455 100%);
+            color: #ffffff;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.1), 0 8px 20px rgba(7,148,85,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+        }
+
+            .btn--allow:hover {
+                background: linear-gradient(180deg, #14c877 0%, #07834b 100%);
+                box-shadow: 0 1px 2px rgba(16,24,40,0.1), 0 10px 24px rgba(7,148,85,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+            }
+
+        .btn--deny {
+            background: linear-gradient(180deg, #ffffff 0%, #fef3f2 100%);
+            color: #b42318;
+            border: 1.5px solid #fda29b;
+            box-shadow: 0 1px 2px rgba(16,24,40,0.04), inset 0 1px 0 #ffffff;
+        }
+
+            .btn--deny:hover {
+                background: linear-gradient(180deg, #fef3f2 0%, #fee4e2 100%);
+                border-color: #f97066;
+                box-shadow: 0 1px 2px rgba(16,24,40,0.06), 0 6px 16px rgba(180,35,24,0.12);
+            }
+
+        /* ---------- DECISION RESULT ---------- */
+        .decision {
+            margin-top: 22px;
+            padding: 20px 22px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, @decisionBg 0%, #ffffff 100%);
+            border: 1.5px solid @decisionBorder;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .decision::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 5px;
+                background: @decisionColor;
+                opacity: 0.85;
+            }
+
+        .decision__icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: @decisionColor;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 800;
+            border: 2px solid @decisionColor;
+            box-shadow: 0 4px 10px rgba(16,24,40,0.06);
+            flex-shrink: 0;
+        }
+
+        .decision__copy {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .decision__label {
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            color: @decisionColor;
+            opacity: 0.7;
+            font-weight: 700;
+        }
+
+        .decision__value {
+            font-size: 19px;
+            font-weight: 800;
+            color: @decisionColor;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .footnote {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--ink-200);
+            color: var(--ink-500);
+            font-size: 13px;
+            line-height: 1.55;
+            text-align: center;
+        }
+
+        .meta-foot {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 11.5px;
+            color: var(--ink-400);
+            letter-spacing: 0.3px;
+        }
+
+        @@media (max-width: 420px) {
+            .field__value {
+                font-size: 20px;
+            }
+
+            .passcode {
+                font-size: 22px;
+                letter-spacing: 2px;
+            }
+
+            .btn {
+                font-size: 13.5px;
+                padding: 14px 12px;
+            }
+
+                .btn svg {
+                    width: 16px;
+                    height: 16px;
+                }
+        }
+    </style>
+    <script src="~/js/language-switcher.js" asp-append-version="true"></script>
+</head>
+<body>
+    <div style="position:fixed;top:10px;inset-inline-end:10px;z-index:2000">
+        <partial name="_LanguageSwitcher" />
+    </div>
+    <div class="page">
+
+        <div class="status">
+            <div class="status__icon">@statusIcon</div>
+            <div class="status__copy">
+                <div class="status__label">Pass Status</div>
+                <div class="status__value">@statusRaw</div>
+            </div>
+        </div>
+
+        <div class="card">
+
+            <div class="card__bar">
+                <div class="brand">
+                    <div class="brand__mark">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 20V7l8-4 8 4v13" />
+                            <path d="M9 20v-5h6v5" />
+                        </svg>
+                    </div>
+                    <div class="brand__text">
+                        <span class="brand__hint">DIAL50 · HOSPITAL</span>
+                        <span class="brand__name">Visitor Pass</span>
+                    </div>
+                </div>
+                <div class="status-chip">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    APPROVED
+                </div>
+            </div>
+
+            <div class="card__body">
+
+                <div class="field">
+                    <div class="field__label">Guest</div>
+                    <div class="field__value">@Model.GuestName</div>
+                    @if (!string.IsNullOrWhiteSpace(Model.AdditionalMembers))
+                    {
+                        <div class="field__sub">
+                            <span class="pill">+ @Model.AdditionalMembers</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="field">
+                    <div class="field__label">Visiting</div>
+                    <div class="field__value" style="font-size:17px;">@Model.PatientName</div>
+                    <div class="field__sub">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" />
+                            <circle cx="12" cy="10" r="2.4" />
+                        </svg>
+                        @Model.RoomBed
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="field">
+                    <div class="field__label">Request Time</div>
+                    <div class="field__value">
+                        @(Model.RequestTime.HasValue
+                                                ? Model.RequestTime.Value.ToString("dd MMM · hh:mm tt")
+                                                : "—")
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="split">
+                    <div class="field">
+                        <div class="field__label">Phone</div>
+                        <div class="field__value">@Model.GuestPhone</div>
+                    </div>
+                    <div class="field">
+                        <div class="field__label">Valid From</div>
+                        <div class="field__value">@Model.ValidFrom.ToString("dd MMM · hh:mm tt")</div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="field">
+                    <div class="field__label">Valid Until</div>
+                    <div class="field__value">@Model.ValidUntil.ToString("dd MMM · hh:mm tt")</div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="field">
+                    <div class="field__label">Pass Code</div>
+                    <div class="passcode">@Model.PassCode</div>
+                </div>
+
+            </div>
+        </div>
+
+        @if (Model.CanAdmit)
+        {
+            <form asp-controller="GuestPass" asp-action="Allow" method="post" id="allowForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="token" value="@Model.Token" />
+            </form>
+
+            <form asp-controller="GuestPass" asp-action="Deny" method="post" id="denyForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="token" value="@Model.Token" />
+            </form>
+
+            <div class="actions">
+                <div class="actions__title">Security Decision</div>
+                <div class="actions__row">
+                    <button type="button" class="btn btn--allow"
+                            onclick="document.getElementById('allowForm').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        ACCEPT
+                    </button>
+
+                    <button type="button" class="btn btn--deny"
+                            onclick="document.getElementById('denyForm').submit();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                        REVOKE
+                    </button>
+                </div>
+            </div>
+        }
+        else if (decisionRaw == "ALLOWED" || decisionRaw == "DENIED")
+        {
+            <div class="decision">
+                <div class="decision__icon">@decisionIcon</div>
+                <div class="decision__copy">
+                    <div class="decision__label">Decision</div>
+                    <div class="decision__value">@decisionLabel</div>
+                </div>
+            </div>
+
+            <div class="footnote">
+                @if (decisionRaw == "ALLOWED")
+                {
+                    <span>Pass has been marked as used. It cannot be scanned again.</span>
+                }
+                else
+                {
+                    <span>Pass has been revoked. It cannot be used again.</span>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="footnote">Entry is not permitted with this pass.</div>
+        }
+
+        <div class="meta-foot">
+            Security Verification · @DateTime.Now.ToString("dd MMM yyyy · HH:mm")
+        </div>
+
+    </div>
+
+</body>
+</html>

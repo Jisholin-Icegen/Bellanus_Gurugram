@@ -1,0 +1,518 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+    <script src="~/js/jquery-3.7.1.min.js"></script>
+
+    <link rel="manifest" href='@Url.Content("~/manifest.json")' />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="apple-touch-icon" href='@Url.Content("~/images/pwa/icon-192.png")' />
+    <script>
+        window.PUSH_CONFIG = {
+            swUrl: '@Url.Content("~/sw.js")',
+            scope: '@Url.Content("~/")',
+            api: '@Url.Content("~/api/Push")'
+        };
+    </script>
+    <script src="~/js/push-client.js" asp-append-version="true"></script>
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            overscroll-behavior: none;
+            background: #f8fafc;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+            body > *:not(script):not(style) {
+                flex: 1 1 auto;
+                min-height: 0;
+                display: flex;
+                flex-direction: column;
+            }
+
+        .content {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        @@media (min-width: 481px) {
+            .content
+
+        {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        }
+        @@media (min-width: 835px) {
+            .content
+
+        {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
+
+        }
+
+        #sessionKickedOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 99999999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            touch-action: none;
+        }
+
+            #sessionKickedOverlay.show {
+                display: flex;
+                animation: fadeIn 0.3s ease-out both;
+            }
+
+        .kicked-modal {
+            position: relative;
+            width: min(400px, 100%);
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 32px 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .kicked-icon-wrap {
+            width: 72px;
+            height: 72px;
+            background: #fef2f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            position: relative;
+            box-shadow: 0 0 0 8px #fff;
+        }
+
+            .kicked-icon-wrap svg {
+                width: 34px;
+                height: 34px;
+                stroke: #ef4444;
+                stroke-width: 2;
+                fill: none;
+            }
+
+        .kicked-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+
+        .kicked-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #fee2e2;
+        }
+
+        .kicked-title {
+            margin: 0 0 12px;
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.5px;
+        }
+
+        .kicked-text {
+            margin: 0 0 24px;
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .kicked-timer-box {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+            .kicked-timer-box strong {
+                color: #ef4444;
+                font-weight: 700;
+                font-size: 18px;
+            }
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+
+        }
+        @@keyframes slideUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        }
+        @@media (max-width: 480px) {
+            .kicked-modal
+
+        {
+            padding: 28px 20px;
+        }
+
+        .kicked-title {
+            font-size: 20px;
+        }
+
+        }
+
+        #pushBanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 99990;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: calc(10px + env(safe-area-inset-top)) 14px 10px;
+            background: #eef2ff;
+            border-bottom: 1px solid #c7d2fe;
+            font-size: 13px;
+            color: #312e81;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body.push-dismissed #pushBanner {
+            display: none !important;
+        }
+
+        #pushBannerText {
+            flex: 1;
+        }
+
+        #enableNotifBtn {
+            background: #4f46e5;
+            color: #fff;
+            border: 0;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-weight: 700;
+        }
+
+        #pushBannerClose {
+            background: transparent;
+            border: 0;
+            font-size: 20px;
+            line-height: 1;
+            color: #6366f1;
+            padding: 0 4px;
+        }
+    </style>
+</head>
+<body>
+
+    @RenderBody()
+@* 
+    <div id="pushBanner">
+        <span id="pushBannerText">Get order and request updates as phone notifications</span>
+        <button type="button" id="enableNotifBtn">Turn on</button>
+        <button type="button" id="pushBannerClose" aria-label="Close">&times;</button>
+    </div>
+
+    <script>
+        (function () {
+            try { if (sessionStorage.getItem('pushDismissed') === '1') document.body.classList.add('push-dismissed'); } catch (e) { }
+            document.getElementById('pushBannerClose').addEventListener('click', function () {
+                document.body.classList.add('push-dismissed');
+                try { sessionStorage.setItem('pushDismissed', '1'); } catch (e) { }
+            });
+        })();
+    </script> *@
+
+    <div id="sessionKickedOverlay" role="dialog" aria-modal="true">
+        <div class="kicked-modal">
+            <div class="kicked-icon-wrap">
+                <svg viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+            </div>
+            <div class="kicked-badge">
+                <span class="kicked-badge-dot"></span>
+                Security Alert
+            </div>
+            <h2 class="kicked-title">Session Expired</h2>
+            <p class="kicked-text">
+                This session was opened on another device. For your security, this window has been logged out.
+            </p>
+            <div class="kicked-timer-box">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                Closing in <strong id="kickedTimerText">10</strong> seconds...
+            </div>
+        </div>
+    </div>
+
+@*     <script>
+        (function () {
+            "use strict";
+
+            var POLL_INTERVAL = 30000;
+
+            setTimeout(function() {
+
+                var bedKey = "";
+
+                if (window.BedContext && typeof BedContext.get === "function") {
+                    bedKey = BedContext.get().bedId;
+                }
+
+                if (!bedKey) {
+                    bedKey = new URLSearchParams(window.location.search).get("BedInfo") || "";
+                }
+
+                if (!bedKey) return;
+
+                var sessionState = {
+                    dead: false,
+                    initialized: false,
+                    sessionToken: null,
+                    timer: null,
+                    controller: null
+                };
+
+                var overlay = document.getElementById("sessionKickedOverlay");
+                var timerText = document.getElementById("kickedTimerText");
+
+                function stopActiveMedia() {
+                    try {
+
+                        document.querySelectorAll("video, audio").forEach(function (element) {
+                            try {
+                                if (element.srcObject && element.srcObject.getTracks) {
+                                    element.srcObject.getTracks().forEach(function (track) {
+                                        try { track.stop(); } catch (e) {}
+                                    });
+                                }
+                                element.pause();
+                                element.srcObject = null;
+                                element.removeAttribute("src");
+                                element.load();
+                            } catch (e) {}
+                        });
+                    } catch (e) {}
+                }
+
+                function stopApplicationServices() {
+
+                    var callSelectors = [
+                        ".call-screen", "#callScreen",
+                        ".video-container", "#videoContainer",
+                        ".agora-container", "#agora-container",
+                        ".call-overlay", "#callOverlay",
+                        "video"
+                    ];
+
+                    callSelectors.forEach(function(selector) {
+                        document.querySelectorAll(selector).forEach(function(el) {
+                            el.style.display = "none"; 
+                            el.style.visibility = "hidden";
+                            el.style.opacity = "0";
+                            el.style.pointerEvents = "none";
+
+                            setTimeout(function() {
+                                try { el.remove(); } catch(e) {}
+                            }, 50);
+                        });
+                    });
+                }
+
+                function terminateSession() {
+                    if (sessionState.dead) return;
+                    sessionState.dead = true;
+
+                    if (sessionState.timer) {
+                        clearInterval(sessionState.timer);
+                        sessionState.timer = null;
+                    }
+
+                    if (sessionState.controller) {
+                        try { sessionState.controller.abort(); } catch (e) {}
+                        sessionState.controller = null;
+                    }
+
+                    stopActiveMedia();
+                    stopApplicationServices();
+
+                    window.location.replace('/Home/Logout');
+                }
+
+                async function initSession() {
+                    try {
+                        var response = await fetch("/Home/ClaimSession?bedInfo=" + encodeURIComponent(bedKey), {
+                            method: "POST",
+                            credentials: "same-origin",
+                            cache: "no-store",
+                            headers: { "X-Requested-With": "XMLHttpRequest" }
+                        });
+
+                        if (response.status === 401 || response.status === 403) return;
+                        if (!response.ok) return;
+
+                        var data = await response.json();
+                        if (!data || !data.success || !data.token) return;
+
+                        sessionState.sessionToken = data.token;
+                        sessionState.initialized = true;
+                        startSessionMonitoring();
+                    } catch (error) {
+                        console.error("[SessionLock] Init failed:", error);
+                    }
+                }
+
+                async function checkSession() {
+                    if (sessionState.dead || !sessionState.initialized || !sessionState.sessionToken) return;
+
+                    if (document.hidden) return;
+
+                    try {
+                        sessionState.controller = new AbortController();
+
+                        var response = await fetch("/Home/CheckSession?bedInfo=" + encodeURIComponent(bedKey) + "&myToken=" + encodeURIComponent(sessionState.sessionToken), {
+                            method: "GET",
+                            credentials: "same-origin",
+                            cache: "no-store",
+                            signal: sessionState.controller.signal,
+                            headers: { "X-Requested-With": "XMLHttpRequest" }
+                        });
+
+                        sessionState.controller = null;
+
+                        if (response.status === 401 || response.status === 403) {
+                            terminateSession();
+                            return;
+                        }
+
+                        if (!response.ok) return;
+
+                        var data = await response.json();
+                        if (data && data.isActive === false) {
+                            terminateSession();
+                        }
+                    } catch (error) {
+                        sessionState.controller = null;
+                    }
+                }
+
+                function startSessionMonitoring() {
+                    if (sessionState.timer) clearInterval(sessionState.timer);
+                    sessionState.timer = setInterval(checkSession, POLL_INTERVAL);
+                }
+
+                document.addEventListener("visibilitychange", function() {
+                    if (!document.hidden && !sessionState.dead) {
+                        checkSession();
+                    }
+                });
+
+                initSession();
+            }, 100);
+        })();
+    </script> *@
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (!window.PushClient) return;
+
+            var roomBed = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Convert.ToString(ViewBag.RoomBed ?? "")))';
+            var bedInfo = '@Html.Raw(System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Convert.ToString(ViewBag.bedInfo ?? "")))';
+
+            if (window.BedContext && typeof BedContext.get === "function") {
+                var ctx = BedContext.get() || {};
+                if (!roomBed) roomBed = ctx.roomBed || "";
+                if (!bedInfo) bedInfo = ctx.bedInfo || "";
+            }
+
+            if (!bedInfo) {
+                try { bedInfo = sessionStorage.getItem("bedInfo") || ""; } catch (e) {}
+            }
+
+            if (!bedInfo) {
+                bedInfo = new URLSearchParams(window.location.search).get("BedInfo") || "";
+            }
+
+            if (bedInfo) {
+                try { sessionStorage.setItem("bedInfo", bedInfo); } catch (e) {}
+            }
+
+            if (roomBed && bedInfo) {
+                PushClient.init(roomBed);
+            }
+        });
+    </script>
+</body>
+</html>

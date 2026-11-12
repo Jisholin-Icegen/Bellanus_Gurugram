@@ -1,0 +1,56 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Educational Materials ::";
+}
+<link href="~/css/MyLibrary.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<style>
+    .icon-box {
+        width: 50px;
+        height: 50px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+</style>
+<div class="app-wrapper">
+    <partial name="_header"></partial>
+    <div class="mobile-header">
+        <button class="back-btn" onclick="goBackMDC()">←</button>
+        <div class="title">Educational Materials</div>
+    </div>
+    <div class="subtitle">
+        Learn more about your condition and recovery process.
+    </div>
+
+    <div id="materials-container" class="content" style="display: flow;"></div>
+
+    <partial name="_footer"></partial>
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+        var hospitalName = '@Model?.PatientName';
+        var bedNumber = '@Model?.BedNumber';
+
+
+        $("#HospitalName").html("Welcome " + hospitalName);
+        $("#RoomName").html(bedNumber);
+
+        });
+        function goBackMDC() {
+
+             var bedInfoEncrypt = '@ViewBag.bedInfoEncrypt';
+
+            var url = '@Url.Action("Index", "MyDailyCare")';
+             window.location.href = url + '?BedInfo='+encodeURIComponent( bedInfoEncrypt);
+
+
+        }
+    </script>
+</div>
+<script src="~/js/MyLibrary.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

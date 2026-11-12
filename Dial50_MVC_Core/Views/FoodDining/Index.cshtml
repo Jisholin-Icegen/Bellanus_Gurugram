@@ -1,0 +1,116 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+<link rel="stylesheet" href="~/css/Food.css">
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <input type="hidden" id="hdnTaskTypeId">
+    <div id="servicesContainer" class="content"></div>
+
+    <partial name="_footer"></partial>
+
+
+    <script>
+
+
+         var curpage = window.location.pathname.split("/").pop();
+
+         function GoToChat(){
+             BedContext.go('AI/Chat');
+         }
+         function GoToCurrentRequest(){
+             BedContext.go('CurrentRequests/Index', { FromLoc: 'FoodDining' });
+         }
+
+         document.addEventListener("DOMContentLoaded", function () {
+
+
+                 var hospitalName = '@Model?.PatientName';
+                 var bedNumber = '@Model?.BedNumber';
+                 var M_BedID = '@Model?.BedID';
+
+                 $("#HospitalName").html("Welcome " + hospitalName);
+                 $("#RoomName").html(bedNumber);
+
+
+                 var buttons = document.querySelectorAll(".navBtn");
+
+
+                 buttons.forEach(function (button) {
+
+
+                     if(button.dataset.page === curpage)
+                          button.classList.add("active")
+                     button.addEventListener("click", function () {
+                         var page = this.getAttribute("data-page");
+                         if (!page) return;
+                         BedContext.go(page === 'FoodDining' ? 'FoodDining/FoodDining' : page);
+                     });
+
+                    });
+
+
+
+        // GetTaskTypes();
+
+                $("#modalSubmit").click(function () {
+
+                 var remarks = $("#modalRemarks").val();
+                 var taskTypeId = $("#hdnTaskTypeId").val();
+
+                 var requestData = {
+                     BedID:'@Model?.BedID',
+                     CategoryId: taskTypeId,
+                     Remarks: remarks,
+                     quantity:'0'
+                 };
+
+                 $.ajax({
+                     url: "/api/Task/InsertTask",
+                     type: "POST",
+                     contentType: "application/json",
+                     data: JSON.stringify(requestData),
+                     success: function (response) {
+
+                        closeModal();
+                         GoToCurrentRequest();
+                     }
+                 });
+
+         });
+
+         });
+
+
+
+
+    </script>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <img id="modalIcon" src="" />
+            </div>
+            <div class="modal-body">
+                <h2 id="modalTitle"></h2>
+                <p>How can we help with this?</p>
+
+                <div class="details-label">Additional Details</div>
+                <textarea placeholder="Enter additional details" id="modalRemarks"></textarea>
+
+                <button class="confirm-btn" id="modalSubmit">Confirm Request</button>
+                <div class="cancel-btn" onclick="closeModal()">Cancel</div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>

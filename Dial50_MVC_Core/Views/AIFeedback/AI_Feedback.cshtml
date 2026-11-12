@@ -1,0 +1,360 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Patient Experience ::";
+    ViewData["UseCustomVoiceAgent"] = true;
+}
+
+<link rel="stylesheet" href="~/css/AI_Feedback.css">
+
+
+<style>
+    #callOverlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        z-index: 999999 !important;
+        background: #0f172a !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+        #callOverlay.gf-hidden {
+            display: none !important;
+        }
+
+        #callOverlay .gf-call-card {
+            width: 100% !important;
+            max-width: 430px !important; 
+            height: 100% !important;
+            max-height: 100dvh !important;
+            margin: 0 auto !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            background: transparent !important;
+        }
+
+    body:has(#callOverlay:not(.gf-hidden)) header,
+    body:has(#callOverlay:not(.gf-hidden)) .app-header,
+    body:has(#callOverlay:not(.gf-hidden)) footer,
+    body:has(#callOverlay:not(.gf-hidden)) .assistant-titlebar,
+    body:has(#callOverlay:not(.gf-hidden)) .content {
+        display: none !important;
+    }
+
+    body:has(#callOverlay:not(.gf-hidden)) .app-wrapper {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+    @@keyframes spin {
+        to
+
+    {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    .gf-cc-btn {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: inherit;
+    }
+
+        .gf-cc-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: #ffffff;
+        }
+
+    .gf-caption {
+        background: transparent;
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin-top: 10px;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        min-height: 44px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .gf-caption-hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+</style>
+<div class="app-wrapper gf-feedback-page">
+
+    <partial name="_header"></partial>
+
+    <div class="assistant-titlebar" id="assistantTitlebar">
+        <button type="button" class="assistant-back-btn" id="assistantBackBtn" aria-label="Go back" onclick="goBack()">
+            <img src="~/images/voice-agent/arrow.png" alt="Back" class="back-arrow-icon">
+        </button>
+        <h1 class="assistant-title">Patient Experience</h1>
+    </div>
+
+    <div class="content" id="pageContent">
+        <main>
+
+            <div id="screenIntro" class="gf-screen gf-intro-screen">
+
+                <h1 class="gf-headline">
+                    We hope you are recovering well
+                </h1>
+
+                <p class="gf-lede">
+                    Your feedback helps us serve you better. Please talk to Grace to share your feedback. Thank you
+                </p>
+                <div class="gf-grace-card">
+                    <div class="gf-avatar-wrap">
+                        <img src="~/images/voice-agent/ai_feedbackavatar.jpg" alt="Grace avatar" class="gf-avatar-img" onerror="this.style.display='none'; this.parentElement.classList.add('gf-avatar-fallback')" />
+                        <span class="gf-online-dot"></span>
+                    </div>
+                    <div class="gf-grace-name">Grace</div>
+                    <div class="gf-grace-role">Your discharge companion</div>
+
+                    <button type="button" id="talkToGraceBtn" class="gf-btn-primary gf-btn-full">
+                        <span class="gf-btn-icon-circle">
+                            <img src="~/images/voice-agent/chat.png" alt="" width="14" height="14" />
+                        </span>
+                        Talk to AI
+                    </button>
+                </div>
+
+                <button type="button" class="gf-classic-link" onclick="goToFeedback()">
+                    <img src="~/images/voice-agent/document.png" alt="" width="16" height="16" />
+                    Use the classic form
+                </button>
+            </div>
+
+            <div id="screenThanks" class="gf-screen gf-thanks-screen gf-hidden">
+
+                <div class="gf-thanks-check">
+                    <img src="~/images/voice-agent/tick.png" alt="" width="28" height="28" />
+                </div>
+
+                <p class="gf-lede gf-center">Your feedback is on its way. We've passed your notes<br>to the teams who can act on them.</p>
+
+                <ul class="gf-ack-list" id="thanksAckList">
+                </ul>
+
+                <div class="gf-recovery-box">
+                    <img src="~/images/voice-agent/heart.png" alt="" width="22" height="22" class="gf-heart-icon" />
+                    <div class="gf-recovery-title">Wishing you a speedy recovery.</div>
+                    <div class="gf-recovery-sub">Safe travels home from all of us at Dial50.</div>
+                </div>
+
+                <button type="button" id="doneBtn" class="gf-btn-ghost gf-btn-full">
+                    <img src="~/images/voice-agent/home.png" alt="" width="16" height="16" />
+                    Done
+                </button>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="callOverlay" class="gf-modal-overlay gf-hidden">
+        <div class="gf-call-card">
+
+            <div class="gf-call-top" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+
+                    <button type="button" id="callBackBtn" class="gf-cc-btn" onclick="closeCallOverlay()" title="Go back" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; line-height: 1;">
+                        &#10229;
+                    </button>
+
+                    <div class="gf-live-badge">
+                        <span class="gf-live-dot"></span>LIVE <span id="liveTimer">00:00</span>
+                    </div>
+                </div>
+
+                <button type="button" id="ccToggleBtn" class="gf-cc-btn" onclick="toggleCC()" title="Toggle Captions" style="width: 36px; height: 36px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                    CC
+                </button>
+            </div>            <div class="gf-call-avatar-wrap">
+                <div class="gf-call-avatar-ring"></div>
+                <img src="~/images/voice-agent/ai_feedbackavatar.jpg" alt="Grace" class="gf-call-avatar-img" onerror="this.style.display='none'; this.parentElement.classList.add('gf-avatar-fallback')" />
+            </div>
+
+            <div class="gf-call-grace-name">
+                Grace
+                <img src="~/images/voice-agent/shining.png" alt="Shining" class="gf-sparkle" />
+            </div>
+
+            <div class="gf-wave-bars gf-hidden" id="waveBars">
+                <span></span><span></span><span></span><span></span>
+            </div>
+
+            <div id="connectingSpinner" style="margin: 15px 0; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+
+            <p id="captionText" class="gf-caption gf-caption-hidden" style="text-align: center; color: #ffffff;">
+                Connecting...
+            </p>
+
+            <div class="gf-call-controls">
+                <div class="gf-ctrl-wrap">
+                    <button type="button" id="micToggleBtn" class="gf-circle-btn">
+                        <img src="~/images/voice-agent/mic.png" alt="" width="20" height="20" />
+                    </button>
+                    <span class="gf-ctrl-label">Mic</span>
+                </div>
+                <div class="gf-ctrl-wrap">
+                    <button type="button" id="endCallBtn" class="gf-circle-btn gf-circle-btn--end">
+                        <img src="~/images/voice-agent/decline.png" alt="" width="22" height="22" />
+                    </button>
+                    <span class="gf-ctrl-label">End</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="classicOverlay" class="gf-modal-overlay gf-hidden">
+        <div class="gf-classic-card">
+            <button type="button" id="classicCloseBtn" class="gf-summary-close" aria-label="Close">&times;</button>
+            <h2 class="gf-summary-title">Quick feedback</h2>
+            <p class="gf-summary-sub">Prefer not to chat? Fill this in instead.</p>
+
+            <div class="gf-classic-section">
+                <div class="gf-classic-label">How was your overall stay?</div>
+
+                <div class="gf-mood-row">
+                    <button type="button" class="gf-mood-btn" data-mood="satisfied">
+                        <img src="~/images/voice-agent/satisfaction.png"
+                             alt="Satisfied"
+                             class="gf-mood-img" />
+                        Satisfied
+                    </button>
+
+                    <button type="button" class="gf-mood-btn" data-mood="neutral">
+                        <img src="~/images/voice-agent/neutral.png"
+                             alt="Neutral"
+                             class="gf-mood-img" />
+                        Neutral
+                    </button>
+
+                    <button type="button" class="gf-mood-btn" data-mood="unsatisfied">
+                        <img src="~/images/voice-agent/Dissapointment.png"
+                             alt="Unsatisfied"
+                             class="gf-mood-img" />
+                        Unsatisfied
+                    </button>
+                </div>
+            </div>
+
+            <div class="gf-classic-section">
+                <div class="gf-classic-label">Anything you'd like to add?</div>
+                <textarea id="classicComments" class="gf-classic-textarea" placeholder="Optional comments..."></textarea>
+            </div>
+
+            <button type="button" id="classicSubmitBtn" class="gf-btn-primary gf-btn-full">Submit feedback</button>
+        </div>
+    </div>
+    <div id="summaryOverlay" class="gf-modal-overlay gf-hidden">
+
+        <div class="gf-summary-card">
+
+            <button type="button"
+                    id="summaryCloseBtn"
+                    class="gf-summary-close">
+                &times;
+            </button>
+
+            <h2 class="gf-summary-title">
+                Here's what I heard
+            </h2>
+
+            <p class="gf-summary-sub">
+                Please check it looks right before you send it.
+            </p>
+
+            <div id="summaryItems"></div>
+
+            @*                 <button type="button"
+                        id="submitFeedbackBtn"
+                        class="gf-btn-primary gf-btn-full">
+                    Looks good — submit my feedback
+
+                    <img src="~/images/voice-agent/arrow%20(2).png"
+                         alt=""
+                         width="16"
+                         height="16">
+                </button> *@
+
+            <button type="button"
+                    id="talkAgainBtn"
+                    class="gf-btn-text gf-btn-full">
+
+                <img src="~/images/voice-agent/refresh.png"
+                     alt=""
+                     width="14"
+                     height="14">
+
+                Talk to Grace again
+            </button>
+
+        </div>
+
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <script>
+        const bed = BedContext.get();
+        const GF_BED_ID = bed.bedId;                         
+        const GF_PATIENT_NAME = bed.patientName || "there";
+
+        function closeCallOverlay() {
+            const callOverlay = document.getElementById('callOverlay');
+            if (callOverlay) {
+                callOverlay.classList.add('gf-hidden');
+            }
+            showScreen('screenIntro');
+        }
+
+        function goBack() {
+            BedContext.go('DischargeFeedback');
+        }
+
+        function GoToCurrentRequest() {
+            window.location.href = '@Url.Action("Index", "CurrentRequests")';
+        }
+
+        function UseClassicForm() {
+            window.location.href = '@Url.Action("Feedback", "Home")';
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.gf-screen').forEach(s =>
+                s.classList.add('gf-hidden')
+            );
+
+            document.getElementById(id).classList.remove('gf-hidden');
+
+            document.getElementById('pageContent').scrollTop = 0;
+            window.scrollTo(0, 0);
+        }
+    </script>
+
+</div>
+<script src="~/js/config.js"></script>
+<script src="~/js/AI_Feedback.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

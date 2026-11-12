@@ -1,0 +1,316 @@
+﻿@* @model BedInfo
+
+@{
+    ViewData["Title"] = ":: My Requests::";
+}
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/MyRequest.css">
+
+<style>
+    .content {
+        overflow-y: hidden !important;
+        max-height: calc(100vh) !important;
+        justify-content: flex-start !important;
+        flex-direction: column !important;
+        display: flex !important;
+    }
+
+    #taskContainer {
+        overflow-y: auto !important;
+        max-height: calc(100vh - 210px) !important;
+    }
+</style>
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+
+    <div class="content">
+        <div class="mobile-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h4 class="title"> Requests & Complaints</h4>
+
+            <label class="divchkComplaint">
+                <h4> <input type="checkbox" id="complaintFilter"> Complaints </h4>
+            </label>
+        </div>
+
+        <div id="taskContainer"></div>
+        <div id="toastNotification" class="toast-msg">
+            Porter not assigned yet
+        </div>
+    </div>
+    <partial name="_footer"></partial>
+
+    <script>
+        var urlParams  = new URLSearchParams(window.location.search);
+        var urlBedInfo = urlParams.get('BedInfo');
+        var urlRegion  = urlParams.get('region');
+
+        var bedInfo = urlBedInfo || '@ViewBag.bedInfo' || '';
+        var userId  = urlBedInfo || '@ViewBag.bedInfo' || '';
+        var region  = urlRegion  || '@ViewBag.Region'  || '';
+
+        if (bedInfo) {
+            sessionStorage.setItem('bedInfo', bedInfo);
+            sessionStorage.setItem('BedId', bedInfo);
+            sessionStorage.setItem('userId', userId);
+        }
+        if (region) sessionStorage.setItem('region', region);
+
+        var serverPatientName = '@ViewBag.PatientName';
+        var serverRoomNumber  = '@ViewBag.RoomNumber';
+        var serverBed         = '@ViewBag.BedNumber';
+        var serverRoomBed     = '@ViewBag.RoomBed';
+        var serverWard        = '@ViewBag.Ward';
+        var serverUhid        = '@ViewBag.Uhid';
+        var serverGender      = '@ViewBag.Gender';
+        var serverAge         = '@ViewBag.Age';
+        var serverDietType    = '@ViewBag.DietType';
+        var serverAllergies   = '@ViewBag.Allergies';
+        var serverHasPatient  = '@ViewBag.HasPatient' === 'True';
+
+        if (serverPatientName) sessionStorage.setItem('PatientName', serverPatientName);
+        if (serverRoomNumber)  sessionStorage.setItem('RoomNumber',  serverRoomNumber);
+        if (serverBed)         sessionStorage.setItem('BedNumber',   serverBed);
+        if (serverRoomBed)     sessionStorage.setItem('RoomBed',     serverRoomBed);
+        if (serverWard)        sessionStorage.setItem('Ward',        serverWard);
+        if (serverUhid)        sessionStorage.setItem('Uhid',        serverUhid);
+        if (serverGender)      sessionStorage.setItem('Gender',      serverGender);
+        if (serverAge)         sessionStorage.setItem('Age',         serverAge);
+        if (serverDietType)    sessionStorage.setItem('DietType',    serverDietType);
+        if (serverAllergies)   sessionStorage.setItem('Allergies',   serverAllergies);
+
+        sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+        console.log('[MyRequests Bootstrap] bedInfo=', bedInfo,
+            '| patient=', serverPatientName,
+            '| room=', serverRoomNumber,
+            '| roomBed=', serverRoomBed);
+    </script>
+
+    <script>
+        function getBedInfoPlain() {
+            return new URLSearchParams(window.location.search).get('BedInfo')
+                || sessionStorage.getItem('bedInfo')
+                || sessionStorage.getItem('BedId')
+                || '';
+        }
+
+        function getBedId() {
+            return sessionStorage.getItem('BedId')
+                || getBedInfoPlain();
+        }
+
+        function getBedNumber() {
+            return sessionStorage.getItem('RoomBed')
+                || sessionStorage.getItem('BedNumber')
+                || '';
+        }
+
+        function getPatientName() {
+            return sessionStorage.getItem('PatientName') || '';
+        }
+
+        document.getElementById("complaintFilter").addEventListener("change", function () {
+            renderTasks(window.allTasks || []);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            $("#HospitalName").html("Welcome " + getPatientName());
+            $("#RoomName").html(getBedNumber());
+        });
+
+        function goBack() {
+            var bedInfoEncrypt = getBedInfoPlain();
+            var url = '@Url.Action("Index", "Home")';
+            window.location.href = url + '?BedInfo=' + encodeURIComponent(bedInfoEncrypt);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toastNotification");
+            toast.innerText = message;
+            toast.classList.add("show");
+            setTimeout(function () { toast.classList.remove("show"); }, 3000);
+        }
+
+        let selectedTaskId = null;
+        let selectedRating = 0;
+
+        function loadTasks() {
+            var bedId = encodeURIComponent(getBedId());
+            var bedNumber = encodeURIComponent(getBedNumber());
+
+            console.log('[MyRequests] GetTasks → BedId=' + bedId + ' BedNumber=' + bedNumber);
+
+            fetch('/MyRequests/GetTasks?BedId=' + bedId + '&BedNumber=' + bedNumber)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("GetTasks response:", data);
+
+                    if (!Array.isArray(data)) data = [];
+                    window.allTasks = data;
+                    renderTasks(data);
+                })
+                .catch(error => {
+                    console.error("Error loading tasks:", error);
+                    window.allTasks = [];
+                    renderTasks([]);
+                });
+        }
+
+        function renderTasks(tasks) {
+            let container = document.getElementById("taskContainer");
+            let complaintOnly = document.getElementById("complaintFilter").checked;
+
+            if (!Array.isArray(tasks)) tasks = [];
+            if (complaintOnly) tasks = tasks.filter(x => x && String(x.categoryId) === "3");
+
+            container.innerHTML = "";
+            if (!tasks.length) return;
+
+            tasks.forEach(task => {
+                if (!task) return;
+
+                let status = (task.status || task.RequestStatus || "").toString().toLowerCase();
+                let colorClass = "";
+
+                if (status === "pending") colorClass = "pending";
+                if (status === "assigned") colorClass = "assigned";
+                if (status === "completed") colorClass = "completed";
+
+                let porterName = task.porterName || task.PorterName || "";
+                let requestDate = "";
+
+                let rawDate = task.requestDate || task.RequestDate;
+                if (rawDate) {
+                    let date = new Date(rawDate);
+                    requestDate = date.toLocaleDateString("en-GB", {
+                        day: "2-digit", month: "short", year: "numeric"
+                    });
+                }
+
+                let taskId = task.taskId ?? task.RequestNo ?? task.requestId ?? "";
+
+                let ratingSection = "";
+                if (status === "completed") {
+                    ratingSection = `
+                    <div class="rating-stars"
+                         onclick="event.stopPropagation(); openRating('${taskId}')">
+                        <i class="bi bi-star"></i>
+                        <i class="bi bi-star"></i>
+                        <i class="bi bi-star"></i>
+                        <i class="bi bi-star"></i>
+                        <i class="bi bi-star"></i>
+                    </div>`;
+                }
+
+                let refreshIcon = status !== "completed"
+                    ? `<div class="refresh"><i class="bi bi-arrow-repeat"></i></div>` : "";
+
+                container.innerHTML += `
+                <div class="card ${colorClass}"
+                     onclick="handleActive('${status}', '${taskId}')"
+                     style="position:relative">
+
+                    <div class="row">
+                        <div>From Room: <b>${task.fromRoom ?? task.FROM ?? ""}</b></div>
+                        <div class="taskid">Task Id: ${taskId}</div>
+                    </div>
+
+                    <div class="row">
+                        <div>Task Name: ${task.taskName ?? task.CategoryName ?? ""}</div>
+                    </div>
+
+                    <div class="row">
+                        <div>Porter Name: <b>${porterName}</b></div>
+                    </div>
+
+                    <div class="status">Status: ${task.status ?? task.RequestStatus ?? ""}</div>
+
+                    <div class="row">
+                        <div>${requestDate}</div>
+                        <div>${ratingSection}</div>
+                    </div>
+
+                    ${refreshIcon}
+                </div>`;
+            });
+        }
+
+        function handleActive(status, taskId) {
+            if (status == "pending") {
+                showToast("Porter not assigned yet");
+            } else {
+                TrackRequest(taskId);
+            }
+        }
+
+        function TrackRequest(taskId) {
+            var bedInfoEncrypt = getBedInfoPlain();
+            window.location.href = 'Tracking?BedInfo=' + encodeURIComponent(bedInfoEncrypt) + '&RequestID=' + taskId;
+        }
+
+        function openRating(taskId) {
+            selectedTaskId = taskId;
+            document.getElementById("ratingModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("ratingModal").style.display = "none";
+        }
+
+        document.querySelectorAll("#modalStars i").forEach(star => {
+            star.addEventListener("click", function () {
+                selectedRating = this.dataset.val;
+                document.querySelectorAll("#modalStars i").forEach(s => s.classList.remove("active"));
+                for (let i = 0; i < selectedRating; i++) {
+                    document.querySelectorAll("#modalStars i")[i].classList.add("active");
+                }
+            });
+        });
+
+        function submitRating() {
+            let remarks = document.getElementById("remarks").value;
+
+            fetch('/Home/SubmitRating', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    TaskId: selectedTaskId,
+                    Rating: selectedRating,
+                    Remarks: remarks
+                })
+            }).then(() => {
+                alert("Thanks for your valuable feedback");
+                closeModal();
+                loadTasks();
+            });
+        }
+
+        loadTasks();
+    </script>
+
+    <div class="modal" id="ratingModal">
+        <div class="modal-content">
+            <h3>Rating Us</h3>
+            <p>Rate your experience</p>
+
+            <div class="rating-stars" id="modalStars">
+                <i class="bi bi-star" data-val="1"></i>
+                <i class="bi bi-star" data-val="2"></i>
+                <i class="bi bi-star" data-val="3"></i>
+                <i class="bi bi-star" data-val="4"></i>
+                <i class="bi bi-star" data-val="5"></i>
+            </div>
+
+            <textarea id="remarks" placeholder="Enter rating remarks"></textarea>
+
+            <button onclick="submitRating()">Submit</button>
+
+            <a class="cancel" onclick="closeModal()">Cancel</a>
+        </div>
+    </div>
+
+    <script src="~/js/layout_DailyCare.js"></script>
+</div> *@

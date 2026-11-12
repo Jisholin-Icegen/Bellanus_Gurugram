@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Dial50_MVC_Core\\Dial50_MVC_Core.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Hospital.API\\Hospital.API.csproj",
+        "Action": "StartWithoutDebugging"
+      }
+    ]
+  }
+]

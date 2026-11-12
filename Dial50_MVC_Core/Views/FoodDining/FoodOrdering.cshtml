@@ -1,0 +1,140 @@
+﻿@model BedInfo
+
+@{                  
+    ViewData["Title"] = ":: Food Services ::";
+}
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/css/Food.css">
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div id="servicesContainer" class="content food-content">
+        <div id="foodOrderingPage" class="order-selection-wrapper">
+            <div class="page-inner">
+                <div class="back-nav">
+                    <a onclick="goBackToFlow()" class="back-btn">
+                        <i class="fa-solid fa-arrow-left"></i> Back
+                    </a>
+                </div>
+                <div class="selection-header">
+                    <h1>Who is this order for?</h1>
+                    <p>Choose patient or visitor mode. Visitor orders are not filtered by the prescribed diet.</p>
+                </div>
+                <div id="npoAlertContainer"></div>
+                <div class="mode-stack">
+                    <div id="patientCard" class="selection-card patient-theme" onclick="selectOrderType('patient')">
+                        <div class="card-icon-clean"><i class="fa-regular fa-user"></i></div>
+                        <div class="card-text-content">
+                            <h3>For the Patient</h3>
+                            <p>Show only meals approved by the patient's prescribed diet plan.</p>
+                        </div>
+                    </div>
+                    <div class="selection-card visitor-theme" onclick="selectOrderType('visitor')">
+                        <div class="card-icon-clean"><i class="fa-solid fa-users"></i></div>
+                        <div class="card-text-content">
+                            <h3>For a Visitor / Companion</h3>
+                            <p>Show the full menu — visitors can order anything.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_footer"></partial>
+
+</div>
+
+<script>
+    var urlParams  = new URLSearchParams(window.location.search);
+    var urlBedInfo = urlParams.get('BedInfo');
+
+    var serverUserId  = '@(ViewBag.BedInfo ?? "")';
+    if (serverUserId) {
+        sessionStorage.setItem('realBedId', serverUserId);
+        sessionStorage.setItem('BedId', serverUserId);
+    }
+
+    if (urlBedInfo) sessionStorage.setItem('bedInfo', urlBedInfo);
+
+    var bedInfo = sessionStorage.getItem('bedInfo') || '';
+
+    var serverPatientName = '@ViewBag.PatientName';
+    var serverRoomNumber  = '@ViewBag.RoomNumber';
+    var serverBed         = '@ViewBag.BedNumber';
+    var serverRoomBed     = '@ViewBag.RoomBed';
+    var serverWard        = '@ViewBag.Ward';
+    var serverUhid        = '@ViewBag.Uhid';
+    var serverGender      = '@ViewBag.Gender';
+    var serverAge         = '@ViewBag.Age';
+    var serverDietType    = '@ViewBag.DietType';
+    var serverAllergies   = '@ViewBag.Allergies';
+    var serverHasPatient  = '@ViewBag.HasPatient' === 'True';
+
+    if (serverPatientName) sessionStorage.setItem('PatientName',  serverPatientName);
+    if (serverRoomNumber)  sessionStorage.setItem('RoomNumber',   serverRoomNumber);
+    if (serverBed)         sessionStorage.setItem('BedNumber',    serverBed);
+    if (serverRoomBed)     sessionStorage.setItem('RoomBed',      serverRoomBed);
+    if (serverWard)        sessionStorage.setItem('Ward',         serverWard);
+    if (serverUhid)        sessionStorage.setItem('Uhid',         serverUhid);
+    if (serverGender)      sessionStorage.setItem('Gender',       serverGender);
+    if (serverAge)         sessionStorage.setItem('Age',          serverAge);
+    if (serverDietType)    sessionStorage.setItem('DietType',     serverDietType);
+    if (serverAllergies)   sessionStorage.setItem('Allergies',    serverAllergies);
+
+    sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+    console.log('[FoodOrdering Bootstrap] bedInfo=', bedInfo,
+                '| patient=', serverPatientName,
+                '| room=', serverRoomNumber,
+                '| roomBed=', serverRoomBed);
+
+    if (typeof window.refreshHeaderFromSession === 'function') {
+        window.refreshHeaderFromSession();
+    }
+
+    let isPatientNpo = false;
+
+    if (bedInfo) {
+        checkNpoStatus(bedInfo);
+    }
+
+    function checkNpoStatus(room) {
+        $.ajax({
+            url: '/FoodDining/GetNpoStatus',
+            type: 'GET',
+            data: { roomNo: room },
+            success: function (res) {
+                if (res.isNpo) {
+                    isPatientNpo = true;
+                    showNpoUi(res.reason);
+                }
+            }
+        });
+    }
+
+    function selectOrderType(type) {
+        if (type === "patient" && isPatientNpo) {
+            return;
+        }
+        BedContext.go('FoodDining/PatientOrderMode', { orderType: type });
+    }
+    function goBackToFlow() {
+        BedContext.go('FoodDining');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var buttons = document.querySelectorAll(".navBtn");
+        buttons.forEach(function (button) {
+            if (button.dataset.page === "FoodDining") {
+                button.classList.add("active");
+            }
+        });
+    });
+</script>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>

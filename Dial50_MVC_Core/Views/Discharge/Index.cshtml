@@ -1,0 +1,71 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Discharge Plan ::";
+}
+
+<link href="~/css/Discharge.css" rel="stylesheet" />
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<style>
+    .icon-box {
+        width: 50px;
+        height: 50px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+</style>
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <div class="mobile-header">
+        <button class="back-btn" onclick="goBackMDC()">←</button>
+        <div class="title"><h1>My Discharge Plan</h1></div>
+    </div>
+    <div class="subtitle">
+        Track your progress towards going home. Estimated: Tomorrow, 10:00 AM.
+    </div>
+
+    <div class="content card">
+        <div class="progress-banner">
+            <div class="progress-left">
+                <div class="home-icon">🏠</div>
+                <div class="progress-text">
+                    <h3 id="progressTitle"></h3>
+                    <p id="progressDesc"></p>
+                </div>
+            </div>
+            <div class="progress-percentage" id="progressPercent"></div>
+        </div>
+
+        <div id="stepsContainer" style="display: flow;"></div>
+    </div>
+
+    <partial name="_footer"></partial>
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+        var hospitalName = '@Model?.PatientName';
+        var bedNumber = '@Model?.BedNumber';
+
+
+        $("#HospitalName").html("Welcome " + hospitalName);
+        $("#RoomName").html(bedNumber);
+
+        });
+        function goBackMDC() {
+
+             var bedInfoEncrypt = '@ViewBag.bedInfoEncrypt';
+
+            var url = '@Url.Action("Index", "MyDailyCare")';
+             window.location.href = url + '?BedInfo='+encodeURIComponent( bedInfoEncrypt);
+
+
+        }
+    </script>
+</div>
+<script src="~/js/Discharge.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

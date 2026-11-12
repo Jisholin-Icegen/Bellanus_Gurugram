@@ -1,0 +1,944 @@
+﻿@model TrackingRequestModel
+
+@{
+    ViewData["Title"] = ":: Live Tracking ::";
+}
+<style>
+    #TracKContainer {
+        overflow-y: auto !important;
+        height: 100vh !important;
+    }
+
+    #floating-buttons {
+        position: fixed;
+        bottom: 35vh !important;
+    }
+
+    .feedback-completed {
+        position: relative;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 28px 20px 22px;
+        margin: 18px 0 16px;
+        text-align: center;
+        box-sizing: border-box;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+        animation: feedbackPromptIn 0.35s ease-out;
+        outline: none;
+        transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+    }
+
+        .feedback-completed:focus,
+        .feedback-completed:focus-visible,
+        .feedback-completed:focus-within {
+            outline: none;
+            border-color: #a7f3d0;
+            transform: scale(0.985);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), 0 6px 18px rgba(16, 185, 129, 0.18);
+        }
+
+    .completed-icon {
+        width: 54px;
+        height: 54px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        box-shadow: none;
+    }
+
+        .completed-icon span {
+            font-size: 27px;
+            font-weight: 700;
+            color: #059669;
+            line-height: 1;
+        }
+
+    .completed-text {
+        margin: 0 0 5px;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.35;
+        letter-spacing: -0.15px;
+    }
+
+    .experience-text {
+        margin: 0 0 20px;
+        color: #64748b;
+        font-size: 13.5px;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    .feedback-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+        margin: 0;
+    }
+
+    .feedback-btn {
+        width: 100%;
+        min-height: 54px;
+        padding: 12px 18px;
+        border-radius: 11px;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        line-height: 1;
+        box-sizing: border-box;
+        outline: none;
+        transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+    }
+
+        .feedback-btn.satisfied {
+            background: #ffffff;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            box-shadow: 0 1px 3px rgba(16, 185, 129, 0.04);
+        }
+
+            .feedback-btn.satisfied::before {
+                content: "✓";
+                color: #10b981;
+                font-size: 17px;
+                font-weight: 700;
+            }
+
+            .feedback-btn.satisfied:hover {
+                background: #f0fdf4;
+                border-color: #6ee7b7;
+                box-shadow: 0 4px 10px rgba(16, 185, 129, 0.10);
+            }
+
+        .feedback-btn.unsatisfied {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            box-shadow: 0 1px 3px rgba(239, 68, 68, 0.03);
+        }
+
+            .feedback-btn.unsatisfied::before {
+                content: "×";
+                color: #ef4444;
+                font-size: 18px;
+                font-weight: 500;
+            }
+
+            .feedback-btn.unsatisfied:hover {
+                background: #fffafa;
+                border-color: #fca5a5;
+                box-shadow: 0 4px 10px rgba(239, 68, 68, 0.08);
+            }
+
+        .feedback-btn:active {
+            transform: scale(0.985);
+        }
+
+        .feedback-btn:focus,
+        .feedback-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .feedback-btn.satisfied:focus,
+        .feedback-btn.satisfied:focus-visible {
+            border-color: #6ee7b7;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+        }
+
+        .feedback-btn.unsatisfied:focus,
+        .feedback-btn.unsatisfied:focus-visible {
+            border-color: #fca5a5;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+
+    @@keyframes feedbackPromptIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 380px) {
+        .feedback-completed {
+            padding: 25px 16px 20px;
+            border-radius: 17px;
+        }
+
+        .completed-icon {
+            width: 52px;
+            height: 52px;
+        }
+
+        .completed-text {
+            font-size: 17px;
+        }
+
+        .experience-text {
+            font-size: 13px;
+        }
+
+        .feedback-btn {
+            min-height: 52px;
+        }
+    }
+
+    .feedback-thanks-overlay {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        z-index: 2147483000;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+        .feedback-thanks-overlay.show {
+            display: flex;
+            animation: feedbackThanksFade 0.22s ease-out;
+        }
+
+    .feedback-thanks-box {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 32px 24px 24px;
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+        animation: feedbackThanksPop 0.28s ease-out;
+        box-sizing: border-box;
+    }
+
+    .feedback-thanks-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ecfdf5;
+        border: 1px solid #bbf7d0;
+        font-size: 27px;
+        font-weight: 700;
+        color: #059669;
+        line-height: 1;
+    }
+
+    .feedback-thanks-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+        margin: 0 0 8px 0;
+        line-height: 1.3;
+        letter-spacing: -0.2px;
+    }
+
+    .feedback-thanks-sub {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0 0 22px 0;
+        line-height: 1.5;
+        padding: 0 4px;
+    }
+
+    .feedback-thanks-ok {
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        background: #10b981;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        padding: 14px 20px;
+        cursor: pointer;
+        transition: background-color 0.18s ease, transform 0.15s ease, box-shadow 0.18s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+        .feedback-thanks-ok:hover {
+            background: #059669;
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.32);
+        }
+
+        .feedback-thanks-ok:active {
+            transform: scale(0.98);
+        }
+
+        .feedback-thanks-ok:focus-visible {
+            outline: 3px solid rgba(59, 130, 246, 0.25);
+            outline-offset: 2px;
+        }
+
+    @@keyframes feedbackThanksFade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes feedbackThanksPop {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link href="~/css/Tracking.css" rel="stylesheet" />
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+
+    <div id="TracKContainer">
+        <div class="top-bar">
+            <div class="back-btn" onclick="goBackHome()">←</div>
+            <div>Bed No: <span class="bold" id="roomNumber"></span></div>
+            <div>Request No: <span class="bold" id="requestId"></span></div>
+        </div>
+
+        <div class="map-wrapper">
+            <div class="map-card">
+                <img id="mapImage" src="" alt="Map">
+                <div class="pin" id="pin">
+                    <div class="pin-pulse"></div>
+                    <div class="pin-core"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-wrapper">
+            <div class="info-card">
+
+                <div class="avatar-wrapper" id="porterImageWrapper" style="display:none;">
+                    <img id="porterImage" class="porter-avatar" src="/images/porter.png"
+                         onerror="this.onerror=null;this.src='/images/porter.png';" alt="Porter">
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Request Status:</span>
+                    <span class="value" id="requestStaus"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Arrival Time:</span>
+                    <span class="value" id="arrival"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Floor Name:</span>
+                    <span class="value" id="floor"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Zone Name:</span>
+                    <span class="value" id="zone"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Task Type:</span>
+                    <span class="value" id="task"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Porter Name:</span>
+                    <span class="value" id="porter"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Patient Name:</span>
+                    <span class="value" id="patientName"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Item Name:</span>
+                    <span class="value" id="itemName"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Quantity:</span>
+                    <span class="value" id="quantity"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Meal Type:</span>
+                    <span class="value" id="mealType"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="label">Special Instruction:</span>
+                    <span class="value" id="specialInstruction"></span>
+                </div>
+
+            </div>
+
+            <div id="trackingCard" class="tracking-card">
+
+                <div class="porter-header">
+
+                    <div class="porter-image-wrapper" id="trackingPorterWrapper" style="display:none;">
+                        <img id="trackingPorterImage" class="porter-image" src="/images/porter.png"
+                             onerror="this.onerror=null;this.src='/images/porter.png';" alt="Porter">
+
+                        <span class="porter-check">✓</span>
+                    </div>
+
+                    <div class="porter-info">
+
+                        <div id="trackingTitle" class="tracking-title">
+                            Need assistance
+                        </div>
+
+                        <div class="tracking-subtitle">
+                            <strong id="porterName">-</strong>
+                            <span id="trackingMessage"> is on the way</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="tracking-status">
+
+                    <div class="tracking-steps">
+
+                        <span data-step="1">
+                            RECEIVED
+                        </span>
+
+                        <span data-step="2">
+                            PREPARING
+                        </span>
+
+                        <span data-step="3">
+                            ON THE WAY
+                        </span>
+
+                        <span data-step="4">
+                            ARRIVED
+                        </span>
+
+                    </div>
+
+                    <div class="progress-container">
+
+                        <div id="trackingProgress"
+                             class="progress-bar">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div id="feedbackPrompt"
+                 class="feedback-completed"
+                 style="display:none;"
+                 role="region"
+                 aria-label="Service feedback">
+
+                <div class="completed-icon" aria-hidden="true">
+                    <span>✓</span>
+                </div>
+
+                <div class="completed-text">
+                    Service completed
+                </div>
+
+                <div class="experience-text">
+                    How was your experience?
+                </div>
+
+                <div class="feedback-buttons">
+
+                    <button type="button"
+                            id="satisfiedButton"
+                            class="feedback-btn satisfied"
+                            data-rating="1"
+                            onclick="submitFeedback(true)">
+                        <span>Satisfied</span>
+                    </button>
+
+                    <button type="button"
+                            id="unsatisfiedButton"
+                            class="feedback-btn unsatisfied"
+                            data-rating="0"
+                            onclick="submitFeedback(false)">
+                        <span>Unsatisfied</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="feedbackThanksOverlay" class="feedback-thanks-overlay" aria-hidden="true">
+        <div class="feedback-thanks-box">
+
+            <div class="feedback-thanks-icon">✓</div>
+
+            <div class="feedback-thanks-title">Thank you for your feedback</div>
+            <div class="feedback-thanks-sub">Your feedback helps us improve our service.</div>
+
+            <button type="button" class="feedback-thanks-ok" onclick="closeThanksAndGoHome()">OK</button>
+
+        </div>
+    </div>
+
+    <script>
+        var bed = BedContext.get();
+        var urlParams = new URLSearchParams(window.location.search);
+
+        var urlRequestId = urlParams.get('requestId') || urlParams.get('RequestID');
+        var urlOrderIds  = urlParams.get('orderIds');
+        var urlRoomNo    = urlParams.get('roomNo');
+
+        var requestIdSession = urlRequestId || sessionStorage.getItem('requestId') || '';
+        var orderIdsSession  = urlOrderIds  || sessionStorage.getItem('orderIds')  || '';
+
+        if (requestIdSession) sessionStorage.setItem('requestId', requestIdSession);
+        if (orderIdsSession)  sessionStorage.setItem('orderIds',  orderIdsSession);
+
+        var rating = 0;
+        var feedbackPromptShown = false;
+
+        function getBedInfo() {
+            return bed.bedInfo || '';
+        }
+
+        function getRegion() {
+            return bed.region || 'IN';
+        }
+
+        function getRoomNo() {
+            return urlRoomNo || bed.roomBed || bed.roomNumber || '';
+        }
+
+        function getRequestIdFromUrl() {
+            return urlParams.get('requestId') || urlParams.get('RequestID') || sessionStorage.getItem('requestId') || '';
+        }
+
+        function getOrderIdsFromUrl() {
+            return urlParams.get('orderIds') || sessionStorage.getItem('orderIds') || '';
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var mealTypeRow = document.getElementById("mealType").closest('.info-row');
+            if (mealTypeRow) mealTypeRow.style.display = 'none';
+
+            if (getOrderIdsFromUrl()) {
+                getTrackingInfoByOrderIds();
+            } else if (getRoomNo() || getRequestIdFromUrl()) {
+                getTrackingInfo();
+            } else {
+                console.warn("No tracking identifier found");
+            }
+
+            setTimeout(updateTime, 200);
+        });
+
+        function showFeedbackPrompt(show) {
+            var el = document.getElementById("feedbackPrompt");
+            if (!el) return;
+
+            if (show) {
+                el.style.display = "block";
+                el.setAttribute("tabindex", "-1");
+
+                if (!feedbackPromptShown) {
+                    feedbackPromptShown = true;
+
+                    setTimeout(function () {
+                        try {
+                            el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        } catch (e) {
+                            el.scrollIntoView(false);
+                        }
+                    }, 200);
+                }
+            } else {
+                el.style.display = "none";
+            }
+        }
+
+        function submitFeedback(isSatisfied) {
+            var reqId = getRequestIdFromUrl();
+
+            if (!reqId) {
+                if (typeof window.showToast === "function") {
+                    window.showToast("Request ID missing");
+                } else {
+                    alert("Request ID missing");
+                }
+                return;
+            }
+
+            $.ajax({
+                url: '/Tracking/SubmitRating',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RequestId: parseInt(reqId, 10),
+                    Rating: isSatisfied ? 1 : 0
+                }),
+                success: function (res) {
+                    if (res && res.success) {
+                        showFeedbackPrompt(false);
+
+                        var overlay = document.getElementById('feedbackThanksOverlay');
+                        if (overlay) {
+                            overlay.classList.add('show');
+                            overlay.setAttribute('aria-hidden', 'false');
+                        }
+                    } else {
+                        if (typeof window.showToast === "function") {
+                            window.showToast((res && res.message) || "Failed to submit feedback");
+                        } else {
+                            alert((res && res.message) || "Failed to submit feedback");
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    if (typeof window.showToast === "function") {
+                        window.showToast("Failed to submit feedback");
+                    } else {
+                        alert("Failed to submit feedback: " + xhr.status);
+                    }
+                }
+            });
+        }
+
+        function closeThanksAndGoHome() {
+            var overlay = document.getElementById('feedbackThanksOverlay');
+            if (overlay) {
+                overlay.classList.remove('show');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
+
+            BedContext.go('Home');
+        }
+
+        window.submitFeedback       = submitFeedback;
+        window.closeThanksAndGoHome = closeThanksAndGoHome;
+        window.showFeedbackPrompt   = showFeedbackPrompt;
+
+        $(".stars-trigger").click(function () {
+            $("#feedbackModal").css("display", "flex");
+        });
+
+        $("#closeFeedback").click(function () {
+            $("#feedbackModal").hide();
+        });
+
+        $(".star").click(function () {
+            rating = $(this).data("value");
+            $(".star").removeClass("active");
+            $(".star").each(function () {
+                if ($(this).data("value") <= rating)
+                    $(this).addClass("active");
+            });
+        });
+
+        function applyMapImage(floorName) {
+            var mapImg = document.getElementById("mapImage");
+            var defaultMap = "images/map/4TH_FLOOR.jpg";
+
+            if (floorName && floorName !== "" && floorName !== "null" && floorName !== "undefined") {
+                var clean = floorName.replace(/ /g, '_');
+                mapImg.src = clean.endsWith('.jpg')
+                    ? "images/map/" + encodeURIComponent(clean)
+                    : "images/map/" + encodeURIComponent(clean) + ".jpg";
+            } else {
+                mapImg.src = defaultMap;
+            }
+
+            mapImg.onerror = function () {
+                this.onerror = null;
+                this.src = defaultMap;
+            };
+        }
+
+        function pushTrackDataToPin(trackData) {
+            window.trackData = trackData;
+            if (typeof window.startMovement === "function") {
+                window.startMovement();
+            }
+        }
+
+        function loadDataForOrderIds(data) {
+            var trackData = (data && Array.isArray(data) && data.length > 0) ? data[0] : null;
+            if (!trackData) return;
+
+            document.getElementById("requestStaus").textContent = trackData.requestStatus || "-";
+            document.getElementById("roomNumber").textContent   = trackData.from || "-";
+            document.getElementById("requestId").textContent    = trackData.requestNo || "-";
+
+            applyMapImage(trackData.floorName);
+
+            document.getElementById("porterImage").src = trackData.porterImage || "/images/porter.png";
+            document.getElementById("arrival").textContent = trackData.etA_Display || trackData.eta || "-";
+            document.getElementById("floor").textContent   = trackData.floorName || "-";
+            document.getElementById("zone").textContent    = trackData.location || trackData.from || "-";
+            document.getElementById("task").textContent    = trackData.categoryName || trackData.mealtype || "-";
+            document.getElementById("porter").textContent  = trackData.porterName || "-";
+            document.getElementById("patientName").textContent = trackData.orderby || trackData.customeR_NAME || "-";
+            document.getElementById("itemName").textContent = trackData.itemname || "-";
+            document.getElementById("quantity").textContent = trackData.quantity || "-";
+
+            var statusForImg   = trackData.requestStatus   || "";
+            var statusIdForImg = trackData.requestStatusId || "";
+            updatePorterImages(trackData, statusForImg, statusIdForImg);
+
+            document.getElementById("mealType").textContent = trackData.mealtype || "-";
+            document.getElementById("mealType").closest('.info-row').style.display = 'flex';
+
+            document.getElementById("specialInstruction").textContent = trackData.specialinstruction || "-";
+
+            pushTrackDataToPin(trackData);
+
+            var status   = trackData.requestStatus || "";
+            var statusId = trackData.requestStatusId || "";
+            var isCompleted = status === "DELIVERED" || status === "Delivered" || statusId === "8";
+
+            showFeedbackPrompt(isCompleted);
+
+            var ratingValue = trackData.rating;
+            if (ratingValue && ratingValue != '0' && ratingValue != 0) {
+                setStarRating(parseInt(ratingValue), ".star");
+                setStarRating(parseInt(ratingValue), ".trigger-star");
+            }
+
+            var porterName = trackData.porterName || "-";
+            if (statusId) {
+                updateTrackingProgress(parseInt(statusId), porterName);
+            } else if (status === "In-Transit" || status === "In Transit") {
+                updateTrackingProgress(7, porterName);
+            } else if (status === "Delivered") {
+                updateTrackingProgress(8, porterName);
+            } else if (status === "Ready for Pickup") {
+                updateTrackingProgress(6, porterName);
+            } else if (status === "Preparing") {
+                updateTrackingProgress(3, porterName);
+            } else if (status === "Placed") {
+                updateTrackingProgress(1, porterName);
+            }
+        }
+
+        function loadData(data) {
+            var trackData = (data && !Array.isArray(data)) ? data
+                : (Array.isArray(data) && data.length > 0 ? data[0] : null);
+            if (!trackData) return;
+
+            var roomNo = getRoomNo() || "-";
+
+            document.getElementById("requestStaus").textContent =
+                trackData.requestStatus || trackData.RequestStatus || trackData.status || "-";
+            document.getElementById("roomNumber").textContent = roomNo;
+            document.getElementById("requestId").textContent =
+                trackData.requestNo || trackData.RequestNo || "-";
+
+            applyMapImage(trackData.floorName || trackData.FloorName);
+
+            document.getElementById("arrival").textContent =
+                trackData.etA_Display || trackData.ETA_Display
+                || trackData.eta || trackData.Eta
+                || trackData.estimateD_TIME || trackData.ESTIMATED_TIME || "-";
+
+            document.getElementById("floor").textContent =
+                trackData.floorName || trackData.FloorName || "-";
+
+            document.getElementById("zone").textContent =
+                trackData.location || trackData.Location
+                || trackData.from || trackData.FROM || "-";
+
+            document.getElementById("task").textContent =
+                trackData.categoryName || trackData.CategoryName
+                || trackData.ordertype || trackData.ORDERTYPE || "-";
+
+            var porterName = trackData.porterName || trackData.PorterName || "-";
+            document.getElementById("porter").textContent = porterName;
+
+            document.getElementById("patientName").textContent =
+                trackData.orderby || trackData.ORDERBY
+                || trackData.customeR_NAME || trackData.CUSTOMER_NAME || "-";
+
+            document.getElementById("itemName").textContent =
+                trackData.itemname || trackData.ITEMNAME || "-";
+
+            document.getElementById("quantity").textContent =
+                trackData.quantity || trackData.QUANTITY || "-";
+
+            document.getElementById("mealType").textContent = "";
+            document.getElementById("mealType").closest('.info-row').style.display = 'none';
+
+            document.getElementById("specialInstruction").textContent =
+                trackData.specialinstruction || trackData.SPECIALINSTRUCTION || "-";
+
+            var status   = trackData.requestStatus || trackData.RequestStatus || trackData.status || "";
+            var statusId = trackData.requestStatusId || trackData.RequestStatusId || "";
+
+            updatePorterImages(trackData, status, statusId);
+            pushTrackDataToPin(trackData);
+
+            var isCompleted = statusId === "6"
+                || status === "Completed" || status === "COMPLETED";
+
+            showFeedbackPrompt(isCompleted);
+
+            var ratingValue = trackData.rating || trackData.Rating;
+            if (ratingValue && ratingValue != '0' && ratingValue != 0) {
+                setStarRating(parseInt(ratingValue), ".star");
+                setStarRating(parseInt(ratingValue), ".trigger-star");
+            }
+
+            if (statusId) {
+                updateTrackingProgressForRequest(parseInt(statusId), porterName);
+            } else {
+                var upper = status.toUpperCase();
+                if (upper === "COMPLETED")        updateTrackingProgressForRequest(6, porterName);
+                else if (upper === "IN PROGRESS") updateTrackingProgressForRequest(4, porterName);
+                else if (upper === "ASSIGNED")    updateTrackingProgressForRequest(3, porterName);
+                else if (upper === "ACCEPTED")    updateTrackingProgressForRequest(2, porterName);
+                else if (upper === "PENDING")     updateTrackingProgressForRequest(1, porterName);
+                else if (upper === "CANCELLED")   updateTrackingProgressForRequest(7, porterName);
+                else if (upper === "ONHOLD")      updateTrackingProgressForRequest(8, porterName);
+            }
+        }
+
+        function goBackHome() {
+            BedContext.go('Home');
+        }
+
+        function setStarRating(ratingValue, ClassName) {
+            $(ClassName).removeClass("active");
+            $(ClassName).each(function () {
+                if ($(this).data("value") <= ratingValue) {
+                    $(this).addClass("active");
+                }
+            });
+        }
+
+        function getTrackingInfoByOrderIds() {
+            var orderIds = getOrderIdsFromUrl();
+            if (!orderIds) return;
+
+            $.ajax({
+                url: "/api/Task/GetTrackInfoByOrderIds",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ OrderIds: orderIds }),
+                success: function (response) {
+                    if (response && response.length > 0) {
+                        window.trackData = response[0];
+                        loadDataForOrderIds(response);
+                        if (typeof window.startMovement === "function") {
+                            window.startMovement();
+                        }
+                    } else {
+                        console.warn("No tracking info for OrderIds:", orderIds);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("GetTrackInfoByOrderIds failed:", xhr.status, xhr.responseText);
+                }
+            });
+        }
+
+        function getTrackingInfo() {
+            var roomNo    = getRoomNo();
+            var requestId = getRequestIdFromUrl();
+
+            if (!roomNo && !requestId) {
+                console.error("Neither RoomNo nor RequestId available.");
+                return;
+            }
+
+            $.ajax({
+                url: "/api/Task/GetTrackInfo",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    RoomNo: roomNo || null,
+                    RequestId: requestId || null
+                }),
+                success: function (response) {
+                    if (response) {
+                        window.trackData = response;
+                        loadData(response);
+                        if (typeof window.startMovement === "function") {
+                            window.startMovement();
+                        }
+                    } else {
+                        console.warn("No tracking info for:", roomNo, requestId);
+                    }
+                },
+                error: function (xhr) {
+                    console.error("GetTrackInfo failed:", xhr.status, xhr.responseText);
+                }
+            });
+        }
+
+        function updateTime() {
+            var el = document.getElementById("dynamic-time");
+            if (!el) return;
+
+            function refresh() {
+                var now = new Date();
+                el.innerText = now.toLocaleDateString((window.I18N ? I18N.locale() : "en-US"), {
+                    weekday: "long", month: "long", day: "numeric"
+                }) + " " + now.toLocaleTimeString((window.I18N ? I18N.locale() : "en-US"), {
+                    hour: "2-digit", minute: "2-digit", hour12: true
+                });
+            }
+            refresh();
+            setInterval(refresh, 60000);
+        }
+
+        setInterval(function () {
+            if (getOrderIdsFromUrl()) {
+                getTrackingInfoByOrderIds();
+            } else if (getRoomNo() || getRequestIdFromUrl()) {
+                getTrackingInfo();
+            }
+        }, 15000);
+
+    </script>
+
+    <partial name="_footer"></partial>
+</div>
+
+<script src="~/js/Tracking.js"></script>

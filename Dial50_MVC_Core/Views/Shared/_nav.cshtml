@@ -1,0 +1,148 @@
+﻿<div class="parent-nav" id="navContainer">
+    <button type="button" class="navBtn" data-page="Home" data-id="">
+        <div class="circle purple"><img src="~/images/chat.png" alt="Chat"></div>
+        <span>Communication</span>
+    </button>
+
+    <button type="button" class="navBtn" data-page="MyDailyCare" data-id="118">
+        <div class="circle teal"><img src="~/images/my_daily_care.png" alt="My Daily Care"></div>
+        <span>My Daily Care</span>
+    </button>
+
+    <button type="button" class="navBtn" data-page="RoomComfort" data-id="134">
+        <div class="circle blue"><img src="~/images/room_comfort.png" alt="Room"></div>
+        <span>Room & Comfort</span>
+    </button>
+
+    <button type="button" class="navBtn" data-page="FoodDining" data-id="115">
+        <div class="circle orange"><img src="~/images/food_dining.png" alt="Food"></div>
+        <span>Food & Dining</span>
+    </button>
+
+    <button type="button" class="navBtn" data-page="Logisitics" data-id="131">
+        <div class="circle violet"><img src="~/images/logistics.png" alt="Logistics"></div>
+        <span>Logistics</span>
+    </button>
+
+    <button type="button" class="navBtn feedbackBtn" data-page="DischargeFeedback">
+        <div class="circle pink">
+            <img src="~/images/FeedBackNav.png" alt="Feedback">
+        </div>
+        <span>Feedback</span>
+    </button>
+</div>
+
+<style>
+    .parent-nav {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1px;
+        width: 100%;
+        padding: 8px 3px 7px;
+        box-sizing: border-box;
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    .navBtn {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 7px;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        text-align: center;
+    }
+
+        .navBtn .circle {
+            width: 52px;
+            height: 52px;
+            min-width: 52px;
+            min-height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin: 0 auto;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+            .navBtn .circle img {
+                width: 28px;
+                height: 28px;
+                max-width: 28px;
+                max-height: 28px;
+                object-fit: contain;
+                display: block;
+                margin: 0;
+                padding: 0;
+            }
+
+        .navBtn span {
+            width: 100%;
+            min-height: 26px;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #172033;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 14px;
+            white-space: normal;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+    .circle.purple {
+        background: #7c3aed;
+    }
+
+    .circle.teal {
+        background: #14b8a6;
+    }
+
+    .circle.blue {
+        background: #3b82f6;
+    }
+
+    .circle.orange {
+        background: #ea580c;
+    }
+
+    .circle.violet {
+        background: #8b5cf6;
+    }
+
+    .circle.pink {
+        background: #E52B50;
+    }
+
+    .feedbackBtn .circle img {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+    }
+
+    .navBtn:focus {
+        outline: none;
+    }
+
+    .navBtn:active .circle {
+        transform: scale(0.96);
+    }
+</style>

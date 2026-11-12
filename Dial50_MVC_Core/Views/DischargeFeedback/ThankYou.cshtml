@@ -1,0 +1,204 @@
+﻿@{
+    ViewData["Title"] = ":: Thank You ::";
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    .content {
+        display: flex !important;
+        flex: 1;
+        min-height: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
+
+    main {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .thankyou-card {
+        max-width: 340px;
+        width: 100%;
+        padding: 28px 22px 24px;
+        background: #ffffff;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 5px 15px rgba(0, 0, 0, 0.04);
+    }
+
+    .thankyou-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #14b8a6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .thankyou-icon i {
+            font-size: 28px;
+            color: #ffffff;
+        }
+
+    .thankyou-card h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 800;
+        color: #172033;
+    }
+
+    .thankyou-card p {
+        margin: 0 0 20px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #6b7280;
+    }
+
+    .back-btn {
+        display: inline-block;
+        padding: 11px 24px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #635bff, #7c3aed);
+        color: #ffffff;
+        font-size: 13.5px;
+        font-weight: 700;
+        text-decoration: none;
+        box-shadow: 0 6px 14px rgba(99, 91, 255, 0.28);
+        transition: transform 0.1s ease, opacity 0.15s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+        .back-btn:hover {
+            opacity: 0.95;
+        }
+
+        .back-btn:active {
+            transform: scale(0.98);
+        }
+</style>
+
+<div class="app-wrapper">
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div class="assistant-titlebar" id="assistantTitlebar">
+        <button type="button" class="assistant-back-btn" id="assistantBackBtn" aria-label="Go back">
+            <img src="~/images/voice-agent/arrow.png" alt="Back" class="back-arrow-icon">
+        </button>
+        <h1 class="assistant-title">Thank You</h1>
+    </div>
+
+    <div class="content" id="pageContent">
+        <main>
+            <div class="thankyou-card">
+                <div class="thankyou-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2>Thank you!</h2>
+                <p>Your feedback has been submitted successfully. We appreciate you taking the time to help us improve.</p>
+                <button type="button" class="back-btn" onclick="goHome()">Back to Home</button>
+            </div>
+        </main>
+    </div>
+
+    <partial name="_footer"></partial>
+</div>
+
+<script>
+    (function () {
+        function setIfNotEmpty(key, value) {
+            if (value !== null && value !== undefined && String(value).trim() !== '') {
+                sessionStorage.setItem(key, value);
+            }
+        }
+
+        var urlParams  = new URLSearchParams(window.location.search);
+        var urlBedInfo = urlParams.get('BedInfo');
+
+        var fromUrlBedInfo = (urlBedInfo && urlBedInfo.trim() !== '') ? urlBedInfo : '';
+
+        var fromViewBagBedInfo   = '@ViewBag.bedInfo';
+        var fromViewBagBedId     = '@ViewBag.bedID';
+        var fromViewBagBedNumber = '@ViewBag.BedNumber';
+        var fromViewBagPatient   = '@ViewBag.PatientName';
+        var fromViewBagRoom      = '@ViewBag.RoomNumber';
+        var fromViewBagRoomBed   = '@ViewBag.RoomBed';
+        var fromViewBagWard      = '@ViewBag.Ward';
+        var fromViewBagUhid      = '@ViewBag.Uhid';
+        var fromViewBagGender    = '@ViewBag.Gender';
+        var fromViewBagAge       = '@ViewBag.Age';
+        var fromViewBagDietType  = '@ViewBag.DietType';
+        var fromViewBagAllergies = '@ViewBag.Allergies';
+
+        setIfNotEmpty('bedInfo', fromUrlBedInfo || fromViewBagBedInfo);
+        setIfNotEmpty('BedId',   fromUrlBedInfo || fromViewBagBedId);
+        setIfNotEmpty('userId',  fromUrlBedInfo || fromViewBagBedInfo);
+
+        setIfNotEmpty('PatientName', fromViewBagPatient);
+        setIfNotEmpty('RoomNumber',  fromViewBagRoom);
+        setIfNotEmpty('BedNumber',   fromViewBagBedNumber);
+        setIfNotEmpty('RoomBed',     fromViewBagRoomBed);
+        setIfNotEmpty('Ward',        fromViewBagWard);
+        setIfNotEmpty('Uhid',        fromViewBagUhid);
+        setIfNotEmpty('Gender',      fromViewBagGender);
+        setIfNotEmpty('Age',         fromViewBagAge);
+        setIfNotEmpty('DietType',    fromViewBagDietType);
+        setIfNotEmpty('Allergies',   fromViewBagAllergies);
+
+        if (fromViewBagPatient && fromViewBagPatient.trim() !== '') {
+            sessionStorage.setItem('hasPatient', '1');
+        }
+
+        if (!sessionStorage.getItem('BedId') && sessionStorage.getItem('bedInfo')) {
+            sessionStorage.setItem('BedId', sessionStorage.getItem('bedInfo'));
+        }
+    })();
+</script>
+
+<script>
+    function sessionGet(key) {
+        return sessionStorage.getItem(key) || '';
+    }
+
+    function resolveBedInfo() {
+        return new URLSearchParams(window.location.search).get('BedInfo')
+            || sessionGet('BedId')
+            || sessionGet('bedInfo')
+            || '';
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.body.setAttribute("data-state", "idle");
+    });
+
+    function goHome() {
+        var bedInfo = resolveBedInfo();
+
+        if (!bedInfo) {
+            window.location.href = '@Url.Action("Index", "Home")';
+            return;
+        }
+
+        window.location.href = '@Url.Action("Index", "Home")?BedInfo=' + encodeURIComponent(bedInfo);
+    }
+
+    window.goHome = goHome;
+</script>
+
+<script src="~/js/voice-agent/config.js"></script>
+<script src="~/js/voice-agent/script.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

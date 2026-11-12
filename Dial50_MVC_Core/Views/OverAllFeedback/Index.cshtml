@@ -1,0 +1,91 @@
+﻿@model BedInfo
+
+@{
+    ViewData["Title"] = ":: Feedback ::";
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/css/DailyCare.css" />
+<link rel="stylesheet" href="~/css/Feedback.css" />
+
+<div class="app-wrapper fb-page">
+    <partial name="_header" />
+    <partial name="_BedContext" />
+
+    <div class="content feedback-page-content" id="pageContent">
+        <main>
+            <div class="mobile-header">
+                <button type="button" class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+                <h4 class="title">Discharge Feedback</h4>
+                <div class="header-spacer"></div>
+            </div>
+
+            <div id="feedbackContainer">
+                <div class="feedback-header">
+                    <div class="patient-info">
+                        <span class="patient-name" id="patientNameDisplay"></span>
+                        <span class="patient-room" id="roomDisplay"></span>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-text">
+                            <span id="answeredCount">0</span> of <span id="totalQuestions">0</span> answered
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-percent" id="progressPercent">0% complete</div>
+                    </div>
+                </div>
+
+                <div class="feedback-subheader">
+                    <h2>How was your stay?</h2>
+                    <p>Tell us how satisfied you were with each area.</p>
+                </div>
+
+                <div id="questionsContainer"></div>
+            </div>
+
+            <div class="submit-wrapper">
+                <button type="button" class="submit-feedback-btn" id="submitFeedback" onclick="submitFeedback()" disabled>
+                    Submit Feedback
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <partial name="_footer" />
+</div>
+
+<div class="toast-message" id="toastMessage"></div>
+
+<div class="thankyou-overlay" id="thankyouModal">
+    <div class="thankyou-modal">
+        <div class="thankyou-icon">✓</div>
+        <h2>Thank you for sharing your experience.</h2>
+        <p>Your feedback helps us serve you better.</p>
+        <div class="reference" id="referenceNumber"></div>
+        <div class="helpline-section">
+            <div class="helpline-title">Hospital Helpline</div>
+            <div class="helpline-number">1800-DIAL-50</div>
+            <div class="helpline-sub">Open 24/7 — call us anytime if you have concerns.</div>
+        </div>
+        <button type="button" class="close-btn" onclick="closeThankYou()">Close</button>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/js/Feedback.js"></script>
+
+<script>
+    function goBack() {
+        BedContext.go('DischargeFeedback');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (typeof initFeedback === 'function') {
+            initFeedback();
+        }
+    });
+</script>
+
+@* <script src="~/js/layout_DailyCare.js"></script> *@

@@ -1,0 +1,338 @@
+﻿@model BedInfo
+
+@{
+    ViewData["Title"] = ":: My Requests::";
+}
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/MyTask.css">
+
+<style>
+    html, body {
+        height: 100% !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    body {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .section-title {
+        display: none;
+        padding: 0 16px;
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-weight: 800;
+        color: #64748b;
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+        .section-title.show {
+            display: block;
+        }
+
+    .empty-state {
+        text-align: center;
+        padding: 24px 16px;
+        color: #9ca3af;
+        font-size: 13.5px;
+    }
+
+    .req-status-pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        color: #fff;
+        margin-top: 6px;
+    }
+
+        .req-status-pill.pending {
+            background: #f59e0b;
+        }
+
+        .req-status-pill.accepted {
+            background: #3b82f6;
+        }
+
+        .req-status-pill.completed {
+            background: #16a34a;
+        }
+
+    /* ---------- App shell ---------- */
+    .app-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: 100vh !important;             /* fallback */
+        height: 100dvh !important;            /* modern */
+        max-height: 100dvh !important;        /* no vh fallback here */
+        overflow: hidden !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+        padding-top: env(safe-area-inset-top) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+        /* All chrome is non-scrolling */
+        .app-wrapper > .header,
+        .app-wrapper > header,
+        .app-wrapper > .mobile-header,
+        .app-wrapper > .bed-context,
+        .app-wrapper > #bedContext,
+        .app-wrapper > footer,
+        .app-wrapper > .footer {
+            flex: 0 0 auto !important;
+            margin-top: 0 !important;
+        }
+
+        .app-wrapper > footer,
+        .app-wrapper > .footer {
+            width: 100% !important;
+            position: relative !important;
+            z-index: 20;
+        }
+
+    /* ---------- THE scroll region ---------- */
+    .tasks-scroll-container {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;             /* CRITICAL */
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        width: 100% !important;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        box-sizing: border-box;
+    }
+
+    #activeList,
+    #completedList {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0 16px;
+        margin-bottom: 20px;
+    }
+
+    .refresh-btn {
+        position: fixed;
+        right: 20px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        background: #ffffff;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-size: 20px;
+        color: #1abc9c;
+        cursor: pointer;
+        z-index: 999;
+        transition: transform 0.2s;
+    }
+
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+
+    @@media (min-width: 768px) {
+        #activeList,
+        #completedList {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            padding: 0 24px;
+        }
+
+        .section-title {
+            padding: 0 24px;
+        }
+
+        .refresh-btn {
+            right: 24px;
+        }
+    }
+
+    @@media (min-width: 1024px) {
+        #activeList,
+        #completedList {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            padding: 0 32px;
+        }
+
+        .section-title {
+            padding: 0 32px;
+        }
+
+        .refresh-btn {
+            right: 32px;
+        }
+    }
+</style>
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_BedContext" />
+
+    <div class="header">
+        <button class="back-btn" onclick="goBack()" aria-label="Back">←</button>
+        <span>Request Details</span>
+    </div>
+
+    <div class="tasks-scroll-container">
+        <div class="section-title" id="activeTitle">ACTIVE</div>
+        <div id="activeList"></div>
+
+        <div class="section-title" id="completedTitle">RECENTLY COMPLETED</div>
+        <div id="completedList"></div>
+    </div>
+
+    <partial name="_footer"></partial>
+
+</div>
+
+<div class="refresh-btn" onclick="loadTasks()">↻</div>
+
+<div class="modal" id="feedbackModal">
+    <div class="modal-box">
+        <h3>Rate Your Experience</h3>
+
+        <div id="stars">
+            <span class="star" data="1">★</span>
+            <span class="star" data="2">★</span>
+            <span class="star" data="3">★</span>
+            <span class="star" data="4">★</span>
+            <span class="star" data="5">★</span>
+        </div>
+
+        <textarea id="remarks" placeholder="Enter remarks"></textarea>
+
+        <button onclick="submitFeedback()">Submit</button>
+
+        <a onclick="closeModal()">Cancel</a>
+    </div>
+</div>
+
+<div id="toastNotification" class="toast-msg">Porter not assigned yet</div>
+
+<script>
+    function showToast(message) {
+        var toast = document.getElementById("toastNotification");
+        if (!toast) return;
+
+        toast.innerText = message;
+        toast.style.position = "fixed";
+        toast.style.left = "50%";
+        toast.style.bottom = "calc(80px + env(safe-area-inset-bottom))";
+        toast.style.background = "#1f2937";
+        toast.style.color = "#ffffff";
+        toast.style.padding = "12px 22px";
+        toast.style.borderRadius = "24px";
+        toast.style.fontSize = "14px";
+        toast.style.fontWeight = "600";
+        toast.style.boxShadow = "0 8px 24px rgba(0,0,0,0.25)";
+        toast.style.zIndex = "9999";
+        toast.style.maxWidth = "85vw";
+        toast.style.textAlign = "center";
+        toast.style.pointerEvents = "none";
+        toast.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+        toast.style.opacity = "1";
+        toast.style.transform = "translateX(-50%) translateY(0)";
+
+        setTimeout(function () {
+            toast.style.opacity = "0";
+            toast.style.transform = "translateX(-50%) translateY(20px)";
+        }, 3000);
+    }
+
+    window.showToast = showToast;
+
+    function goBack() {
+        BedContext.go('Home');
+    }
+
+    function loadTasks() {
+        var bc = BedContext.get();
+        var bedId = encodeURIComponent(bc.bedId || '');
+        var bedNumber = encodeURIComponent(bc.bedNumber || '');
+
+        fetch('/MyRequests/GetTasks?BedId=' + bedId + '&BedNumber=' + bedNumber)
+            .then(res => res.json())
+            .then(data => {
+                if (!Array.isArray(data)) data = [];
+                window.allTasks = data;
+                renderTasks(data);
+                updateSectionVisibility();
+            })
+            .catch(() => {
+                window.allTasks = [];
+                renderTasks([]);
+                updateSectionVisibility();
+            });
+    }
+
+    function updateSectionVisibility() {
+        var activeList = document.getElementById('activeList');
+        var completedList = document.getElementById('completedList');
+        var activeTitle = document.getElementById('activeTitle');
+        var completedTitle = document.getElementById('completedTitle');
+
+        if (!activeList || !completedList) return;
+
+        var activeHasItems = activeList.children.length > 0;
+        var completedHasItems = completedList.children.length > 0;
+
+        activeTitle.classList.toggle('show', activeHasItems);
+        completedTitle.classList.toggle('show', completedHasItems);
+
+        if (!activeHasItems && !completedHasItems) {
+            activeTitle.classList.add('show');
+            activeTitle.textContent = 'ACTIVE';
+            activeList.innerHTML = '<div class="empty-state">No active requests right now.</div>';
+        }
+    }
+
+    function decorateStatusPills() {
+        var nodes = document.querySelectorAll('#activeList .req-status-pill, #completedList .req-status-pill');
+        nodes.forEach(function (node) {
+            var text = (node.textContent || '').trim().toLowerCase();
+            node.classList.remove('pending', 'accepted', 'completed');
+
+            if (text === 'pending') {
+                node.classList.add('pending');
+            } else if (text === 'accepted' || text === 'in progress' || text === 'inprogress') {
+                node.classList.add('accepted');
+            } else if (text === 'completed') {
+                node.classList.add('completed');
+            }
+        });
+    }
+</script>
+
+<script src="~/js/MyRequests.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>
+
+<script>
+    (function () {
+        var _origRenderTasks = window.renderTasks;
+        window.renderTasks = function (data) {
+            if (typeof _origRenderTasks === 'function') {
+                _origRenderTasks(data);
+            }
+            decorateStatusPills();
+            updateSectionVisibility();
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTasks();
+        });
+    })();
+</script>

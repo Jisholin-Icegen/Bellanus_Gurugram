@@ -1,0 +1,145 @@
+﻿@model BedInfo
+
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+
+<link rel="stylesheet" href="~/css/Food.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div id="servicesContainer" class="content food-content">
+        <div id="patientModePage" class="timing-selection-wrapper">
+            <div class="back-link-row">
+                <button type="button" class="back-btn-minimal" onclick="GoToOrderMode()">
+                    <i class="fa-solid fa-arrow-left"></i> Back
+                </button>
+            </div>
+            <div class="meta-pills-row">
+                <div class="pill pill-plain"><span id="pNameRoom"></span></div>
+                <div class="pill pill-green"><i class="fa-solid fa-plate-wheat"></i> <span id="pDietType"></span></div>
+                <div class="pill pill-red" id="allergyPill" style="display:none;"><i class="fa-solid fa-circle-exclamation"></i> <span id="pAllergy"></span></div>
+            </div>
+            <div class="selection-header">
+                <h1>How would you like to order?</h1>
+                <p>Choose between planning tomorrow's meals or ordering something right now.</p>
+            </div>
+            <div class="selection-cards-stack">
+                <div class="timing-card preorder-card" onclick="selectPatientMode('preorder')">
+                    <div class="icon-wrap"><i class="fa-regular fa-calendar-days"></i></div>
+                    <h3>Pre-order</h3>
+                    <p>Plan tomorrow's meals — select Breakfast, Lunch &amp; Dinner all at once so the kitchen can prepare ahead.</p>
+                </div>
+                <div class="timing-card ordernow-card" onclick="selectPatientMode('now')">
+                    <div class="icon-wrap"><i class="fa-solid fa-bolt-lightning"></i></div>
+                    <h3>Order Now</h3>
+                    <p>Instant request — order something right away, anytime you want. No limits.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <partial name="_footer"></partial>
+
+</div>
+
+<script>
+    var urlParams  = new URLSearchParams(window.location.search);
+    var urlBedInfo = urlParams.get('BedInfo');
+
+
+    var serverUserId  = '@(ViewBag.BedInfo ?? "")';
+    if (serverUserId) {
+        sessionStorage.setItem('realBedId', serverUserId);
+        sessionStorage.setItem('BedId', serverUserId);
+    }
+
+    var urlOrderType = urlParams.get('orderType') || 'patient';
+    sessionStorage.setItem("OrderType", urlOrderType);
+
+    if (urlBedInfo) sessionStorage.setItem('bedInfo', urlBedInfo);
+
+    var bedInfo = sessionStorage.getItem('bedInfo') || '';
+
+    var serverPatientName = '@ViewBag.PatientName';
+    var serverRoomNumber  = '@ViewBag.RoomNumber';
+    var serverBed         = '@ViewBag.BedNumber';
+    var serverRoomBed     = '@ViewBag.RoomBed';
+    var serverWard        = '@ViewBag.Ward';
+    var serverUhid        = '@ViewBag.Uhid';
+    var serverGender      = '@ViewBag.Gender';
+    var serverAge         = '@ViewBag.Age';
+    var serverDietType    = '@ViewBag.DietType';
+    var serverAllergies   = '@ViewBag.Allergies';
+    var serverHasPatient  = '@ViewBag.HasPatient' === 'True';
+
+    if (serverPatientName) sessionStorage.setItem('PatientName',  serverPatientName);
+    if (serverRoomNumber)  sessionStorage.setItem('RoomNumber',   serverRoomNumber);
+    if (serverBed)         sessionStorage.setItem('BedNumber',    serverBed);
+    if (serverRoomBed)     sessionStorage.setItem('RoomBed',      serverRoomBed);
+    if (serverWard)        sessionStorage.setItem('Ward',         serverWard);
+    if (serverUhid)        sessionStorage.setItem('Uhid',         serverUhid);
+    if (serverGender)      sessionStorage.setItem('Gender',       serverGender);
+    if (serverAge)         sessionStorage.setItem('Age',          serverAge);
+    if (serverDietType)    sessionStorage.setItem('DietType',     serverDietType);
+    if (serverAllergies)   sessionStorage.setItem('Allergies',    serverAllergies);
+
+    sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+    console.log('[PatientOrderMode Bootstrap] bedInfo=', bedInfo,
+                '| patient=', serverPatientName,
+                '| room=', serverRoomNumber,
+                '| roomBed=', serverRoomBed);
+
+    if (typeof window.refreshHeaderFromSession === 'function') {
+        window.refreshHeaderFromSession();
+    }
+
+
+     function selectPatientMode(mode) {
+        var type = sessionStorage.getItem('OrderType') || 'patient';
+        BedContext.go('FoodDining/MenuItems', { orderType: type, mode: mode });
+    }
+
+    function GoToOrderMode() {
+        BedContext.go('FoodDining/FoodOrdering');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var pName = BedContext.get().patientName || "Patient";
+        var pRoom = BedContext.get().roomBed || BedContext.get().roomNumber || "N/A";
+        var pDiet = BedContext.get().dietType || "Regular Diet";
+        var pAllergy = BedContext.get().allergies;
+
+        if (urlOrderType === 'visitor') {
+             $(".meta-pills-row").hide();
+            $(".selection-header p").text("Order for a visitor. The full menu is available.");
+        } else {
+            $("#pDietType").text(pDiet);
+            if (pAllergy && pAllergy !== "None" && pAllergy !== "") {
+                $("#pAllergy").text("Allergic to " + pAllergy);
+                $("#allergyPill").show();
+            }
+        }
+
+        $("#pNameRoom").text(pName + ' · Room ' + pRoom);
+        $("#pDietType").text(pDiet);
+
+        if (pAllergy && pAllergy !== "None" && pAllergy !== "") {
+            $("#pAllergy").text("Allergic to " + pAllergy);
+            $("#allergyPill").show();
+        }
+
+        var buttons = document.querySelectorAll(".navBtn");
+        buttons.forEach(function (button) {
+            if (button.dataset.page === "FoodDining") {
+                button.classList.add("active");
+            }
+        });
+    });
+</script>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>

@@ -1,0 +1,184 @@
+﻿@model Dial50_MVC_Core.Models.BedInfo
+
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/css/Food.css">
+
+<style>
+
+    #servicesContainer {
+        position: relative !important;
+    }
+
+</style>
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div id="servicesContainer">
+
+        <div class="food-sticky-header" style="position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+                <h1 style="margin: 0 0 4px 0;">Food &amp; Dining</h1>
+                <p style="margin: 0;">Order meals, track delivery, and check your diet plan.</p>
+            </div>
+            <button type="button" onclick="openVoiceAgent()" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #ffffff; border: none; border-radius: 30px; padding: 10px 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Order with Aria
+            </button>
+        </div>
+
+        @if (ViewBag.IsFoodOrderingShown == true)
+        {
+            <div class="food-card food-ordering" onclick="window.location.href='/FoodDining/FoodOrdering'">
+                <div class="card-pill">NEW ORDER</div>
+                <h3>Food Ordering</h3>
+                <p>Browse meals approved for your diet and place an order.</p>
+                <div class="card-link-row">
+                    <span>Order Now &rarr;</span>
+                </div>
+                <i class="fa-solid fa-utensils bg-icon"></i>
+            </div>
+        }
+
+        <div class="food-card my-orders" onclick="goTo('/FoodDining/MyOrders')">
+            <div class="card-pill">TRACK &amp; HISTORY</div>
+            <h3>My Orders</h3>
+            <p>Track active deliveries and view your order history.</p>
+            <div class="card-link-row">
+                <span>View orders &rarr;</span>
+            </div>
+            <i class="fa-solid fa-clipboard-list bg-icon"></i>
+        </div>
+
+        <div class="food-card other-services" onclick="goTo('/FoodDining/OtherServices')">
+            <div class="card-pill">BEDSIDE SUPPORT</div>
+            <h3>Other Services</h3>
+            <p>Extra condiments, utensils, tray pickup, drinking water, and more.</p>
+            <div class="card-link-row">
+                <span>Browse services &rarr;</span>
+            </div>
+            <i class="fa-solid fa-bell-concierge bg-icon"></i>
+        </div>
+
+    </div>
+
+    <div id="voiceAgentModal"
+         style="position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:rgba(15,23,42,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:2147483647;display:none;align-items:stretch;justify-content:stretch;padding:0;box-sizing:border-box;overflow:hidden;">
+
+        <div style="background:#ffffff;width:100%;height:100%;height:100dvh;max-width:none;max-height:none;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden;border:none;border-radius:0;box-shadow:none;">
+
+            <div style="padding:clamp(12px,2.5vw,18px) clamp(14px,3vw,22px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-shrink:0;background:linear-gradient(135deg,#ffffff,#f0fdfa);border-bottom:1px solid #e2e8f0;box-sizing:border-box;">
+
+                <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+
+                    <button type="button"
+                            id="assistantBackBtn"
+                            aria-label="Go back"
+                            onclick="closeVoiceAgent()"
+                            style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:none;border-radius:10px;background:#589a8b;color:#ffffff;font-size:18px;font-weight:600;cursor:pointer;flex:0 0 36px;transition:all 0.2s ease;box-shadow:0 2px 5px rgba(88,154,139,0.3);">
+
+                        <img src="/images/voice-agent/arrow.png"
+                             alt="Back"
+                             style="width:16px;height:16px;object-fit:contain;filter:brightness(0) invert(1);" />
+
+                    </button>
+@*                     <span style="width:36px;height:36px;flex:0 0 36px;display:flex;align-items:center;justify-content:center;background:#00b894;color:#ffffff;border-radius:12px;font-size:17px;box-shadow:0 2px 5px rgba(0,184,148,0.18);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </span> *@
+
+                    <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
+                        <h3 style="margin:0;font-size:clamp(16px,2.2vw,18px);font-weight:800;line-height:1.3;color:#172b4d;">
+                            Order with Aria
+                        </h3>
+
+                        <span style="display:block;font-size:clamp(10px,1.5vw,11px);font-weight:400;line-height:1.4;color:#8498b8;">
+                            AI-powered food ordering service
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div style="position:relative;flex:1 1 0;min-height:0;min-width:0;width:100%;overflow:hidden;background:#0f172a;">
+
+                <iframe id="voiceAgentIframe"
+                        src="about:blank"
+                        title="Aria Voice Ordering Assistant"
+                        allow="microphone;camera;autoplay"
+                        allowfullscreen
+                        style="position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;border:none;background:#0f172a;">
+                </iframe>
+
+            </div>
+
+            <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px clamp(12px,3vw,20px);padding-bottom:max(10px,env(safe-area-inset-bottom));background:#ffffff;border-top:1px solid #e2e8f0;box-sizing:border-box;">
+
+                <div style="display:flex;align-items:center;gap:8px;color:#64748b;font-size:12px;font-weight:600;min-width:0;">
+                    <span style="display:inline-block;width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.12);"></span>
+                    <span>Aria Voice Assistant</span>
+                </div>
+
+                <button type="button"
+                        onclick="closeVoiceAgent()"
+                        style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:11px 20px;background:linear-gradient(135deg,#e2e5e9,#cbd0d8);color:#374151;border:1px solid #b8c0ca;border-radius:30px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 4px 10px rgba(15,23,42,0.12);transition:all 0.2s ease;">
+                    <i class="fa-solid fa-utensils" style="color:#4b5563;font-size:14px;"></i>
+                    Browse Manually
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <partial name="_footer"></partial>
+</div>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>
+<script src="~/js/food-aria/food-config.js"></script>
+<script src="~/js/food-aria/food-script.js"></script>
+
+<script>
+
+    window.goTo = function (basePath) {
+        window.location.href = BedContext.url(basePath);
+    };
+
+        document.addEventListener('DOMContentLoaded', function () {
+        const voiceModal = document.getElementById('voiceAgentModal');
+        const voiceIframe = document.getElementById('voiceAgentIframe');
+
+        window.openVoiceAgent = function () {
+            if (!voiceIframe.getAttribute('data-loaded')) {
+                var bedInfo = (window.BedContext && window.BedContext.get().bedId) || '';
+
+                var url = new URL(window.FOOD_AI_CONFIG.appUrl);
+                if (bedInfo) url.searchParams.set('BedInfo', bedInfo);
+
+                voiceIframe.src = url.toString();
+                voiceIframe.setAttribute('data-loaded', 'true');
+            }
+
+            voiceModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeVoiceAgent = function () {
+            voiceModal.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        voiceModal.addEventListener('click', function (e) {
+            if (e.target === voiceModal) {
+                closeVoiceAgent();
+            }
+        });
+    });
+</script>

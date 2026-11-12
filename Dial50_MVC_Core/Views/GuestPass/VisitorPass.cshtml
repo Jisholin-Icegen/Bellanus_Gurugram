@@ -1,0 +1,482 @@
+﻿@model Dial50_MVC_Core.Models.VisitorPassViewModel
+@{
+    Layout = null;
+
+    var statusRaw = (Model.Status ?? "VALID").ToUpper();
+
+    string badgeText;
+    string badgeBg;
+    string badgeColor;
+    string badgeIcon;
+
+    switch (statusRaw)
+    {
+        case "VALID":
+            badgeText = "APPROVED"; badgeBg = "#00c48c"; badgeColor = "#ffffff"; badgeIcon = "✓";
+            break;
+        case "ALREADY USED":
+            badgeText = "ALREADY USED"; badgeBg = "#fef3c7"; badgeColor = "#92400e"; badgeIcon = "!";
+            break;
+        case "REVOKED":
+            badgeText = "REVOKED"; badgeBg = "#fee2e2"; badgeColor = "#991b1b"; badgeIcon = "✕";
+            break;
+        case "EXPIRED":
+            badgeText = "EXPIRED"; badgeBg = "#fee2e2"; badgeColor = "#991b1b"; badgeIcon = "✕";
+            break;
+        case "NOT YET VALID":
+            badgeText = "NOT YET VALID"; badgeBg = "#e1effe"; badgeColor = "#1e429f"; badgeIcon = "i";
+            break;
+        default:
+            badgeText = "INVALID"; badgeBg = "#e5e7eb"; badgeColor = "#374151"; badgeIcon = "?";
+            break;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visitor Pass</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 16px;
+            background: #eef2f7;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #1f2d3d;
+        }
+
+        .wrap {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .vp-card {
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+            margin-bottom: 14px;
+        }
+
+        .vp-header {
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .vp-header__left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vp-logo {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .vp-logo svg {
+                width: 20px;
+                height: 20px;
+            }
+
+        .vp-header__titles {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
+
+        .vp-hospital {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+        }
+
+        .vp-title {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .vp-approved {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+        }
+
+            .vp-approved svg {
+                width: 14px;
+                height: 14px;
+            }
+
+        .vp-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .vp-left, .vp-middle, .vp-right {
+            padding: 18px 16px;
+        }
+
+        .vp-divider {
+            width: 1px;
+            background: #e5e7eb;
+        }
+
+        .vp-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            letter-spacing: 1.4px;
+            color: #8b98a9;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .vp-guest-name {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1f2d3d;
+            margin-bottom: 10px;
+        }
+
+        .vp-members {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+
+        .vp-visiting-block {
+            border-top: 1px dashed #e5e7eb;
+            padding-top: 12px;
+        }
+
+        .vp-visiting__name {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .vp-visiting__room {
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+            .vp-visiting__room svg {
+                width: 12px;
+                height: 12px;
+            }
+
+        .vp-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .vp-meta__col strong {
+            display: block;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .vp-valid {
+            margin-top: 14px;
+            border-top: 1px dashed #e5e7eb;
+            padding-top: 12px;
+        }
+
+            .vp-valid strong {
+                display: block;
+                font-size: 13px;
+                margin-top: 2px;
+            }
+
+        .vp-middle {
+            background: #fffbeb;
+        }
+
+        .vp-instr-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #b45309;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+            .vp-instr-header svg {
+                width: 18px;
+                height: 18px;
+            }
+
+        .vp-instr-list {
+            margin: 0;
+            padding-left: 18px;
+            color: #78350f;
+            font-size: 12.5px;
+            line-height: 1.55;
+        }
+
+            .vp-instr-list li {
+                margin-bottom: 6px;
+            }
+
+        .vp-right {
+            text-align: center;
+        }
+
+        .vp-passcode {
+            font-size: 22px;
+            font-weight: 800;
+            color: #7c3aed;
+            letter-spacing: 2px;
+            margin: 4px 0 12px;
+        }
+
+        .vp-qr {
+            display: inline-block;
+            padding: 8px;
+            background: #eef2f7;
+            border-radius: 10px;
+        }
+
+            .vp-qr img {
+                display: block;
+                width: 120px;
+                height: 120px;
+            }
+
+        .vp-scan {
+            display: block;
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+
+        .vp-done-btn {
+            width: 100%;
+            margin-top: 6px;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #1e293b;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @@media (max-width: 520px) {
+            .vp-body {
+                grid-template-columns: 1fr;
+            }
+
+            .vp-divider {
+                display: none;
+            }
+
+            .vp-middle {
+                border-top: 1px dashed #e5e7eb;
+                border-bottom: 1px dashed #e5e7eb;
+            }
+        }
+    </style>
+    <script src="~/js/language-switcher.js" asp-append-version="true"></script>
+</head>
+<body>
+    <div style="position:fixed;top:10px;inset-inline-end:10px;z-index:2000">
+        <partial name="_LanguageSwitcher" />
+    </div>
+    <div class="wrap">
+
+        <div class="vp-card">
+
+            <div class="vp-header">
+                <div class="vp-header__left">
+                    <div class="vp-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 20V7l8-4 8 4v13" />
+                            <path d="M9 20v-5h6v5" />
+                        </svg>
+                    </div>
+                    <div class="vp-header__titles">
+                        <span class="vp-hospital">DIAL50 · HOSPITAL</span>
+                        <span class="vp-title">Visitor Pass</span>
+                    </div>
+                </div>
+                <div class="vp-approved" style="background:@badgeBg; color:@badgeColor;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        @if (badgeIcon == "✓")
+                        {
+                            <polyline points="20 6 9 17 4 12" />
+                        }
+                        else if (badgeIcon == "✕")
+                        {
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        }
+                        else if (badgeIcon == "!")
+                        {
+                            <line x1="12" y1="8" x2="12" y2="13" />
+                            <circle cx="12" cy="16" r="0.6" fill="currentColor" />
+                        }
+                        else if (badgeIcon == "i")
+                        {
+                            <circle cx="12" cy="12" r="9" />
+                            <line x1="12" y1="11" x2="12" y2="16" />
+                            <circle cx="12" cy="8" r="0.5" fill="currentColor" />
+                        }
+                        else
+                        {
+                            <circle cx="12" cy="12" r="9" />
+                        }
+                    </svg>
+                    <span>@badgeText</span>
+                </div>
+            </div>
+
+            <div class="vp-body">
+
+                <div class="vp-left">
+                    <span class="vp-label">GUEST</span>
+                    <div class="vp-guest-name">@Model.GuestName</div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.AdditionalMembers))
+                    {
+                        <div class="vp-members">+ more: @Model.AdditionalMembers</div>
+                    }
+
+                    <div class="vp-visiting-block">
+                        <span class="vp-label">VISITING</span>
+                        <div class="vp-visiting__name">@Model.PatientName</div>
+                        <div class="vp-visiting__room">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" />
+                                <circle cx="12" cy="10" r="2.4" />
+                            </svg>
+                            <span>@Model.RoomBed</span>
+                        </div>
+                    </div>
+
+                    <div class="vp-meta">
+                        <div class="vp-meta__col">
+                            <span class="vp-label">PHONE</span>
+                            <strong>@Model.GuestPhone</strong>
+                        </div>
+                        <div class="vp-meta__col">
+                            <span class="vp-label">TIME IN</span>
+                            <strong>@Model.ValidFrom.ToString("h:mm tt")</strong>
+                        </div>
+                    </div>
+
+                    <div class="vp-valid">
+                        <span class="vp-label">
+                            <svg viewBox="0 0 24 24" fill="none" style="width:12px; height:12px; margin-right:4px;">
+                                <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+                                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6"
+                                      stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            REQUEST TIME
+                        </span>
+                        <strong>
+                            @(Model.RequestTime.HasValue
+                                                        ? Model.RequestTime.Value.ToString("dd MMM yyyy · h:mm tt")
+                                                        : "—")
+                        </strong>
+                    </div>
+
+                    <div class="vp-valid">
+                        <span class="vp-label">VALID UNTIL</span>
+                        <strong>@Model.ValidUntil.ToString("ddd, h:mm tt")</strong>
+                    </div>
+                </div>
+
+                <div class="vp-divider"></div>
+
+                <div class="vp-middle">
+                    <div class="vp-instr-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2l8 3v6c0 5-3.5 9.2-8 11-4.5-1.8-8-6-8-11V5l8-3z" />
+                            <path d="M9 12l2 2 4-4" />
+                        </svg>
+                        <span>ENTRY INSTRUCTIONS</span>
+                    </div>
+                    <ol class="vp-instr-list">
+                        <li>Show this pass <b>+ a valid photo ID</b> at the main security desk.</li>
+                        <li>Maximum <b>2 visitors at a time</b> with the patient.</li>
+                        <li>Single-use pass — valid <b>only inside the time window</b> shown.</li>
+                        <li>Follow ward staff instructions; no food/flowers without approval.</li>
+                    </ol>
+                </div>
+
+                <div class="vp-divider"></div>
+
+                <div class="vp-right">
+                    <span class="vp-label">PASS CODE</span>
+                    <div class="vp-passcode">@Model.PassCode</div>
+
+                    <div class="vp-qr">
+                        <img src="@Model.QrImageUrl" alt="QR" />
+                    </div>
+
+                    <span class="vp-scan">Scan at security</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <button type="button" class="vp-done-btn" onclick="handleDone();">
+            Done
+        </button>
+
+        <script>
+            function handleDone() {
+                try { window.close(); } catch (e) { }
+
+                setTimeout(function () {
+                    if (!document.hidden) {
+                        if (window.history.length > 1) {
+                            window.history.back();
+                        } else {
+                            window.location.href = '/PreLanding';
+                        }
+                    }
+                }, 150);
+            }
+        </script>
+
+    </div>
+
+</body>
+</html>

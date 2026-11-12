@@ -1,0 +1,141 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/css/Food.css">
+
+<style>
+    #servicesContainer.orders-dashboard-page {
+        display: block !important;
+        grid-template-columns: none !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 24px 32px !important;
+    }
+
+    .dashboard-inner {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+</style>
+
+<!-- data-locale-base is required so Food.js can load the translations -->
+<div class="app-wrapper" data-locale-base="@Url.Content("~/locales/")">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div id="servicesContainer" class="content orders-dashboard-page">
+        <div id="cancel-toast" class="toast-notification-container" style="display:none;">
+            <div class="toast-content">
+                <i class="fas fa-check-circle toast-check-icon"></i>
+                <span id="toast-message-text" class="toast-text"></span>
+            </div>
+        </div>
+        <div class="dashboard-inner">
+            <div class="dashboard-top-nav">
+                <button class="btn-back-link" onclick="GoToBack()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+                <button class="btn-refresh-pill" onclick="location.reload()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <h2 class="page-title">My Orders</h2>
+            <p class="subtitle">Track all your meal orders — pre-orders and instant requests.</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="num" id="totalOrdersCount">0</div>
+                    <div class="label">TOTAL ORDERS</div>
+                </div>
+                <div class="stat-card active-stat">
+                    <div class="num" id="activeOrdersCount">0</div>
+                    <div class="label">ACTIVE</div>
+                </div>
+                <div class="stat-card success-stat">
+                    <div class="num" id="deliveredOrdersCount">0</div>
+                    <div class="label">DELIVERED</div>
+                </div>
+            </div>
+            @if (ViewBag.IsFoodOrderingShown == true)
+            {
+                <div class="preorder-planning-wrapper">
+                    <div class="planning-header">
+                        <div class="calendar-icon-box"><i class="fa-regular fa-calendar"></i></div>
+                        <div class="header-text">
+                            <small>TOMORROW'S PRE-ORDERS</small>
+                            <h3 id="tomorrowDateDisplay">Sun, Jul 5</h3>
+                            <p>No meals booked yet — plan ahead so the kitchen has time to prepare.</p>
+                        </div>
+                    </div>
+                    <button class="btn-plan-tomorrow" onclick="goTo('/FoodDining/PatientOrderMode')">
+                        <i class="fa-regular fa-calendar-plus"></i> Plan tomorrow
+                    </button>
+                    <div id="preorderList" class="meal-placeholders-stack"></div>
+                </div>
+            }
+            <div class="history-section">
+                <div class="history-title">TODAY &amp; EARLIER</div>
+                <div id="recentOrdersList">
+                    <div class="text-center p-3"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            await (window.i18nReady || Promise.resolve());
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            const today = new Date();
+            const tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+
+            $("#tomorrowDateDisplay").text(tomorrow.toLocaleDateString('en-US', options));
+
+            var bc = BedContext.get();
+            var actualRoom = bc.roomBed || bc.roomNumber;
+
+            if (actualRoom) {
+                loadOrdersDashboard(actualRoom);
+                setInterval(function () {
+                    loadOrdersDashboard(actualRoom);
+                }, 60000);
+            } else {
+                $("#recentOrdersList").html('<div class="text-center p-5 text-muted">Room information missing. Please rescan your QR code.</div>');
+            }
+
+            var curpage = window.location.pathname.split("/").pop();
+            var buttons = document.querySelectorAll(".navBtn");
+            buttons.forEach(function (button) {
+                if (button.dataset.page === "FoodDining") button.classList.add("active");
+            });
+        });
+
+        function GoToBack() {
+            BedContext.go('FoodDining');
+        }
+
+        function goTo(url) {
+            window.location.href = BedContext.url(url);
+        }
+
+        function processCancel(orderId) {
+            $.ajax({
+                url: '/FoodDining/CancelPreorder',
+                type: 'POST',
+                data: { orderId: orderId },
+                success: function (res) {
+                    if (res.success === true || res.success === "true") {
+                        location.reload();
+                    } else {
+                        alert("Order could not be cancelled.");
+                    }
+                }
+            });
+        }
+    </script>
+</div>
+
+<script src="~/js/Food.js"></script>

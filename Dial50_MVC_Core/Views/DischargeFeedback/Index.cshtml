@@ -1,0 +1,336 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Discharge Feedback ::";
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    .gf-discharge-page .content {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .gf-discharge-page .content > main {
+            width: 100%;
+            height: auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 18px 24px 18px;
+            margin: 0 auto;
+            gap: 8px;
+            box-sizing: border-box;
+            overflow: visible;
+            max-width: 640px;
+            flex: 0 0 auto;
+        }
+
+    .feedback-header {
+        flex-shrink: 0;
+    }
+
+        .feedback-header h2 {
+            margin: 6px 0 4px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #172033;
+            overflow-wrap: anywhere;
+        }
+
+        .feedback-header p {
+            margin: 0 0 12px;
+            font-size: 13.5px;
+            line-height: 1.45;
+            color: #6b7280;
+            overflow-wrap: anywhere;
+        }
+
+    .feedback-cta-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 14px;
+        flex-shrink: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .feedback-cta {
+        min-width: 0;
+        width: 100%;
+        border-radius: 16px;
+        padding: 24px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        min-height: 160px;
+        box-sizing: border-box;
+    }
+
+        .feedback-cta:active {
+            transform: scale(0.97);
+        }
+
+        .feedback-cta.grace {
+            background: linear-gradient(150deg, #a94fd6, #7a5fe0);
+        }
+
+        .feedback-cta.manual {
+            background: linear-gradient(150deg, #3aa79f, #2f8f88);
+        }
+
+        .feedback-cta .cta-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.95;
+        }
+
+        .feedback-cta .cta-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 6px;
+        }
+
+        .feedback-cta .cta-sub {
+            font-size: 12.5px;
+            line-height: 1.35;
+            opacity: 0.9;
+        }
+
+    @@media (min-width: 600px) {
+        .gf-discharge-page .content > main {
+            padding: 32px 24px 40px 24px;
+            gap: 12px;
+            max-width: 720px;
+        }
+
+        .feedback-header h2 {
+            font-size: 24px;
+            margin: 8px 0 6px;
+        }
+
+        .feedback-header p {
+            font-size: 16px;
+            line-height: 1.55;
+            margin-bottom: 24px;
+        }
+
+        .feedback-cta-row {
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-cta {
+            min-height: 200px;
+            padding: 32px 24px;
+            border-radius: 20px;
+        }
+
+            .feedback-cta .cta-icon {
+                font-size: 48px;
+                margin-bottom: 16px;
+            }
+
+            .feedback-cta .cta-title {
+                font-size: 20px;
+            }
+
+            .feedback-cta .cta-sub {
+                font-size: 15px;
+            }
+    }
+
+    @@media (min-width: 1024px) {
+        .gf-discharge-page .content > main {
+            padding: 48px 32px 36px 32px;
+            max-width: 860px;
+        }
+
+        .feedback-header h2 {
+            font-size: 26px;
+        }
+
+        .feedback-cta {
+            min-height: 220px;
+        }
+
+            .feedback-cta .cta-icon {
+                font-size: 56px;
+            }
+
+            .feedback-cta .cta-title {
+                font-size: 22px;
+            }
+    }
+
+    @@media (max-height: 500px) {
+        .gf-discharge-page .content > main {
+            padding: 8px 14px 10px 14px;
+            gap: 6px;
+        }
+
+        .feedback-header h2 {
+            font-size: 16px;
+            margin: 2px 0 2px;
+        }
+
+        .feedback-header p {
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .feedback-cta-row {
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .feedback-cta {
+            min-height: 84px;
+            padding: 10px 12px;
+            border-radius: 14px;
+        }
+
+            .feedback-cta .cta-icon {
+                font-size: 22px;
+                margin-bottom: 4px;
+            }
+
+            .feedback-cta .cta-title {
+                font-size: 13px;
+            }
+
+            .feedback-cta .cta-sub {
+                font-size: 11px;
+            }
+    }
+
+    @@media (max-width: 359px) {
+        .feedback-cta-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .feedback-cta {
+            min-height: 104px;
+            padding: 14px 12px;
+        }
+
+            .feedback-cta .cta-icon {
+                font-size: 26px;
+                margin-bottom: 6px;
+            }
+    }
+</style>
+
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/voice-agent/styles.css">
+
+<div class="app-wrapper gf-discharge-page">
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div class="assistant-titlebar" id="assistantTitlebar">
+        <button type="button" class="assistant-back-btn" id="assistantBackBtn" aria-label="Go back">
+            <img src="~/images/voice-agent/arrow.png" alt="Back" class="back-arrow-icon">
+        </button>
+        <h1 class="assistant-title">Discharge Feedback</h1>
+    </div>
+
+    <div class="content" id="pageContent">
+        <main>
+
+            <div class="feedback-header">
+                <h2>We value your feedback</h2>
+                <p>
+                    Your feedback means a lot to us.
+                    Could you spare a moment to share your experience?
+                </p>
+            </div>
+
+            <div class="feedback-cta-row">
+                <a href="#" onclick="goToAIFeedback(); return false;" class="feedback-cta grace">
+                    <i class="fa-solid fa-headset cta-icon"></i>
+                    <div class="cta-title">Talk to AI</div>
+                    <div class="cta-sub">Voice-powered experience</div>
+                </a>
+                <a href="#" onclick="goToOverallFeedback(); return false;" class="feedback-cta manual">
+                    <i class="fa-solid fa-clipboard-list cta-icon"></i>
+                    <div class="cta-title">Guided Assessment</div>
+                    <div class="cta-sub">Structured feedback form</div>
+                </a>
+            </div>
+
+        </main>
+    </div>
+
+    <partial name="_footer"></partial>
+</div>
+
+<script>
+    function goToAIFeedback() {
+        var bed = BedContext.get();
+        if (!bed.bedInfo) {
+            alert('Session expired. Please scan the QR again.');
+            return;
+        }
+        window.location.href = '@Url.Action("Index", "AIFeedback")' + '?BedInfo=' + encodeURIComponent(bed.bedInfo);
+    }
+
+    function goToOverallFeedback() {
+        var bed = BedContext.get();
+        if (!bed.bedInfo) {
+            alert('Session expired. Please scan the QR again.');
+            return;
+        }
+        window.location.href = '/OverAllFeedback/Index?BedInfo=' + encodeURIComponent(bed.bedInfo);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var bed = BedContext.get();
+
+        var h = document.getElementById('HospitalName');
+        if (h && bed.patientName) h.textContent = 'Welcome ' + bed.patientName;
+
+        var r = document.getElementById('RoomName');
+        if (r && bed.roomBed) r.textContent = bed.roomBed;
+
+        var curpage = window.location.pathname.split("/").pop();
+        document.querySelectorAll(".navBtn").forEach(function (button) {
+            if (button.dataset.page === curpage) {
+                button.classList.add("active");
+            }
+
+            button.addEventListener("click", function () {
+                var page = this.getAttribute("data-page");
+                BedContext.go(page);
+            });
+        });
+
+        var backBtn = document.getElementById('assistantBackBtn');
+        if (backBtn) {
+            backBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                BedContext.go('DischargeFeedback');
+            });
+        }
+    });
+</script>
+
+<script src="~/js/voice-agent/config.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

@@ -1,0 +1,105 @@
+﻿@model BedInfo
+
+@{
+    ViewData["Title"] = ":: My Requests::";
+}
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/MyTask.css">
+
+<style>
+</style>
+
+<div class="app-wrapper">
+
+
+    <partial name="_header"></partial>
+
+
+
+    <div class="header">
+        Requests & Complaints
+
+        <div>
+            <input type="checkbox" id="complaintFilter"> Complaints
+        </div>
+
+    </div>
+
+    <div class="section-title">ACTIVE</div>
+    <div id="activeList"></div>
+
+    <div class="section-title">RECENTLY COMPLETED</div>
+    <div id="completedList"></div>
+
+</div>
+
+<div class="refresh-btn" onclick="loadTasks()">↻</div>
+
+
+<!-- FEEDBACK MODAL -->
+
+<div class="modal" id="feedbackModal">
+
+    <div class="modal-box">
+
+        <h3>Rate Your Experience</h3>
+
+        <div id="stars">
+            <span class="star" data="1">★</span>
+            <span class="star" data="2">★</span>
+            <span class="star" data="3">★</span>
+            <span class="star" data="4">★</span>
+            <span class="star" data="5">★</span>
+        </div>
+
+<textarea id="remarks" placeholder="Enter remarks"></textarea>
+
+        <button onclick="submitFeedback()">Submit</button>
+
+        <a onclick="closeModal()">Cancel</a>
+
+    </div>
+</div>
+
+<partial name="_footer"></partial>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+    var hospitalName = '@Model?.PatientName';
+    var bedNumber = '@Model?.BedNumber';
+
+
+    $("#HospitalName").html("Welcome " + hospitalName);
+    $("#RoomName").html(bedNumber);
+
+
+    });
+
+    function goBack() {
+
+         var bedInfoEncrypt = '@ViewBag.bedInfoEncrypt';
+
+
+
+    }
+
+
+     function loadTasks(){
+
+        var bedId = encodeURIComponent('@ViewBag.bedID');
+        var BedNumber = encodeURIComponent('@Model?.BedNumber');
+        var filter = "All";
+
+        fetch('/MyRequests/GetTasks?BedId='+bedId+'&BedNumber='+BedNumber)   // MVC API
+        .then(res=>res.json())
+        .then(data=>renderTasks(data))
+
+        }
+
+
+</script>
+
+<script src="~/js/MyRequests.js"></script>
+
+<script src="~/js/layout_DailyCare.js"></script>

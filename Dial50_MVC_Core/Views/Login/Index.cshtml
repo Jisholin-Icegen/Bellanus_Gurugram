@@ -1,0 +1,73 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Patient Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Dial50.ai - Patient Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/login.css">
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="~/images/Dial50-Logo.png"
+             alt="Dial50.ai"
+             onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'logo-fallback\'><span class=\'dial\'>Dial</span><span class=\'ai\'>50.ai</span><span class=\'sub\'>AI Patient Concierge</span></div>';">
+    </div>
+
+    <div class="login-card">
+        <h1>Welcome</h1>
+        <p class="subtitle">Enter your room number to get started</p>
+
+        <form asp-controller="Login" asp-action="Index" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div class="input-group">
+                <div class="input-wrapper">
+                    <i class="fas fa-door-open"></i>
+                    <input type="text"
+                           id="roomNumber"
+                           name="roomNumber"
+                           placeholder="Enter room number (e.g. 402)"
+                           autocomplete="off"
+                           inputmode="numeric"
+                           aria-label="Room number"
+                           value="@(ViewData["RoomNumber"])"
+                           class="@(ViewData["Error"] != null ? "input-error" : "")">
+                </div>
+                <button type="submit" class="arrow-btn" aria-label="Submit room number">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+
+            @if (ViewData["Error"] != null)
+            {
+                <div class="error-message">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span>@ViewData["Error"]</span>
+                </div>
+            }
+        </form>
+
+        <div class="helper-links">
+            <div class="assist-note">
+                <p class="assist-title">Need Assistance?</p>
+                <p class="assist-subtitle">Please contact the reception desk for help.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 Dial50.ai - AI Patient Concierge
+    </div>
+
+    <partial name="_SessionLock" />
+
+    <script src="~/js/login.js"></script>
+</body>
+</html>

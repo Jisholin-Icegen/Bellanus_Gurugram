@@ -1,0 +1,1182 @@
+@model BedInfo
+
+@{
+    ViewData["Title"] = ":: Apollo Assistant ::";
+}
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/AI.css">
+
+<style>
+    .content {
+        overflow-y: auto !important;
+        max-height: calc(100vh - 162px) !important;
+    }
+
+    .error-box {
+        padding: 24px;
+        color: #b00020;
+        font-family: sans-serif;
+        text-align: center;
+    }
+
+        .error-box button {
+            margin-top: 12px;
+            padding: 8px 16px;
+        }
+
+    .video-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        z-index: 100000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+        .video-overlay.show {
+            display: flex;
+        }
+
+    .video-modal {
+        position: relative;
+        width: 100%;
+        max-width: min(340px, calc(100vw - 40px));
+        max-height: calc(100vh - 40px);
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: center;
+        overflow: hidden;
+        box-sizing: border-box;
+    }
+
+    .video-modal-body {
+        flex: 0 1 auto;
+        min-height: 0;
+        max-height: calc(100% - 56px);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
+        .video-modal-body .video-frame {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            flex-shrink: 0;
+        }
+
+            .video-modal-body .video-frame iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+    .video-overlay-back {
+        width: 100%;
+        height: 42px;
+        margin-top: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        flex-shrink: 0;
+        box-sizing: border-box;
+    }
+
+        .video-overlay-back:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .video-overlay-back:active {
+            transform: scale(0.98);
+        }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        padding: 18px;
+        box-sizing: border-box;
+    }
+
+        .modal-overlay.show {
+            display: flex !important;
+        }
+
+    .request-modal {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        background: #f4f4f5;
+        border-radius: 22px;
+        padding: 30px 26px 26px;
+        text-align: center;
+        box-sizing: border-box;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, .22);
+        margin: auto;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        padding: 0;
+        z-index: 10;
+        color: #333333;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+        .modal-close-btn:hover {
+            background: #f0f0f0;
+        }
+
+    .modal-avatar {
+        width: 130px;
+        height: 130px;
+        margin: 6px auto 20px;
+        border-radius: 50%;
+        background: #e9e9ea;
+        border: 3px solid #c7d2dc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+    .modal-request-id {
+        font-size: 17px;
+        color: #1e293b;
+        margin-bottom: 14px;
+    }
+
+        .modal-request-id strong {
+            font-weight: 700;
+        }
+
+    .modal-details {
+        text-align: left;
+        margin-bottom: 20px;
+        word-break: break-word;
+    }
+
+        .modal-details p {
+            font-size: 15px;
+            color: #1e293b;
+            line-height: 1.5;
+            margin: 0 0 4px 0;
+        }
+
+        .modal-details strong {
+            font-weight: 700;
+        }
+
+    .eta-status-pill-box {
+        background: #ebebed;
+        border-radius: 18px;
+        padding: 22px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        margin-bottom: 16px;
+    }
+
+    .eta-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .pill-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    .pill-text {
+        text-align: center;
+    }
+
+        .pill-text small {
+            display: block;
+            font-size: 12px;
+            color: #9a9a9d;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .pill-text strong {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+    .pill-divider {
+        width: 1px;
+        height: 50px;
+        background: #d5d5d8;
+    }
+
+    .success-track-btn {
+        width: 100%;
+        border: none;
+        border-radius: 30px;
+        background: #10b981;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 15px;
+        cursor: pointer;
+        transition: .2s;
+        margin-bottom: 6px;
+    }
+
+        .success-track-btn:hover {
+            background: #059669;
+        }
+
+    .modal-footer-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #1e293b;
+        font-weight: 600;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .nav-link {
+        cursor: pointer;
+        padding: 6px 8px;
+        user-select: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+        color: #1e293b;
+    }
+
+        .nav-link.disabled {
+            color: #c7c7cb;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .nav-link:not(.disabled):hover {
+            color: #10b981;
+        }
+
+    .dots {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+        .dots .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #d6d6d8;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.15s, transform 0.15s;
+        }
+
+            .dots .dot.active {
+                background: #3b82f6;
+                transform: scale(1.35);
+            }
+
+            .dots .dot:hover {
+                background: #94a3b8;
+            }
+
+        .dots .dot-gap {
+            color: #9a9a9d;
+            font-size: 11px;
+            line-height: 1;
+            padding: 0 1px;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+    @@media (max-width: 420px) {
+        .video-overlay {
+            padding: 12px;
+        }
+
+        .video-modal {
+            max-width: calc(100vw - 24px);
+            max-height: calc(100vh - 24px);
+        }
+
+        .video-overlay-back {
+            height: 38px;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    }
+
+    @@media (max-height: 500px) {
+        .video-modal {
+            max-height: calc(100vh - 16px);
+        }
+
+        .video-overlay-back {
+            height: 34px;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    }
+</style>
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+
+    <div class="content">
+        <div class="mobile-header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="title">Apollo Assistant</div>
+        </div>
+
+        <main>
+            <div class="iframe-container">
+                @if (ViewBag.Error != null)
+                {
+                    <div class="error-box">
+                        <h3>Unable to open chat</h3>
+                        <p>@ViewBag.Error</p>
+                        <button onclick="goBack()">Go Back</button>
+                    </div>
+                }
+                else
+                {
+                    <iframe id="webFrame" allow="microphone;screen-wake-lock" src="@ViewBag.IframeUrl"></iframe>
+                }
+            </div>
+        </main>
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <div class="video-overlay" id="videoOverlay">
+        <div class="video-modal">
+            <div class="video-modal-body" id="videoModalBody"></div>
+            <button class="video-overlay-back" onclick="closeVideoOverlay()" aria-label="Close">✕ Close</button>
+        </div>
+    </div>
+
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var urlBedInfo = urlParams.get('BedInfo');
+        var urlRegion = urlParams.get('region');
+
+        var bedInfo = urlBedInfo || '@ViewBag.bedInfo' || '';
+        var region = urlRegion || '@ViewBag.Region' || '';
+
+        if (bedInfo) sessionStorage.setItem('bedInfo', bedInfo);
+        if (region) sessionStorage.setItem('region', region);
+
+        var serverPatientName = '@ViewBag.PatientName';
+        var serverRoomNumber = '@ViewBag.RoomNumber';
+        var serverBed = '@ViewBag.BedNumber';
+        var serverRoomBed = '@ViewBag.RoomBed';
+        var serverWard = '@ViewBag.Ward';
+        var serverUhid = '@ViewBag.Uhid';
+        var serverGender = '@ViewBag.Gender';
+        var serverAge = '@ViewBag.Age';
+        var serverDietType = '@ViewBag.DietType';
+        var serverAllergies = '@ViewBag.Allergies';
+        var serverHasPatient = '@ViewBag.HasPatient' === 'True';
+
+        if (serverPatientName) sessionStorage.setItem('PatientName', serverPatientName);
+        if (serverRoomNumber) sessionStorage.setItem('RoomNumber', serverRoomNumber);
+
+        var serverBedNumber = serverRoomBed || serverRoomNumber || serverBed || '';
+        sessionStorage.removeItem('BedNumber');
+        if (serverBedNumber) sessionStorage.setItem('BedNumber', serverBedNumber);
+
+        if (serverWard) sessionStorage.setItem('Ward', serverWard);
+        if (serverUhid) sessionStorage.setItem('Uhid', serverUhid);
+        if (serverGender) sessionStorage.setItem('Gender', serverGender);
+        if (serverAge) sessionStorage.setItem('Age', serverAge);
+        if (serverDietType) sessionStorage.setItem('DietType', serverDietType);
+        if (serverAllergies) sessionStorage.setItem('Allergies', serverAllergies);
+
+        sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+        if (typeof window.refreshHeaderFromSession === 'function') {
+            window.refreshHeaderFromSession();
+        }
+
+        var fromLocEncrypt = '@Html.Raw(Json.Serialize(ViewBag.fromLocationEncrypt ?? ""))';
+        var conversationId = '@Html.Raw(Json.Serialize(ViewBag.ConversationID ?? ""))';
+
+        var patientNameJs = serverPatientName || '';
+        var bedNumberJs = serverRoomBed || '';
+
+        var pollInterval = null;
+        var safetyTimer = null;
+        var hasRedirected = false;
+
+        var lastVideoRequestId = null;
+        var videoPollInterval = null;
+
+        var lastSeenTaskId = null;
+        var taskPollInterval = null;
+        var taskPollInFlight = false;
+
+        var _successModalToken = 0;
+        var _currentModalRequestId = null;
+
+        function GoToCurrentRequest() {
+            window.location.href = '@Url.Action("Index", "CurrentRequests")'
+                + '?BedInfo=' + encodeURIComponent(bedInfo)
+                + '&FromLoc=' + encodeURIComponent(fromLocEncrypt);
+        }
+
+        function goBack() {
+            if (hasRedirected) return;
+            hasRedirected = true;
+
+            if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+            if (safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+            if (videoPollInterval) { clearInterval(videoPollInterval); videoPollInterval = null; }
+            if (taskPollInterval) { clearInterval(taskPollInterval); taskPollInterval = null; }
+
+            window.location.href = '@Url.Action("Index", "Home")'
+                + '?BedInfo=' + encodeURIComponent(bedInfo)
+                + '&region=' + encodeURIComponent(sessionStorage.getItem("region") || "IN");
+        }
+
+        function startPolling() {
+            if (pollInterval) return;
+            if (typeof InitConversationStatus !== "function") return;
+
+            var pollId = conversationId || urlBedInfo || bedInfo;
+            if (!pollId) return;
+
+            pollInterval = setInterval(function () {
+                InitConversationStatus(pollId)
+                    .done(function (res) {
+                        var ended = Array.isArray(res)
+                            ? res.length > 0
+                            : (res && (res.status === "ended" || res.isEnded === true || res.count > 0));
+
+                        if (ended) {
+                            goBack();
+                        }
+                    });
+            }, 2000);
+        }
+
+        function convertToEmbedUrl(url) {
+            if (!url) return '';
+
+            if (url.indexOf('youtube.com/embed') > -1) {
+                return url.indexOf('?') > -1 ? url : url + '?rel=0&modestbranding=1&playsinline=1';
+            }
+
+            var videoId = '';
+            if (url.indexOf('youtu.be/') > -1) {
+                videoId = url.split('youtu.be/')[1].split('?')[0].split('&')[0];
+            } else if (url.indexOf('youtube.com/watch') > -1) {
+                var qs = url.split('?')[1] || '';
+                qs.split('&').forEach(function (p) {
+                    if (p.indexOf('v=') === 0) videoId = p.substring(2);
+                });
+            } else if (url.indexOf('youtube.com/shorts/') > -1) {
+                videoId = url.split('shorts/')[1].split('?')[0].split('&')[0];
+            } else if (url.indexOf('youtube.com/live/') > -1) {
+                videoId = url.split('live/')[1].split('?')[0].split('&')[0];
+            }
+
+            if (!videoId) return url;
+
+            return 'https://www.youtube.com/embed/' + videoId
+                + '?rel=0'
+                + '&modestbranding=1'
+                + '&playsinline=1'
+                + '&enablejsapi=0'
+                + '&origin=' + encodeURIComponent(window.location.origin);
+        }
+
+        function openVideoOverlay(videoUrlOrList) {
+            var overlay = document.getElementById('videoOverlay');
+            var body = document.getElementById('videoModalBody');
+            if (!overlay || !body) return;
+
+            var links = [];
+
+            if (Array.isArray(videoUrlOrList)) {
+                links = videoUrlOrList;
+            } else if (typeof videoUrlOrList === 'string') {
+                links = videoUrlOrList.trim().split(/\s+/).filter(function (u) {
+                    return u && u.indexOf('http') === 0;
+                });
+            }
+
+            if (links.length === 0) return;
+
+            body.innerHTML = '';
+            links.forEach(function (link) {
+                var embedUrl = convertToEmbedUrl(link);
+                var frame = document.createElement('div');
+                frame.className = 'video-frame';
+                frame.innerHTML =
+                    '<iframe src="' + embedUrl + '" ' +
+                    'frameborder="0" ' +
+                    'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" ' +
+                    'referrerpolicy="strict-origin-when-cross-origin" ' +
+                    'allowfullscreen></iframe>';
+                body.appendChild(frame);
+            });
+
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoOverlay() {
+            var overlay = document.getElementById('videoOverlay');
+            var body = document.getElementById('videoModalBody');
+            if (!overlay || !body) return;
+            body.innerHTML = '';
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        function pollForVideo() {
+            var bedNo = sessionStorage.getItem('bedInfo') || urlBedInfo || bedInfo;
+            if (!bedNo) return;
+
+            $.ajax({
+                url: '/Home/CheckLatestVideo',
+                type: 'GET',
+                data: { bedNo: bedNo },
+                success: function (response) {
+                    if (response.hasVideo && response.videoLinks) {
+                        if (lastVideoRequestId !== response.requestId) {
+                            lastVideoRequestId = response.requestId;
+                            var bedKey = getTaskBedId() || 'unknown';
+                            sessionStorage.setItem('pendingVideoLinks_' + bedKey, response.videoLinks);
+                            sessionStorage.setItem('pendingVideoTitle_' + bedKey, response.categoryName || '');
+                        }
+                    }
+                }
+            });
+        }
+
+        function getTaskBedId() {
+            return sessionStorage.getItem('bedInfo')
+                || sessionStorage.getItem('BedId')
+                || bedInfo
+                || '';
+        }
+
+        function getTaskBedNumber() {
+            return sessionStorage.getItem('BedNumber') || serverRoomBed || serverRoomNumber || '';
+        }
+
+        function getTaskField(obj, camel, pascal) {
+            if (!obj) return '';
+            if (obj[camel] !== undefined && obj[camel] !== null) return obj[camel];
+            if (obj[pascal] !== undefined && obj[pascal] !== null) return obj[pascal];
+            return '';
+        }
+
+        function getTaskId(r) {
+            return String(
+                getTaskField(r, 'taskId', 'TaskId') ||
+                getTaskField(r, 'requestId', 'RequestId') ||
+                ''
+            ).trim();
+        }
+
+        function getTaskName(r) {
+            return String(getTaskField(r, 'taskName', 'TaskName') || '').trim();
+        }
+
+        function getPorterName(r) {
+            return String(getTaskField(r, 'porterName', 'PorterName') || '').trim();
+        }
+
+        function getTaskStatus(r) {
+            return String(getTaskField(r, 'status', 'Status') || '').trim().toUpperCase();
+        }
+
+        function getTaskEta(r) {
+            return String(
+                getTaskField(r, 'eta', 'Eta') ||
+                getTaskField(r, 'ETA', 'ETA') ||
+                ''
+            ).trim();
+        }
+
+        function getTaskRequestDate(r) {
+            var raw = getTaskField(r, 'requestDate', 'RequestDate');
+            if (!raw) return null;
+
+            if (raw instanceof Date) return isNaN(raw) ? null : raw;
+
+            var s = String(raw).trim();
+
+            var iso = new Date(s);
+            if (!isNaN(iso)) return iso;
+
+            var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+            if (m) {
+                var d = new Date(
+                    parseInt(m[3], 10),
+                    parseInt(m[1], 10) - 1,
+                    parseInt(m[2], 10),
+                    parseInt(m[4] || '0', 10),
+                    parseInt(m[5] || '0', 10),
+                    parseInt(m[6] || '0', 10)
+                );
+                return isNaN(d) ? null : d;
+            }
+
+            return null;
+        }
+
+        function statusColorFor(status) {
+            switch ((status || '').toUpperCase()) {
+                case 'READY':
+                case 'ACCEPTED':
+                case 'ASSIGNED':
+                    return '#3b82f6';
+                case 'IN-PROGRESS':
+                case 'INPROGRESS':
+                case 'EXECUTED':
+                    return '#3b82f6';
+                case 'COMPLETED':
+                case 'DELIVERED':
+                    return '#10b981';
+                case 'CANCELLED':
+                case 'CANCELED':
+                    return '#ef4444';
+                case 'ONHOLD':
+                    return '#f59e0b';
+                default:
+                    return '#00a86b';
+            }
+        }
+
+        function resolveEta(rawEta, porterName) {
+            var eta = String(rawEta || '').trim();
+            if (eta && eta !== '-') return eta;
+
+            var hasPorter = porterName && porterName.trim() !== '';
+            if (hasPorter) return '5 Mins';
+
+            return '-';
+        }
+
+        var successRequests = [];
+        var successIndex = 0;
+
+        function fetchTasksForModal() {
+            var bedId = encodeURIComponent(getTaskBedId());
+            var bedNumber = encodeURIComponent(getTaskBedNumber());
+            var url = '/AI/GetTasks?BedId=' + bedId + '&BedNumber=' + bedNumber;
+
+            return $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json'
+            })
+                .then(function (data) {
+                    return Array.isArray(data) ? data : [];
+                })
+                .catch(function () {
+                    return [];
+                });
+        }
+
+        function groupAllByRequestId(rows) {
+            var map = {};
+            var order = [];
+
+            rows.forEach(function (r) {
+                var id = getTaskId(r);
+                if (!id) return;
+
+                if (!map[id]) {
+                    map[id] = {
+                        RequestId: id,
+                        TaskNames: [],
+                        PorterName: '',
+                        Status: 'PENDING',
+                        Eta: '',
+                        RequestDate: getTaskRequestDate(r)
+                    };
+                    order.push(id);
+                }
+
+                var taskName = getTaskName(r);
+                if (taskName && map[id].TaskNames.indexOf(taskName) === -1) {
+                    map[id].TaskNames.push(taskName);
+                }
+
+                var porter = getPorterName(r);
+                if (!map[id].PorterName && porter !== '') {
+                    map[id].PorterName = porter;
+                }
+
+                var rowStatus = getTaskStatus(r);
+                var curStatus = String(map[id].Status || '').toUpperCase();
+
+                var priority = {
+                    'PENDING': 1,
+                    'READY': 2,
+                    'ACCEPTED': 2,
+                    'ASSIGNED': 3,
+                    'IN-PROGRESS': 4,
+                    'INPROGRESS': 4,
+                    'EXECUTED': 5,
+                    'DELIVERED': 5,
+                    'COMPLETED': 6,
+                    'CANCELLED': 7,
+                    'CANCELED': 7,
+                    'ONHOLD': 8
+                };
+
+                if ((priority[rowStatus] || 1) > (priority[curStatus] || 1)) {
+                    map[id].Status = rowStatus;
+                }
+
+                var eta = getTaskEta(r);
+                if (eta && (!map[id].Eta || map[id].Eta === '' || map[id].Eta === '-')) {
+                    map[id].Eta = eta;
+                }
+
+                var rd = getTaskRequestDate(r);
+                if (rd && (!map[id].RequestDate || rd > map[id].RequestDate)) {
+                    map[id].RequestDate = rd;
+                }
+            });
+
+            return order.map(function (id) {
+                var g = map[id];
+                g.TaskName = g.TaskNames.join(', ');
+                delete g.TaskNames;
+                g.Eta = resolveEta(g.Eta, g.PorterName);
+                return g;
+            });
+        }
+
+        function paintTaskRequest() {
+            if (!successRequests.length) {
+                successRequests = [{
+                    RequestId: '',
+                    TaskName: '',
+                    PorterName: '',
+                    Status: 'PENDING',
+                    Eta: '-'
+                }];
+                successIndex = 0;
+            }
+
+            if (successIndex < 0) successIndex = 0;
+            if (successIndex > successRequests.length - 1) successIndex = successRequests.length - 1;
+
+            var req = successRequests[successIndex];
+            var porter = (req.PorterName || '').trim();
+
+            var reqIdEl = document.getElementById('successReqId');
+            var staffEl = document.getElementById('successStaffName');
+            var taskEl = document.getElementById('successTaskName');
+            var etaEl = document.getElementById('successEta');
+            var statEl = document.getElementById('successStatus');
+
+            if (reqIdEl) reqIdEl.textContent = req.RequestId ? '#' + req.RequestId : '#-';
+            if (staffEl) staffEl.textContent = porter ? porter.toUpperCase() : 'will be';
+            if (taskEl) taskEl.textContent = req.TaskName || '-';
+            if (etaEl) etaEl.textContent = req.Eta || '-';
+
+            if (statEl) {
+                statEl.textContent = req.Status ? req.Status.toUpperCase() : 'PENDING';
+                statEl.style.color = statusColorFor(req.Status);
+            }
+
+            var dotsEl = document.getElementById('dotsContainer');
+            if (dotsEl) {
+                var total = successRequests.length;
+                var maxDots = 7;
+
+                if (total <= maxDots) {
+                    dotsEl.innerHTML = successRequests.map(function (r, i) {
+                        return '<span class="dot' + (i === successIndex ? ' active' : '') +
+                            '" onclick="goToRequestIndex(' + i + ')"></span>';
+                    }).join('');
+                } else {
+                    var half = Math.floor(maxDots / 2);
+                    var start = successIndex - half;
+                    var end = successIndex + half;
+
+                    if (start < 0) { start = 0; end = maxDots - 1; }
+                    if (end > total - 1) { end = total - 1; start = total - maxDots; }
+
+                    var html = '';
+
+                    if (start > 0) {
+                        html += '<span class="dot" onclick="goToRequestIndex(0)"></span>';
+                        if (start > 1) html += '<span class="dot-gap">…</span>';
+                    }
+
+                    for (var i = start; i <= end; i++) {
+                        html += '<span class="dot' + (i === successIndex ? ' active' : '') +
+                            '" onclick="goToRequestIndex(' + i + ')"></span>';
+                    }
+
+                    if (end < total - 1) {
+                        if (end < total - 2) html += '<span class="dot-gap">…</span>';
+                        html += '<span class="dot" onclick="goToRequestIndex(' + (total - 1) + ')"></span>';
+                    }
+
+                    dotsEl.innerHTML = html;
+                }
+            }
+
+            var prevEl = document.getElementById('btnPrevRequest');
+            var nextEl = document.getElementById('btnNextRequest');
+
+            if (prevEl) {
+                if (successIndex === 0) prevEl.classList.add('disabled');
+                else prevEl.classList.remove('disabled');
+            }
+
+            if (nextEl) {
+                if (successIndex === successRequests.length - 1) nextEl.classList.add('disabled');
+                else nextEl.classList.remove('disabled');
+            }
+        }
+
+        function goToRequestIndex(i) {
+            if (i < 0 || i > successRequests.length - 1) return;
+            successIndex = i;
+            paintTaskRequest();
+        }
+
+        function prevRequest() {
+            if (successIndex <= 0) return;
+            successIndex--;
+            paintTaskRequest();
+        }
+
+        function nextRequest() {
+            if (successIndex >= successRequests.length - 1) return;
+            successIndex++;
+            paintTaskRequest();
+        }
+
+        function showSuccessModal(requestNo) {
+            var overlay = document.getElementById('requestSuccessScreen');
+            if (!overlay) return;
+
+            var normalized = requestNo ? String(requestNo) : null;
+            if (!normalized) return;
+
+            if (overlay.classList.contains('show') &&
+                _currentModalRequestId &&
+                String(_currentModalRequestId) !== normalized) {
+                overlay.classList.remove('show');
+                overlay.style.display = '';
+                document.body.style.overflow = '';
+                _currentModalRequestId = null;
+            }
+
+            if (_currentModalRequestId === normalized && overlay.classList.contains('show')) {
+                return;
+            }
+
+            _currentModalRequestId = normalized;
+            saveLastSeenTaskId(normalized);
+
+            overlay.classList.add('show');
+            overlay.style.display = '';
+            document.body.style.overflow = 'hidden';
+
+            var myToken = ++_successModalToken;
+
+            fetchTasksForModal().then(function (rows) {
+                if (myToken !== _successModalToken) return;
+
+                successRequests = groupAllByRequestId(rows);
+
+                if (!successRequests.length) {
+                    successRequests = [{
+                        RequestId: normalized,
+                        TaskName: '',
+                        PorterName: '',
+                        Status: 'PENDING',
+                        Eta: '-'
+                    }];
+                    successIndex = 0;
+                } else {
+                    successIndex = 0;
+                    for (var i = 0; i < successRequests.length; i++) {
+                        if (String(successRequests[i].RequestId) === normalized) {
+                            successIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                paintTaskRequest();
+            });
+        }
+
+        function closeSuccessModal() {
+            var overlay = document.getElementById('requestSuccessScreen');
+            if (overlay) {
+                overlay.classList.remove('show');
+                overlay.style.display = '';
+                document.body.style.overflow = '';
+            }
+            _currentModalRequestId = null;
+        }
+
+        function goToTracking() {
+            var req = successRequests[successIndex] || {};
+            if (!req.RequestId) return;
+            window.location.href = '/Tracking?BedInfo=' + encodeURIComponent(getTaskBedId())
+                + '&RequestID=' + encodeURIComponent(req.RequestId);
+        }
+
+        function getLastSeenTaskKey() {
+            var bed = getTaskBedId() || getTaskBedNumber() || 'unknown';
+            return 'lastSeenTaskId_' + bed;
+        }
+
+        function loadLastSeenTaskId() {
+            try {
+                lastSeenTaskId = sessionStorage.getItem(getLastSeenTaskKey()) || null;
+            } catch (e) {
+                lastSeenTaskId = null;
+            }
+        }
+
+        function saveLastSeenTaskId(id) {
+            lastSeenTaskId = String(id);
+            try {
+                sessionStorage.setItem(getLastSeenTaskKey(), String(id));
+            } catch (e) { }
+        }
+
+        function pollForNewTask() {
+            if (taskPollInFlight) return;
+
+            var bedId = getTaskBedId();
+            var bedNumber = getTaskBedNumber();
+            if (!bedId && !bedNumber) return;
+
+            taskPollInFlight = true;
+
+            $.ajax({
+                url: '/AI/GetFreshTask',
+                type: 'GET',
+                data: {
+                    bedId: bedId,
+                    bedNumber: bedNumber,
+                    token: '',
+                    lastSeenTaskId: lastSeenTaskId || ''
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (!res || !res.hasFreshTask) return;
+
+                    var taskId = String(res.taskId || '').trim();
+                    if (!taskId) return;
+
+                    if (taskId === String(lastSeenTaskId)) return;
+
+                    var bedKey = getTaskBedId() || 'unknown';
+                    sessionStorage.setItem('pendingSuccessTaskId_' + bedKey, taskId);
+                },
+                complete: function () {
+                    taskPollInFlight = false;
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            loadLastSeenTaskId();
+        });
+
+        window.addEventListener("load", function () {
+            startPolling();
+
+            safetyTimer = setTimeout(function () {
+                goBack();
+            }, 5 * 60 * 1000);
+        });
+
+        window.addEventListener("message", function (e) {
+            if (!e || !e.data) return;
+
+            if (e.data.type === "call-ended") {
+                goBack();
+                return;
+            }
+
+            if (e.data.type === "task-created" && e.data.requestId) {
+                var incomingId = String(e.data.requestId);
+                if (incomingId === String(lastSeenTaskId)) return;
+                var bedKey = getTaskBedId() || 'unknown';
+                sessionStorage.setItem('pendingSuccessTaskId_' + bedKey, incomingId);
+            }
+        });
+
+        window.addEventListener("beforeunload", function () {
+            if (pollInterval) clearInterval(pollInterval);
+            if (safetyTimer) clearTimeout(safetyTimer);
+            if (videoPollInterval) clearInterval(videoPollInterval);
+            if (taskPollInterval) clearInterval(taskPollInterval);
+        });
+
+        window.openVideoOverlay = openVideoOverlay;
+        window.closeVideoOverlay = closeVideoOverlay;
+        window.showSuccessModal = showSuccessModal;
+        window.closeSuccessModal = closeSuccessModal;
+        window.goToTracking = goToTracking;
+        window.prevRequest = prevRequest;
+        window.nextRequest = nextRequest;
+        window.goToRequestIndex = goToRequestIndex;
+    </script>
+
+    <div id="requestSuccessScreen" class="modal-overlay">
+        <div class="request-modal">
+            <button type="button" class="modal-close-btn" onclick="closeSuccessModal()" aria-label="Close">X</button>
+
+            <div class="modal-avatar">
+                <img src="/images/porter.png" alt="Staff"
+                     onerror="this.onerror=null;this.src='/images/porter.png';">
+            </div>
+
+            <div class="modal-request-id">
+                Request Id: <strong id="successReqId">#-</strong>
+            </div>
+
+            <div class="modal-details">
+                <p>
+                    Support staff
+                    <strong id="successStaffName">-</strong> assigned.
+                </p>
+                <p>
+                    Task Name:
+                    <strong id="successTaskName">-</strong>
+                </p>
+            </div>
+
+            <div class="eta-status-pill-box">
+                <div class="eta-item">
+                    <div class="pill-icon">⏱</div>
+                    <div class="pill-text">
+                        <small>ETA</small>
+                        <strong id="successEta">-</strong>
+                    </div>
+                </div>
+                <div class="pill-divider"></div>
+                <div class="eta-item">
+                    <div class="pill-icon">📍</div>
+                    <div class="pill-text">
+                        <small>STATUS</small>
+                        <strong id="successStatus" style="color:#00a86b;">-</strong>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="success-track-btn" onclick="goToTracking()">
+                Track Status
+            </button>
+
+            <div class="modal-footer-pagination">
+                <span class="nav-link" id="btnPrevRequest" onclick="prevRequest()">&lt; Previous</span>
+                <div class="dots" id="dotsContainer"></div>
+                <span class="nav-link" id="btnNextRequest" onclick="nextRequest()">Next &gt;</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="~/js/AI.js"></script>
+<script src="~/js/layout_DailyCare.js"></script>

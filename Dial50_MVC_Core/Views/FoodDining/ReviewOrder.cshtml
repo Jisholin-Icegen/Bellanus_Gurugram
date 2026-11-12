@@ -1,0 +1,262 @@
+﻿@model Dial50_MVC_Core.Models.BedInfo
+
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+<link rel="stylesheet" href="~/css/Food.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<style>
+
+    .floating-confirm-bar {
+        position: fixed !important;
+        bottom: calc(30px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 auto !important;
+        width: calc(100% - 32px) !important;
+        max-width: 400px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        z-index: 9999 !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+        pointer-events: none;
+    }
+
+    .confirm-btn-green {
+        pointer-events: auto;
+        width: 100% !important;
+        min-height: 56px !important;
+        border-radius: 30px !important;
+        background: #10b981 !important;
+        color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border: none !important;
+        cursor: pointer !important;
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35) !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+        .confirm-btn-green:active {
+            transform: scale(0.97) !important;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+        }
+
+    .review-page-inner {
+        padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+</style>
+
+<div class="app-wrapper" data-locale-base="@Url.Content("~/locales/")">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <input type="hidden" id="hdnTaskTypeId">
+    <input type="hidden" id="hdnOrderType" value="@ViewBag.OrderType" />
+    <input type="hidden" id="hdnMealOrderType" value="@ViewBag.Mode" />
+    <input type="hidden" id="hdnMealType" value="@ViewBag.Meal" />
+    <input type="hidden" id="hdnOrderDate" value="@ViewBag.OrderDate" />
+
+    <div id="servicesMenuContainer" class="content">
+        <div id="cancel-toast" class="toast-notification-container" style="display:none;">
+            <div class="toast-content">
+                <i class="fas fa-check-circle toast-check-icon"></i>
+                <span id="toast-message-text" class="toast-text"></span>
+            </div>
+        </div>
+        <div class="review-page-inner">
+            <a class="back-link" onclick="goBackToMenu()">← Back to menu</a>
+            <div class="review-page-header">
+                <h1>Review your order</h1>
+            </div>
+            <div id="dynamicHeaderArea" class="header-container-spacing"></div>
+
+            <div id="reviewItemsList" class="review-items-list"></div>
+            <div class="special-instructions-box" id="reviewSpecialInstructionBox" style="display:none;">
+                <div class="label">SPECIAL INSTRUCTIONS</div>
+                <div id="reviewSpecialInstruction" class="instruction-text"></div>
+            </div>
+            <div id="emptyCartSection" class="empty-state-container" style="display:none;">
+                <div class="empty-icon-box">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                </div>
+                <h3>Your cart is empty</h3>
+                <p>Add items from the menu to review your order.</p>
+
+                <button class="browse-menu-btn" onclick="goBackToMenu()">
+                    Browse menu
+                </button>
+            </div>
+            <div id="confirmOrderBar" class="floating-confirm-bar">
+                <button class="confirm-btn-green" onclick="submitFinalOrder()">
+                    Confirm Order (<span id="review-total-count">0</span> items)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <script>
+        var urlParams  = new URLSearchParams(window.location.search);
+        var urlBedInfo = urlParams.get('BedInfo');
+
+        if (urlBedInfo) sessionStorage.setItem('bedInfo', urlBedInfo);
+
+        var bedInfo = sessionStorage.getItem('bedInfo') || '';
+
+        var serverPatientName = '@ViewBag.PatientName';
+        var serverRoomNumber  = '@ViewBag.RoomNumber';
+        var serverBed         = '@ViewBag.BedNumber';
+        var serverRoomBed     = '@ViewBag.RoomBed';
+        var serverWard        = '@ViewBag.Ward';
+        var serverUhid        = '@ViewBag.Uhid';
+        var serverGender      = '@ViewBag.Gender';
+        var serverAge         = '@ViewBag.Age';
+        var serverDietType    = '@ViewBag.DietType';
+        var serverAllergies   = '@ViewBag.Allergies';
+        var serverHasPatient  = '@ViewBag.HasPatient' === 'True';
+
+        if (serverPatientName) sessionStorage.setItem('PatientName',  serverPatientName);
+        if (serverRoomNumber)  sessionStorage.setItem('RoomNumber',   serverRoomNumber);
+        if (serverBed)         sessionStorage.setItem('BedNumber',    serverBed);
+        if (serverRoomBed)     sessionStorage.setItem('RoomBed',      serverRoomBed);
+        if (serverWard)        sessionStorage.setItem('Ward',         serverWard);
+        if (serverUhid)        sessionStorage.setItem('Uhid',         serverUhid);
+        if (serverGender)      sessionStorage.setItem('Gender',       serverGender);
+        if (serverAge)         sessionStorage.setItem('Age',          serverAge);
+        if (serverDietType)    sessionStorage.setItem('DietType',     serverDietType);
+        if (serverAllergies)   sessionStorage.setItem('Allergies',    serverAllergies);
+
+        sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+        console.log('[ReviewOrder Bootstrap] bedInfo=', bedInfo,
+                    '| patient=', serverPatientName,
+                    '| room=', serverRoomNumber,
+                    '| roomBed=', serverRoomBed);
+
+        if (typeof window.refreshHeaderFromSession === 'function') {
+            window.refreshHeaderFromSession();
+        }
+
+        var curpage = window.location.pathname.split("/").pop();
+
+        function GoToChat() {
+            BedContext.go('AI/Chat');
+        }
+
+        function GoToCurrentRequest() {
+            BedContext.go('CurrentRequests/Index');
+        }
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            await (window.i18nReady || Promise.resolve());
+            if (typeof renderReviewItems !== 'function') { console.error('Food.js did not load'); return; }
+            renderReviewItems();
+            updateDynamicHeader();
+            loadSpecialInstruction();
+
+            function loadSpecialInstruction() {
+                let note = localStorage.getItem("SpecialInstruction");
+
+                if (note && note.trim() !== "") {
+                    $("#hdnSpecialInstruction").val(note);
+                    $("#reviewSpecialInstruction").text('"' + note + '"');
+                    $("#reviewSpecialInstructionBox").show();
+                } else {
+                    $("#reviewSpecialInstructionBox").hide();
+                    $("#reviewSpecialInstruction").text("");
+                }
+            }
+
+            $("#modalSubmit").click(function () {
+
+                var remarks = $("#modalRemarks").val();
+                var taskTypeId = $("#hdnTaskTypeId").val();
+
+                var requestData = {
+                    BedID: BedContext.get().bedId,
+                    CategoryId: taskTypeId,
+                    Remarks: remarks,
+                    quantity: '0'
+                };
+
+                $.ajax({
+                    url: "/api/Task/InsertTask",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        closeModal();
+                        GoToCurrentRequest();
+                    }
+                });
+
+            });
+        });
+
+        function selectOrderMode(mode) {
+            if (mode === 'preorder') {
+                BedContext.go('FoodDining/PreOrder');
+            } else {
+                BedContext.go('FoodDining/OrderNow');
+            }
+        }
+
+        function goBackToMenu() {
+            const lastMenu = sessionStorage.getItem("LastMenuPage");
+            if (lastMenu && lastMenu !== "null") {
+                window.location.href = lastMenu;
+                return;
+            }
+            BedContext.go('FoodDining/MenuItems');
+        }
+
+    </script>
+
+</div>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>
+
+<script>
+    function applyReviewPageTranslations() {
+        if (typeof i18n === 'undefined' || !i18n.dict || Object.keys(i18n.dict).length === 0) {
+            setTimeout(applyReviewPageTranslations, 200);
+            return;
+        }
+
+        $('.back-link').html('← ' + i18n.t('Back to menu', 'Back to menu'));
+        $('.review-page-header h1').text(i18n.t('Review your order', 'Review your order'));
+        $('.special-instructions-box .label').text(i18n.t('SPECIAL INSTRUCTIONS', 'SPECIAL INSTRUCTIONS'));
+        $('.empty-state-container h3').text(i18n.t('Your cart is empty', 'Your cart is empty'));
+        $('.empty-state-container p').text(i18n.t('Add items from the menu to review your order.', 'Add items from the menu to review your order.'));
+        $('.browse-menu-btn').text(i18n.t('Browse menu', 'Browse menu'));
+
+        $('.review-items-list .item-name, .review-items-list .cart-item-title').each(function () {
+            if (!$(this).attr('data-orig')) {
+                $(this).attr('data-orig', $(this).text().trim());
+            }
+            let originalName = $(this).attr('data-orig');
+            $(this).text(i18n.t(originalName, originalName));
+        });
+
+        let currentCount = $('#review-total-count').text().trim() || '0';
+        $('#confirmOrderBar button').html(
+            `${i18n.t('Confirm Order', 'Confirm Order')} (<span id="review-total-count">${currentCount}</span> ${i18n.t('items', 'items')})`
+        );
+    }
+
+    document.addEventListener('DOMContentLoaded', applyReviewPageTranslations);
+    document.addEventListener('languageChanged', applyReviewPageTranslations);
+</script>

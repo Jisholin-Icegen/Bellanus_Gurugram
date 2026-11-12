@@ -1,0 +1,210 @@
+﻿@model BedInfo
+@{
+    ViewData["Title"] = ":: Room Services ::";
+}
+
+<link rel="stylesheet" href="~/css/Room.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    html, body {
+        height: 100% !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        background: #f1f3f7 !important;
+    }
+
+    body {
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .app-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
+        padding-top: env(safe-area-inset-top) !important;
+        padding-bottom: env(safe-area-inset-bottom) !important;
+    }
+
+        .app-wrapper > .header,
+        .app-wrapper > header,
+        .app-wrapper > .mobile-header,
+        .app-wrapper > .bed-context,
+        .app-wrapper > #bedContext,
+        .app-wrapper > nav,
+        .app-wrapper > .nav {
+            flex: 0 0 auto !important;
+        }
+
+        #servicesContainer,
+        .app-wrapper > .content {
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            width: 100% !important;
+            display: grid !important;
+            align-content: start !important;
+            align-items: start !important;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+            grid-auto-rows: auto !important;
+            gap: 16px !important;
+            padding: 16px !important;
+            padding-bottom: calc(32px + env(safe-area-inset-bottom)) !important;
+            box-sizing: border-box !important;
+        }
+
+        .app-wrapper > footer,
+        .app-wrapper > .footer {
+            flex: 0 0 auto !important;
+            margin-top: 0 !important;
+            width: 100% !important;
+            position: relative !important;
+            z-index: 20;
+        }
+
+    html body #servicesContainer > .card,
+    html body #servicesContainer > .care-card {
+        height: auto !important;
+        min-height: 160px !important;
+        aspect-ratio: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 24px 16px !important;
+        background-color: #ffffff !important;
+        border-radius: 16px !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+        cursor: pointer !important;
+        transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+    }
+
+    @@media (min-width: 600px) {
+        #servicesContainer {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+            padding: 20px !important;
+            gap: 20px !important;
+        }
+
+        html body #servicesContainer > .card,
+        html body #servicesContainer > .care-card {
+            min-height: 180px !important;
+        }
+    }
+
+    @@media (min-width: 992px) {
+        #servicesContainer {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+            padding: 24px !important;
+            gap: 24px !important;
+        }
+    }
+</style>
+
+<div class="app-wrapper">
+    <partial name="_header"></partial>
+    <partial name="_BedContext" />
+    <partial name="_nav"></partial>
+
+    <input type="hidden" id="hdnTaskTypeId">
+    <div id="servicesContainer" class="content"></div>
+
+    <partial name="_footer"></partial>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <img id="modalIcon" src="" />
+        </div>
+        <div class="modal-body">
+            <h2 id="modalTitle"></h2>
+            <p>How can we help with this?</p>
+            <div class="details-label">Additional Details</div>
+            <textarea placeholder="Enter additional details" id="modalRemarks"></textarea>
+            <button class="confirm-btn" id="modalSubmit">Confirm Request</button>
+            <div class="cancel-btn" onclick="closeModal()">Cancel</div>
+        </div>
+    </div>
+</div>
+
+<div id="requestLoadingScreen" class="modal-overlay request-loading-overlay">
+    <div class="request-loading-modal">
+        <div class="loading-icon-wrapper">
+            <div class="loading-ring ring-1"></div>
+            <div class="loading-ring ring-2"></div>
+            <div class="loading-icon-circle"><i class="fa-solid fa-wrench"></i></div>
+        </div>
+        <div class="loading-title">Sending Request...</div>
+        <div class="loading-subtitle">Connecting to support station</div>
+    </div>
+</div>
+
+<div id="requestSuccessScreen" class="modal-overlay">
+    <div class="request-modal">
+        <button type="button" class="modal-close-btn" onclick="closeSuccessModal()" aria-label="Close">X</button>
+        <div class="modal-avatar">
+            <img src="/images/porter.png" alt="Staff" onerror="this.onerror=null;this.src='/images/porter.png';">
+        </div>
+        <div class="modal-request-id">Request Id: <strong id="successReqId">#-</strong></div>
+        <div class="modal-details">
+            <p>Support staff <strong id="successStaffName">-</strong> assigned.</p>
+            <p>Task Name: <strong id="successTaskName">-</strong></p>
+        </div>
+        <div class="eta-status-pill-box">
+            <div class="eta-item">
+                <div class="pill-icon"><i class="fa-regular fa-clock"></i></div>
+                <div class="pill-text"><small>ETA</small><strong id="successEta">-</strong></div>
+            </div>
+            <div class="pill-divider"></div>
+            <div class="eta-item">
+                <div class="pill-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="pill-text"><small>STATUS</small><strong id="successStatus" style="color:#00a86b;">-</strong></div>
+            </div>
+        </div>
+        <button type="button" class="success-track-btn" onclick="goToTracking()">Track Status</button>
+        <div class="modal-footer-pagination">
+            <span class="nav-link" id="btnPrevRequest" onclick="prevRequest()">&lt; Previous</span>
+            <div class="dots" id="dotsContainer"></div>
+            <span class="nav-link" id="btnNextRequest" onclick="nextRequest()">Next &gt;</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    var curpage = window.location.pathname.split("/").pop();
+
+    function GoToChat() {
+        window.location.href = BedContext.url('@Url.Action("Chat", "AI")');
+    }
+    function GoToCurrentRequest() {
+        BedContext.go('CurrentRequests/Index', { FromLoc: 'RoomComfort' });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var buttons = document.querySelectorAll(".navBtn");
+        buttons.forEach(function (button) {
+            if (button.dataset.page === curpage) button.classList.add("active");
+            button.addEventListener("click", function () {
+                BedContext.go(this.getAttribute("data-page"));
+            });
+        });
+    });
+
+    window.__taskTypesRequest = fetch('/RoomComfort/GetTaskTypes', { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .catch(function () { return []; });
+</script>
+
+<script src="~/js/layout_DailyCare.js" defer></script>
+<script src="~/js/Room.js" defer></script>

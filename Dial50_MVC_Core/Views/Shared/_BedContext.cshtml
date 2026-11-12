@@ -1,0 +1,13 @@
+@* Place in: Views/Shared/_BedContext.cshtml
+   Include ONCE in _Layout.cshtml, before any page script:
+       <partial name="_BedContext" />
+   Pages then never read ViewBag or write sessionStorage for bed values. *@
+@using Dial50_MVC_Core.Services
+@inject IBedContextAccessor BedAccessor
+@{
+    var ctx = BedAccessor.Current;
+}
+<script>
+    window.__bedServer = @Json.Serialize(ctx);
+</script>
+<script src="~/js/bed-context.js"></script>

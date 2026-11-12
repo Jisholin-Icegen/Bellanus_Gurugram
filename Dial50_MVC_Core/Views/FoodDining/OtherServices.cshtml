@@ -1,0 +1,725 @@
+﻿@model BedInfo
+
+@{
+    ViewData["Title"] = ":: Food Services ::";
+}
+
+<link rel="stylesheet" href="~/css/Food.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    #requestSuccessScreen.modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+        #requestSuccessScreen.modal-overlay.show {
+            display: flex;
+        }
+
+    .request-modal {
+        background: #ffffff;
+        width: 100%;
+        max-width: 360px;
+        border-radius: 24px;
+        padding: 24px 20px 0;
+        box-sizing: border-box;
+        position: relative;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        animation: slideUpModal 0.3s ease-out;
+        overflow: hidden;
+    }
+
+    @@keyframes slideUpModal {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: #f1f5f9;
+        color: #64748b;
+        font-size: 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-avatar {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 4px solid #1abc9c;
+        background: #e2e8f0;
+    }
+
+        .modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .modal-request-id {
+        text-align: center;
+        font-size: 15px;
+        color: #1e293b;
+        margin-bottom: 16px;
+    }
+
+        .modal-request-id strong {
+            color: #0f172a;
+        }
+
+    .modal-details {
+        text-align: center;
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.5;
+        margin-bottom: 20px;
+    }
+
+        .modal-details p {
+            margin: 0 0 6px;
+        }
+
+        .modal-details strong {
+            color: #0f172a;
+        }
+
+    .eta-status-pill-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+    }
+
+    .eta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .pill-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1abc9c;
+        font-size: 14px;
+    }
+
+    .pill-text {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .pill-text small {
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-text strong {
+            font-size: 14px;
+            color: #0f172a;
+        }
+
+    .pill-divider {
+        width: 1px;
+        height: 30px;
+        background: #cbd5e1;
+    }
+
+    .success-track-btn {
+        width: 100%;
+        border: none;
+        border-radius: 30px;
+        background: #1abc9c;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+        .success-track-btn:hover {
+            background: #16a085;
+        }
+
+    .modal-footer-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 16px 0;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 20px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+        color: #1e293b;
+        cursor: pointer;
+        font-weight: 500;
+        user-select: none;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .nav-link.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            text-decoration: none;
+        }
+
+    .dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+        .dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+            .dots span.active {
+                background: #3b82f6;
+                transform: scale(1.15);
+            }
+
+        .dots .dot-gap {
+            width: auto;
+            height: auto;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1;
+            cursor: default;
+            flex-shrink: 0;
+        }
+</style>
+
+<div class="app-wrapper">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <input type="hidden" id="hdnTaskTypeId">
+
+    <div class="other-services-header" style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 24px 32px 0 32px; box-sizing: border-box;">
+        <div class="page-back">
+            <button type="button" onclick="GoToBack()" class="back-button-link">
+                <i class="fa-solid fa-arrow-left"></i> Back to Food &amp; Dining
+            </button>
+        </div>
+        <div class="services-header" style="text-align: left; margin-top: 10px;">
+            <h1 class="orders-title-header" style="margin: 0;">Other Services</h1>
+        </div>
+    </div>
+
+    <div id="servicesContainer" class="content food-content" style="display: block !important; padding: 0 !important;">
+        <div id="mainContentArea" class="other-services-wrapper">
+            <div class="services-grid" id="otherServicesGrid">
+
+                <div class="loading-placeholder" style="grid-column: span 2; text-align: center; padding: 40px;">
+                    <i class="fa-solid fa-circle-notch fa-spin"></i> Loading services...
+                </div>
+            </div>
+        </div>
+
+        <div id="requestSuccessScreen" class="modal-overlay">
+            <div class="request-modal">
+
+                <button type="button" class="modal-close-btn" onclick="closeSuccessModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+                <div class="modal-avatar">
+                    <img src="/images/default-staff.png" alt="Staff"
+                         onerror="this.src='/images/User.png'">
+                </div>
+
+                <div class="modal-request-id">
+                    Request Id: <strong id="successReqId">#-</strong>
+                </div>
+
+                <div class="modal-details">
+                    <p>Support staff <strong id="successStaffName">Not assigned yet</strong> assigned.</p>
+                    <p>Task Name: <strong id="successTaskName">-</strong></p>
+                </div>
+
+                <div class="eta-status-pill-box">
+                    <div class="eta-item">
+                        <div class="pill-icon"><i class="fa-regular fa-clock"></i></div>
+                        <div class="pill-text">
+                            <small>ETA</small>
+                            <strong id="successEta">-</strong>
+                        </div>
+                    </div>
+                    <div class="pill-divider"></div>
+                    <div class="eta-item">
+                        <div class="pill-icon"><i class="fa-solid fa-location-dot"></i></div>
+                        <div class="pill-text">
+                            <small>STATUS</small>
+                            <strong id="successStatus" style="color:#00a86b;">-</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="success-track-btn" onclick="goToTracking()">
+                    Track Status
+                </button>
+
+                <div class="modal-footer-pagination">
+                    <span class="nav-link" id="btnPrevRequest" onclick="prevRequest()">&lt; Previous</span>
+                    <div class="dots" id="dotsContainer"></div>
+                    <span class="nav-link" id="btnNextRequest" onclick="nextRequest()">Next &gt;</span>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay" style="display:none;">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="service-icon">
+                        <img id="modalIcon" src="" alt="icon" />
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h2 id="modalTitle">Request Service</h2>
+                    <p>Would you like to add any specific details for the staff?</p>
+
+                    <div class="details-label">Additional Details (Optional)</div>
+                    <textarea placeholder="e.g. Please bring extra ice, or extra sugar..." id="modalRemarks"></textarea>
+
+                    <button class="confirm-btn" id="modalSubmit">Confirm Request</button>
+                    <div class="cancel-btn" onclick="closeModal()">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <partial name="_footer"></partial>
+
+</div>
+
+<script>
+
+    var allServices      = [];
+    var allTasks         = [];
+    var currentTaskIdx   = 0;
+    var currentRequestId = 0;
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        fetchServices();
+
+        currentRequestId = parseInt(sessionStorage.getItem('lastRequestId') || '0', 10);
+
+        var buttons = document.querySelectorAll(".navBtn");
+        buttons.forEach(function (button) {
+            if (button.dataset.page === "FoodDining") {
+                button.classList.add("active");
+            }
+        });
+
+        $("#modalSubmit").click(function () {
+            submitTaskRequest();
+        });
+
+        $(document).on('click', '.service-card', function () {
+            var $card = $(this);
+            openServiceModal(
+                $card.data('title'),
+                $card.data('id'),
+                $card.data('img')
+            );
+        });
+    });
+
+    function fetchServices() {
+
+        $("#otherServicesGrid").html(`
+            <div style="grid-column: span 2; text-align: center; padding: 80px; width: 100%;">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #6366f1;"></i>
+                <p style="margin-top: 10px; color: #64748b; font-weight: 600;">Loading Services...</p>
+            </div>
+        `);
+
+        $.ajax({
+            url: '/FoodDining/GetFoodServices',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                if (data && data.length > 0) {
+                    allServices = data;
+                    renderServiceGrid(data);
+                } else {
+                    $("#otherServicesGrid").html(
+                        '<div style="grid-column: span 2; text-align: center; padding: 50px; color: #94a3b8;">No services available right now.</div>'
+                    );
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Error fetching services:", error);
+                $("#otherServicesGrid").html(
+                    '<div style="grid-column: span 2; text-align: center; padding: 50px; color: #ef4444;">Unable to load services.</div>'
+                );
+            }
+        });
+    }
+
+    function esc(str) {
+        return $('<div>').text(str == null ? '' : String(str)).html();
+    }
+
+    function serviceCardHtml(service) {
+        var title = esc(service.categoryDescription);
+        var id    = esc(service.categoryId);
+        var img   = esc(service.categoryImage);
+
+        return `
+            <div class="service-card"
+                 data-title="${title}"
+                 data-id="${id}"
+                 data-img="/${img}">
+                <div class="service-icon-box">
+                    <img src="/${img}"
+                         alt="${title}"
+                         onerror="this.src='/images/default-service.png'">
+                </div>
+                <div class="service-title">
+                    ${title}
+                </div>
+            </div>`;
+    }
+
+    function renderServiceGrid(data) {
+        var html = "";
+        for (var i = 0; i < data.length; i++) {
+            html += serviceCardHtml(data[i]);
+        }
+        $("#otherServicesGrid").html(html);
+    }
+
+
+    function openServiceModal(title, id, iconPath) {
+        $("#modalTitle").text(title);
+        $("#hdnTaskTypeId").val(id);
+
+        var img = (iconPath == null ? "" : String(iconPath)).trim();
+        img = img.replace(/^\/+/, "");
+
+        var finalSrc = img.length > 0
+            ? "/" + img
+            : "/images/default-service.png";
+
+        $("#modalIcon")
+            .off("error")
+            .on("error", function () {
+                this.onerror = null;
+                this.src = "/images/default-service.png";
+            })
+            .attr("src", finalSrc)
+            .attr("alt", title || "service");
+
+        $("#modalOverlay").fadeIn(200);
+    }
+
+    function closeModal() {
+        $("#modalOverlay").fadeOut(200);
+        $(".other-services-wrapper").css({
+            "opacity": "1",
+            "filter": "none"
+        });
+        $("#modalRemarks").val("");
+    }
+
+    function goToTracking() {
+        if (currentRequestId && currentRequestId > 0) {
+            BedContext.go('Tracking', { RequestID: currentRequestId });
+        } else {
+            BedContext.go('Tracking');
+        }
+    }
+    
+    function submitTaskRequest() {
+
+        const remarks    = $("#modalRemarks").val();
+        const categoryId = $("#hdnTaskTypeId").val();
+        const bc         = BedContext.get();
+        const userName   = bc.patientName || '';
+        const actualRoom = bc.roomBed || bc.roomNumber || '';
+
+        if (!actualRoom) {
+            alert("Session expired. Please re-login.");
+            return;
+        }
+
+        $("#modalSubmit").prop("disabled", true).text("Submitting...");
+
+        $.ajax({
+            url: "/FoodDining/SubmitOtherServiceRequest",
+            type: "POST",
+            data: {
+                categoryId: categoryId,
+                remarks:    remarks,
+                roomNo:     actualRoom,
+                userName:   userName
+            },            success: function (response) {
+
+                if (response.success) {
+
+                    currentRequestId = response.requestId || 0;
+                    sessionStorage.setItem('lastRequestId', currentRequestId);
+
+                    closeModal();
+                    $("#mainContentArea").hide();
+
+                    loadSuccessTasks();
+                    $("#modalSubmit").prop("disabled", false).text("Confirm Request");
+
+
+                } else {
+                    alert("Failed to raise request.");
+                    $("#modalSubmit").prop("disabled", false).text("Confirm Request");
+                }
+            },
+            error: function () {
+                alert("Ajax Error");
+                $("#modalSubmit").prop("disabled", false).text("Confirm Request");
+            }
+        });
+    }
+
+    function loadSuccessTasks() {
+
+        var bc        = BedContext.get();
+        var bedId     = encodeURIComponent(bc.bedId || '');
+        var bedNumber = encodeURIComponent(bc.bedNumber || '');
+        var token     = encodeURIComponent(bc.bedInfo || '');
+
+        var url = '/AI/GetFreshTask'
+                + '?bedId=' + bedId
+                + '&bedNumber=' + bedNumber
+                + '&token=' + token
+                + '&windowSeconds=86400'
+                + '&lastSeenTaskId=';
+
+        fetch(url)
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+
+                if (!Array.isArray(data)) data = [];
+
+                if (data.length > 0) {
+                    allTasks = data;
+                } else {
+                    allTasks = [{
+                        taskId:     currentRequestId ? currentRequestId.toString() : '-',
+                        taskName:   $('#modalTitle').text() || 'Request',
+                        porterName: '',
+                        status:     'PENDING',
+                        fromRoom:   serverRoomBed || '',
+                        service:    'REQUEST'
+                    }];
+                }
+
+                currentTaskIdx = 0;
+                renderSuccessTask(currentTaskIdx);
+                document.getElementById('requestSuccessScreen').classList.add('show');
+            })
+            .catch(function (err) {
+                console.warn('[Success Modal] GetFreshTask failed — using fallback', err);
+
+                allTasks = [{
+                    taskId:     currentRequestId ? currentRequestId.toString() : '-',
+                    taskName:   $('#modalTitle').text() || 'Request',
+                    porterName: '',
+                    status:     'PENDING',
+                    fromRoom:   serverRoomBed || '',
+                    service:    'REQUEST'
+                }];
+
+                currentTaskIdx = 0;
+                renderSuccessTask(currentTaskIdx);
+                document.getElementById('requestSuccessScreen').classList.add('show');
+            });
+    }
+
+    function pick(obj) {
+        for (var i = 1; i < arguments.length; i++) {
+            var k = arguments[i];
+            if (obj[k] !== undefined && obj[k] !== null) return obj[k];
+        }
+        return '';
+    }
+
+    function renderSuccessTask(index) {
+
+        if (!allTasks || allTasks.length === 0) return;
+
+        if (index < 0) index = 0;
+        if (index > allTasks.length - 1) index = allTasks.length - 1;
+        currentTaskIdx = index;
+
+        const task = allTasks[currentTaskIdx];
+
+        $('#successReqId').text('#' + (pick(task, 'taskId', 'TaskId', 'TaskID') || '-'));
+        $('#successTaskName').text(pick(task, 'taskName', 'TaskName') || '-');
+        $('#successStaffName').text(pick(task, 'porterName', 'PorterName') || 'Not assigned yet');
+        $('#successStatus').text(pick(task, 'status', 'Status') || '-').css('color', '#0f172a');
+        $('#successEta').text('-');
+
+        renderDots();
+
+        var isFirst = (currentTaskIdx === 0);
+        var isLast  = (currentTaskIdx === allTasks.length - 1);
+
+        $('#btnPrevRequest').toggleClass('disabled', isFirst);
+        $('#btnNextRequest').toggleClass('disabled', isLast);
+    }
+
+    function renderDots() {
+
+        var dotsEl = document.getElementById('dotsContainer');
+        if (!dotsEl) return;
+
+        var total = allTasks.length;
+        var maxDots = 7;
+        var html = '';
+
+        if (total <= maxDots) {
+
+            for (var i = 0; i < total; i++) {
+                html += '<span class="' + (i === currentTaskIdx ? 'active' : '') +
+                        '" onclick="jumpToTask(' + i + ')"></span>';
+            }
+
+        } else {
+
+            var half = Math.floor(maxDots / 2);
+            var start = currentTaskIdx - half;
+            var end = currentTaskIdx + half;
+
+            if (start < 0) { start = 0; end = maxDots - 1; }
+            if (end > total - 1) { end = total - 1; start = total - maxDots; }
+
+            if (start > 0) {
+                html += '<span class="' + (currentTaskIdx === 0 ? 'active' : '') +
+                        '" onclick="jumpToTask(0)"></span>';
+                if (start > 1) {
+                    html += '<span class="dot-gap">…</span>';
+                }
+            }
+
+            for (var j = start; j <= end; j++) {
+                html += '<span class="' + (j === currentTaskIdx ? 'active' : '') +
+                        '" onclick="jumpToTask(' + j + ')"></span>';
+            }
+
+            if (end < total - 1) {
+                if (end < total - 2) {
+                    html += '<span class="dot-gap">…</span>';
+                }
+                html += '<span class="' + (currentTaskIdx === total - 1 ? 'active' : '') +
+                        '" onclick="jumpToTask(' + (total - 1) + ')"></span>';
+            }
+        }
+
+        dotsEl.innerHTML = html;
+    }
+
+    function jumpToTask(i) {
+        if (i < 0 || i >= allTasks.length) return;
+        currentTaskIdx = i;
+        renderSuccessTask(currentTaskIdx);
+    }
+
+    function prevRequest() {
+        console.log('[Prev] idx=', currentTaskIdx, '/ len=', allTasks.length);
+
+        if (currentTaskIdx > 0) {
+            currentTaskIdx--;
+            renderSuccessTask(currentTaskIdx);
+        } else {
+            console.log('[Prev] already at first task — no-op');
+        }
+    }
+
+    function nextRequest() {
+        console.log('[Next] idx=', currentTaskIdx, '/ len=', allTasks.length);
+
+        if (currentTaskIdx < allTasks.length - 1) {
+            currentTaskIdx++;
+            renderSuccessTask(currentTaskIdx);
+        } else {
+            console.log('[Next] already at last task — no-op');
+        }
+    }
+
+    function closeSuccessModal() {
+        document.getElementById('requestSuccessScreen').classList.remove('show');
+        $('#mainContentArea').show();
+    }
+
+    function GoToBack() {
+        BedContext.go('FoodDining');
+    }
+
+</script>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>

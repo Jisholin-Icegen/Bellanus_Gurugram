@@ -1,0 +1,251 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<style>
+    .fab-wrap {
+        position: fixed;
+        bottom: 90px;
+        right: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 14px;
+        z-index: 2147483647;
+        pointer-events: none;
+    }
+
+    .fab-action {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(12px) scale(.8);
+        pointer-events: none;
+        transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .fab-wrap.open .fab-action {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+        .fab-wrap.open .fab-action:nth-child(1) {
+            transition-delay: .02s;
+        }
+
+        .fab-wrap.open .fab-action:nth-child(2) {
+            transition-delay: .07s;
+        }
+
+    .fab-action .lbl {
+        background: #ffffff;
+        color: #2c313a;
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 6px 11px;
+        border-radius: 8px;
+        box-shadow: 0 3px 12px rgba(0,0,0,.15);
+        white-space: nowrap;
+    }
+
+    .mini {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(120,80,200,.4);
+    }
+
+        .mini.requests {
+            background: linear-gradient(150deg, #a94fd6, #7a5fe0);
+        }
+
+        .mini.talk {
+            background: linear-gradient(150deg, #7b4fd6, #5f3fc9);
+        }
+
+    .fab-main {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(150deg, #3aa79f, #2f8f88);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 24px rgba(47,143,136,.5);
+        transition: transform .25s ease;
+        pointer-events: auto;
+    }
+
+    .fab-wrap.open .fab-main {
+        transform: rotate(135deg);
+    }
+
+    .fab-main .close-ico {
+        display: none;
+    }
+
+    .fab-wrap.open .fab-main .support-ico {
+        display: none;
+    }
+
+    .fab-wrap.open .fab-main .close-ico {
+        display: block;
+    }
+
+    .fab-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(20,24,34,.28);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .2s ease;
+        z-index: 2147483646;
+    }
+
+        .fab-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+    footer {
+        text-align: center;
+        padding: 8px 0;
+        font-size: 13px;
+        color: #888;
+        position: relative;
+        z-index: 10000;
+    }
+
+    @@media (min-width: 768px) {
+        .fab-wrap {
+            right: 32px;
+            bottom: 100px;
+        }
+    }
+
+    @@media (min-width: 1024px) {
+        .fab-wrap {
+            right: 48px;
+        }
+    }
+</style>
+
+<script>
+    function openRequests() {
+        BedContext.go('MyRequests');
+    }
+
+    function openAI() {
+        var bc = BedContext.get();
+        if (!bc.bedInfo) {
+            console.warn('[nav] no BedInfo token — cannot open AI call');
+            return;
+        }
+        BedContext.go('Home', { autoStartCall: '1' });
+    }
+
+    function Home() {
+        BedContext.go('Home');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var fabWrap = document.getElementById('fabWrap');
+        var fabMain = document.getElementById('fabMain');
+        var overlay = document.getElementById('fabOverlay');
+
+        function toggleFab(open) {
+            fabWrap.classList.toggle('open', open);
+            overlay.classList.toggle('show', open);
+            fabMain.setAttribute('aria-expanded', open);
+        }
+
+        fabMain.addEventListener('click', function (e) {
+            e.stopPropagation();
+            toggleFab(!fabWrap.classList.contains('open'));
+        });
+
+        overlay.addEventListener('click', function () {
+            toggleFab(false);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                toggleFab(false);
+            }
+        });
+    });
+</script>
+
+<footer>
+
+    <div class="fab-wrap" id="fabWrap">
+
+        @if (controller != "MyRequests")
+        {
+            <div class="fab-action" onclick="openRequests()">
+                <span class="lbl">My Requests</span>
+                <button class="mini requests" aria-label="My Requests">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="5" y="4" width="14" height="17" rx="2" />
+                        <path d="M9 4V3a1 1 0 011-1h4a1 1 0 011 1v1" />
+                        <path d="M8.5 11l1.4 1.4 2.6-2.6" />
+                        <path d="M14 11.2h2.5" />
+                        <path d="M8.5 16l1.4 1.4 2.6-2.6" />
+                        <path d="M14 16h2.5" />
+                    </svg>
+                </button>
+            </div>
+        }
+
+        @if (controller != "AI" && controller != "Home" && controller != "DischargeFeedback")
+        {
+            <div class="fab-action" onclick="openAI()">
+                <span class="lbl">Talk to AI</span>
+                <button class="mini talk" aria-label="Talk to AI">
+                    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v2.5" />
+                        <circle cx="12" cy="2.4" r="1.1" fill="currentColor" stroke="none" />
+                        <rect x="5" y="6" width="14" height="11" rx="3" />
+                        <circle cx="9.3" cy="11.3" r="1.3" fill="currentColor" stroke="none" />
+                        <circle cx="14.7" cy="11.3" r="1.3" fill="currentColor" stroke="none" />
+                        <path d="M9.5 14.3h5" />
+                        <path d="M3 10.5v3.5M21 10.5v3.5" />
+                    </svg>
+                </button>
+            </div>
+        }
+
+        <button class="fab-main" id="fabMain" aria-label="Support" aria-expanded="false">
+            <svg class="support-ico" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+                <path d="M4 13v-1a8 8 0 0116 0v1" />
+                <path d="M4 13a2 2 0 012-2h0a1 1 0 011 1v4a1 1 0 01-1 1h0a2 2 0 01-2-2z" />
+                <path d="M20 13a2 2 0 00-2-2h0a1 1 0 00-1 1v4a1 1 0 001 1h0a2 2 0 002-2z" />
+                <path d="M18 17v1a3 3 0 01-3 3h-3" />
+            </svg>
+            <svg class="close-ico" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="fab-overlay" id="fabOverlay"></div>
+
+    <div>© 2026 Icegen Computing</div>
+    <div id="dynamic-time"></div>
+</footer>

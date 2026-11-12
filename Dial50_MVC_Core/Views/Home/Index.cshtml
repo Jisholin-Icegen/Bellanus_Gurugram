@@ -1,0 +1,3312 @@
+@model BedInfo
+@{
+    ViewData["Title"] = ":: Chat AI ::";
+
+}
+
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<script src="~/js/voice-agent/config.js"></script>
+
+<link rel="stylesheet" href="~/css/DailyCare.css">
+<link rel="stylesheet" href="~/css/voice-agent/styles.css">
+
+<style>
+
+    body:not([data-state]) #callLayer,
+    body:not([data-state]) #endedLayer,
+    body:not([data-state]) .call-layer,
+    body:not([data-state]) .ended-layer {
+        display: none !important;
+    }
+
+    html[data-autostart="pending"] .app-wrapper > *:not(#autoStartLoader) {
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+
+    #autoStartLoader {
+        display: none;
+        position: fixed;
+        inset: 0;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        background: #f1f3f7;
+        z-index: 100002;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    html[data-autostart="pending"] #autoStartLoader {
+        display: flex !important;
+    }
+
+    #autoStartLoader .spinner {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        border: 3px solid #e2e8f0;
+        border-top-color: #6366f1;
+        animation: autostartSpin 0.8s linear infinite;
+    }
+
+    #autoStartLoader .lbl {
+        font-size: 15px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    @@keyframes autostartSpin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    html {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f1f3f7 !important;
+    }
+
+    body {
+        width: 100% !important;
+        min-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #f1f3f7 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        min-height: 100vh !important;
+    }
+
+    .app-wrapper {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 430px !important;
+        min-width: 320px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+        left: auto !important;
+        right: auto !important;
+        transform: none !important;
+    }
+
+    @@media (max-width: 480px) {
+        body {
+            justify-content: stretch !important;
+        }
+
+        .app-wrapper {
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    }
+
+    .content {
+        display: flex !important;
+        flex: 1;
+        min-height: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 24px !important; 
+    }
+
+    main {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 2px 12px 4px 12px;
+        margin: 0;
+        gap: 8px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .widget__prompt {
+        flex: 0 0 auto;
+        margin: 0 !important;
+        padding: 2px 0 !important;
+        height: auto;
+        line-height: 1.2;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    body[data-state="idle"] .app-wrapper {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+    }
+
+    body[data-state="idle"] .content,
+    body[data-state="idle"] main,
+    body[data-state="idle"] #pageContent {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+    }
+
+    body[data-state="idle"] #pageNav {
+        position: relative !important;
+        top: auto !important;
+        margin: 0 !important;
+    }
+
+    #interactiveCard {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border-radius: 0 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        inset: auto !important;
+    }
+
+    body[data-state="idle"] #interactiveCard {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        inset: auto !important;
+    }
+
+    .idle-layer {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        display: block !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        inset: auto !important;
+    }
+
+    body[data-state="idle"] .idle-layer {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        inset: auto !important;
+        display: block !important;
+    }
+
+    .grace-idle {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        margin: 0 0 8px 0 !important;
+        padding: 22px 16px 26px 16px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        inset: auto !important;
+        background: linear-gradient(135deg, #6366f1, #7c3aed) !important;
+        border-radius: 20px !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        gap: 0 !important;
+    }
+
+        .grace-idle * {
+            box-sizing: border-box !important;
+        }
+
+    body[data-state="idle"] .grace-idle {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        inset: auto !important;
+        margin: 0 0 8px 0 !important;
+        padding: 22px 16px 26px 16px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .grace-idle-desc {
+        order: 1 !important;
+        width: 100% !important;
+        margin: 0 0 18px 0 !important;
+        padding: 0 !important;
+        text-align: center !important;
+        color: #ffffff !important;
+        font-family: inherit !important;
+        font-size: 17px !important;
+        font-weight: 700 !important;
+        line-height: 1.35 !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        position: static !important;
+    }
+
+    .grace-idle-btn {
+        order: 2 !important;
+        position: relative !important;
+        width: 154px !important;
+        height: 154px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        cursor: pointer !important;
+        display: block !important;
+        line-height: 0 !important;
+    }
+
+    .grace-idle-avatar {
+        width: 154px !important;
+        height: 154px !important;
+        position: relative !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        background: transparent !important;
+        border: 4px solid #ffffff !important;
+        box-shadow: none !important;
+        display: block !important;
+    }
+
+        .grace-idle-avatar img {
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+        }
+
+    .grace-idle-pill {
+        position: absolute !important;
+        left: 50% !important;
+        bottom: 17px !important;
+        transform: translateX(-50%) !important;
+        z-index: 10 !important;
+        height: 38px !important;
+        padding: 0 17px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        white-space: nowrap !important;
+        color: #ffffff !important;
+        font-family: inherit !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 1 !important;
+        background: rgba(69, 42, 139, 0.78) !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.42) !important;
+        border-radius: 22px !important;
+        box-shadow: none !important;
+        letter-spacing: 0 !important;
+        animation: none !important;
+    }
+
+    .grace-idle-btn:hover .grace-idle-pill {
+        background: rgba(75, 46, 150, 0.88) !important;
+    }
+
+    .grace-idle-btn:active {
+        transform: scale(0.98) !important;
+    }
+
+    .grace-idle-btn:focus {
+        outline: none !important;
+    }
+
+    body:has(.video-overlay.show) #header,
+    body:has(.video-overlay.show) .header,
+    body:has(.video-overlay.show) .header-flex,
+    body:has(.video-overlay.show) .header-nav,
+    body:has(.video-overlay.show) .support-ico,
+    body:has(.video-overlay.show) .support-icon,
+    body:has(.video-overlay.show) .support-icons,
+    body:has(.video-overlay.show) footer,
+    body:has(.video-overlay.show) #footer,
+    body:has(.video-overlay.show) .app-wrapper > footer,
+    body:has(.video-overlay.show) #pageNav,
+    body:has(.video-overlay.show) .nav,
+    body:has(.video-overlay.show) .nav-bar,
+    body:has(.video-overlay.show) .bottom-nav,
+    body:has(.video-overlay.show) .top-nav,
+    body:has(.video-overlay.show) .app-nav,
+    body:has(.video-overlay.show) .assistant-titlebar,
+    body:has(.video-overlay.show) .floating-support-btn,
+    body:has(.video-overlay.show) .support-btn {
+        display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    body:has(.video-overlay.show) .video-overlay.show {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 100000 !important;
+        border-radius: 0 !important;
+    }
+
+    .patfeedback-card {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        border-radius: 20px;
+        padding: 16px 20px;
+        cursor: pointer;
+        overflow: hidden;
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        background: linear-gradient(135deg, #08b8a5, #009f78) !important;
+        color: #fff;
+        margin-bottom: 8px;
+        margin-top: 0 !important;
+        flex-shrink: 0;
+        clear: both;
+    }
+
+        .patfeedback-card:active {
+            transform: translateY(-1px);
+        }
+
+        .patfeedback-card h3 {
+            color: #ffffff !important;
+            margin: 0 0 3px 0;
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .patfeedback-card p {
+            color: rgba(255,255,255,0.9) !important;
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.3;
+            max-width: 80%;
+            margin: 0 0 6px 0;
+        }
+
+        .patfeedback-card .card-pill {
+            background: #d8c900 !important;
+            color: #4d4a00 !important;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 20px;
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.3);
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+
+            .patfeedback-card .card-pill i {
+                font-size: 8px;
+                margin-right: 3px;
+                color: #4d4a00 !important;
+            }
+
+        .patfeedback-card .card-link-row {
+            margin-top: auto;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+            .patfeedback-card .card-link-row span {
+                color: #ffffff !important;
+            }
+
+        .patfeedback-card .bg-icon {
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-size: 60px;
+            color: rgba(255,255,255,0.15) !important;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+    .bottom-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: linear-gradient(135deg, #6366f1, #7c3aed);
+        border-radius: 20px;
+        padding: 12px 16px;
+        color: white;
+        margin-top: 8px;
+        flex-shrink: 0;
+        min-height: 55px;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+    }
+
+        .bottom-card h3 {
+            font-size: 14px;
+            margin: 0;
+            color: white;
+            font-weight: 600;
+        }
+
+    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) {
+        overflow: hidden !important;
+    }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .content {
+            min-height: 0 !important;
+            overflow: hidden !important;
+            flex: 1 1 auto !important;
+            padding-bottom: 0 !important;
+        }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) main {
+            overflow: hidden !important;
+            padding: 0 !important;
+            gap: 0 !important;
+        }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #interactiveCard {
+            position: relative !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            max-height: none !important;
+            margin: 0 !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            box-sizing: border-box !important;
+            overflow: hidden !important;
+            flex: 1 1 auto !important;
+        }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #callLayer {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            padding: 20px 16px !important;
+            overflow: hidden !important;
+            background: #0f172a !important;
+        }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .patfeedback-card,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .bottom-card,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .idle-layer,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #pageNav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .nav-bar,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .bottom-nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .top-nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .app-nav {
+            display: none !important;
+        }
+
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar {
+            display: flex !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            width: 100% !important;
+            height: 40px !important;
+            min-height: 40px !important;
+            background: #ffffff !important;
+            flex-shrink: 0 !important;
+        }
+
+            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar .assistant-title {
+                color: #000000 !important;
+            }
+
+            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar .back-arrow-icon {
+                filter: brightness(0) invert(1) !important;
+            }
+
+    .call-rings {
+        width: min(55vw, 220px);
+        height: min(55vw, 220px);
+        max-width: 220px;
+        max-height: 220px;
+    }
+
+    .call-title {
+        margin-top: 28px !important;
+        font-size: clamp(20px, 5vw, 28px) !important;
+        text-align: center;
+    }
+
+    .call-status-row {
+        margin-top: 8px !important;
+    }
+
+    .call-controls {
+        margin-top: 28px !important;
+    }
+
+    .hangup-btn {
+        margin-top: 24px !important;
+    }
+
+    @@media (max-width: 480px) {
+        .grace-idle {
+            padding: 20px 14px 24px 14px !important;
+        }
+
+        .grace-idle-desc {
+            font-size: 16px !important;
+            margin-bottom: 16px !important;
+        }
+
+        .grace-idle-btn,
+        .grace-idle-avatar {
+            width: 140px !important;
+            height: 140px !important;
+        }
+
+        .grace-idle-pill {
+            bottom: 14px !important;
+            height: 34px !important;
+            padding: 0 15px !important;
+            font-size: 13px !important;
+        }
+    }
+
+    @@media (max-height: 650px) {
+        .call-rings {
+            width: 160px !important;
+            height: 160px !important;
+        }
+
+        .call-title {
+            margin-top: 16px !important;
+            font-size: 20px !important;
+        }
+
+        .call-controls {
+            margin-top: 16px !important;
+        }
+
+        .hangup-btn {
+            margin-top: 12px !important;
+        }
+    }
+
+    @@media (min-height: 800px) {
+        .call-rings {
+            width: 210px !important;
+            height: 210px !important;
+        }
+
+        .call-controls {
+            margin-top: 32px !important;
+        }
+
+        .hangup-btn {
+            margin-top: 28px !important;
+        }
+    }
+
+    .control-btn#micBtn,
+    .control-btn.speaker-btn {
+        position: relative !important;
+        width: 56px !important;
+        height: 56px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 50% !important;
+        background: linear-gradient( 145deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0.03) ) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 0 rgba(255, 255, 255, 0.05), 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: visible !important;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+        transition: transform 0.1s ease, box-shadow 0.2s ease !important;
+    }
+
+        .control-btn#micBtn .control-icon,
+        .control-btn.speaker-btn .control-icon {
+            width: 24px !important;
+            height: 24px !important;
+            object-fit: contain !important;
+            display: block !important;
+            filter: brightness(0) invert(1) !important;
+            opacity: 1 !important;
+        }
+
+        .control-btn#micBtn.muted::before,
+        .control-btn.speaker-btn.muted::before {
+            content: "" !important;
+            position: absolute !important;
+            inset: 0 !important;
+            border-radius: 50% !important;
+            background: radial-gradient( circle at center, rgba(39, 157, 148, 0.18), transparent 70% ) !important;
+            pointer-events: none !important;
+            z-index: 1 !important;
+        }
+
+        .control-btn#micBtn.muted::after,
+        .control-btn.speaker-btn.muted::after {
+            content: "" !important;
+            position: absolute !important;
+            width: 34px !important;
+            height: 3px !important;
+            background: linear-gradient( 90deg, rgba(39, 157, 148, 0) 0%, #279d94 15%, #2ee0d2 50%, #279d94 85%, rgba(39, 157, 148, 0) 100% ) !important;
+            border-radius: 3px !important;
+            transform: rotate(-45deg) !important;
+            pointer-events: none !important;
+            z-index: 3 !important;
+            box-shadow: 0 0 6px rgba(46, 224, 210, 0.6), 0 0 12px rgba(39, 157, 148, 0.35) !important;
+        }
+
+        .control-btn#micBtn:active,
+        .control-btn.speaker-btn:active {
+            transform: scale(0.92) !important;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20), inset 0 -1px 0 rgba(255, 255, 255, 0.05), 0 3px 10px rgba(0, 0, 0, 0.40) !important;
+        }
+
+        .control-btn#micBtn:focus,
+        .control-btn.speaker-btn:focus {
+            outline: none !important;
+        }
+
+    .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.82);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+        box-sizing: border-box;
+        border-radius: inherit;
+        overflow: hidden;
+    }
+
+        .video-overlay.show {
+            display: flex;
+        }
+
+    .video-modal {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        max-height: 90%;
+        display: flex;
+        flex-direction: column;
+        background: transparent;
+        border-radius: 0;
+        overflow: hidden;
+        box-shadow: none;
+        margin-top: -40px;
+    }
+
+    .video-modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 0;
+        background: transparent;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+        .video-modal-body .video-frame {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            height: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+            border: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+        }
+
+            .video-modal-body .video-frame iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+            }
+
+    .video-overlay-back {
+        width: 100%;
+        height: 48px;
+        margin-top: 16px;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+
+        .video-overlay-back:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .video-overlay-back:active {
+            transform: scale(0.98);
+        }
+
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+        .modal-overlay.show {
+            display: flex !important;
+        }
+
+    .request-modal {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        background: #ffffff;
+        border-radius: 24px;
+        padding: 24px 20px 0;
+        text-align: center;
+        box-sizing: border-box;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        margin: auto;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        animation: slideUpModal 0.3s ease-out;
+        overflow: hidden;
+    }
+
+    @@keyframes slideUpModal {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-close-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: none;
+        padding: 0;
+        z-index: 10;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+        .modal-close-btn:hover {
+            background: #e2e8f0;
+        }
+
+    .modal-avatar {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        border: 4px solid #1abc9c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+        .modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+    .modal-request-id {
+        text-align: center;
+        font-size: 15px;
+        color: #1e293b;
+        margin-bottom: 16px;
+    }
+
+        .modal-request-id strong {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+    .modal-details {
+        text-align: center;
+        font-size: 14px;
+        color: #475569;
+        line-height: 1.5;
+        margin-bottom: 20px;
+        word-break: break-word;
+    }
+
+        .modal-details p {
+            margin: 0 0 6px;
+        }
+
+        .modal-details strong {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+    .eta-status-pill-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        gap: 0;
+    }
+
+    .eta-item {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pill-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0;
+        font-size: 14px;
+        color: #1abc9c;
+        flex-shrink: 0;
+    }
+
+    .pill-text {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        min-width: 0;
+    }
+
+        .pill-text small {
+            display: block;
+            font-size: 10px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 0;
+        }
+
+        .pill-text strong {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+    .pill-divider {
+        width: 1px;
+        height: 30px;
+        background: #cbd5e1;
+        flex-shrink: 0;
+        margin: 0 8px;
+    }
+
+    .success-track-btn {
+        width: 100%;
+        border: none;
+        border-radius: 30px;
+        background: #1abc9c;
+        color: #fff;
+        font-size: 15px;
+        font-weight: 700;
+        padding: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+        margin-bottom: 0;
+    }
+
+        .success-track-btn:hover {
+            background: #16a085;
+        }
+
+    .modal-footer-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 16px 0;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 20px;
+        font-size: 13px;
+        color: #1e293b;
+        font-weight: 500;
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .nav-link {
+        cursor: pointer;
+        padding: 6px 4px;
+        user-select: none;
+        white-space: nowrap;
+        flex-shrink: 0;
+        color: #1e293b;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .nav-link.disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+            pointer-events: none;
+            text-decoration: none;
+        }
+
+    .dots {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+        .dots .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #cbd5e1;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+            .dots .dot.active {
+                background: #3b82f6;
+                transform: scale(1.15);
+            }
+
+            .dots .dot:hover {
+                background: #94a3b8;
+            }
+
+        .dots .dot-gap {
+            width: auto;
+            height: auto;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 12px;
+            line-height: 1;
+            padding: 0 1px;
+            cursor: default;
+            flex-shrink: 0;
+            user-select: none;
+        }
+
+    #interactiveCard .call-layer .call-rings .call-avatar,
+    #interactiveCard .call-layer .call-avatar {
+        position: absolute !important;
+        left: auto !important;
+        top: auto !important;
+        right: 22px !important;
+        bottom: 22px !important;
+        transform: none !important;
+        width: 62px !important;
+        height: 62px !important;
+        min-width: 62px !important;
+        min-height: 62px !important;
+        max-width: 62px !important;
+        max-height: 62px !important;
+        border-radius: 50% !important;
+        background: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        z-index: 6 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    #interactiveCard .call-layer .call-rings .call-avatar-icon,
+    #interactiveCard .call-layer .call-avatar-icon {
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        display: block !important;
+        filter: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
+    }
+
+    body[data-state="ended"] .call-avatar,
+    body[data-state="ended"] .call-layer .call-avatar,
+    body[data-state="ended"] .call-rings .call-avatar {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    #interactiveCard .ended-layer .ended-avatar-container {
+        width: 100px !important;
+        height: 100px !important;
+        min-width: 100px !important;
+        min-height: 100px !important;
+        max-width: 100px !important;
+        max-height: 100px !important;
+        border-radius: 50% !important;
+        background: #ffffff !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 5 !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    #interactiveCard .ended-layer .ended-avatar-icon-img {
+        width: 100% !important;
+        height: 100% !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        object-fit: cover !important;
+        object-position: center !important;
+        display: block !important;
+        filter: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
+    }
+
+
+    .hangup-btn .end-call-icon,
+    #endChatBtn img {
+        filter: brightness(0) invert(1) !important;
+        opacity: 1 !important;
+    }
+
+    body:is([data-state="connecting"], [data-state="connected"]) #callLayer,
+    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *,
+    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *::before,
+    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *::after {
+        animation: none !important;
+        text-shadow: none !important;
+    }
+
+    #assistantTitlebar .assistant-back-btn,
+    #assistantBackBtn {
+        width: 30px !important;
+        height: 30px !important;
+        min-width: 30px !important;
+        padding: 0 !important;
+    }
+
+    #assistantTitlebar .back-arrow-icon {
+        width: 16px !important;
+        height: auto !important;
+    }
+
+    #assistantTitlebar .assistant-title {
+        font-size: 17px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+    }
+
+    .request-loading-overlay {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(15, 23, 42, 0.35);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999999;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+        .request-loading-overlay.show {
+            display: flex;
+        }
+
+    .request-loading-modal {
+        position: relative;
+        width: 100%;
+        max-width: 360px;
+        min-height: 360px;
+        background: #ffffff;
+        border-radius: 24px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        overflow: hidden;
+        box-sizing: border-box;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.20);
+        padding: 40px 25px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        animation: loadingModalIn 0.25s ease-out;
+    }
+
+        .request-loading-modal::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.38;
+            pointer-events: none;
+            background-image: linear-gradient(30deg, #edf1f4 12%, transparent 12.5%, transparent 87%, #edf1f4 87.5%, #edf1f4), linear-gradient(150deg, #edf1f4 12%, transparent 12.5%, transparent 87%, #edf1f4 87.5%, #edf1f4), linear-gradient(30deg, #edf1f4 12%, transparent 12.5%, transparent 87%, #edf1f4 87.5%, #edf1f4), linear-gradient(150deg, #edf1f4 12%, transparent 12.5%, transparent 87%, #edf1f4 87.5%, #edf1f4), linear-gradient(60deg, #f5f7f8 25%, transparent 25.5%, transparent 75%, #f5f7f8 75%);
+            background-size: 80px 140px;
+            background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0;
+        }
+
+    .loading-icon-wrapper {
+        position: relative;
+        width: 130px;
+        height: 130px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 28px;
+        z-index: 2;
+    }
+
+    .loading-icon-circle {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        background: #f0f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 2;
+    }
+
+        .loading-icon-circle i {
+            color: #009f94;
+            font-size: 42px;
+        }
+
+    .loading-ring {
+        position: absolute;
+        width: 124px;
+        height: 124px;
+        border-radius: 50%;
+        border: 4px solid transparent;
+        pointer-events: none;
+        z-index: 3;
+    }
+
+    .ring-1 {
+        border-top-color: #00b8a9;
+        border-right-color: #00b8a9;
+        animation: loadingSpin 1.3s linear infinite;
+    }
+
+    .ring-2 {
+        border-bottom-color: #00b8a9;
+        border-left-color: #00b8a9;
+        animation: loadingSpinReverse 1.3s linear infinite;
+    }
+
+    .loading-title {
+        position: relative;
+        z-index: 2;
+        color: #10233d;
+        font-size: 24px;
+        line-height: 32px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .loading-subtitle {
+        position: relative;
+        z-index: 2;
+        color: #55708f;
+        font-size: 15px;
+        line-height: 22px;
+        font-weight: 400;
+    }
+
+    @@keyframes loadingSpin {
+        from
+
+    {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    @@keyframes loadingSpinReverse {
+        from
+
+    {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+
+    }
+
+    @@keyframes loadingModalIn {
+        from
+
+    {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .request-loading-modal
+
+    {
+        max-width: 340px;
+        min-height: 340px;
+    }
+
+    }
+
+    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #callLayer > * {
+        flex-shrink: 0 !important;
+    }
+
+    body[data-state="idle"] .content,
+    body[data-state="idle"] main,
+    body[data-state="idle"] #pageContent {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    body[data-state="idle"] .grace-idle,
+    body[data-state="idle"] .patfeedback-card,
+    body[data-state="idle"] .bottom-card {
+        width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .patient-status-card {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        min-height: 110px !important;
+        height: auto !important;
+        flex: 0 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: space-between !important;
+        padding: 16px 20px !important;
+        margin: 8px 0 !important;
+        overflow: hidden !important;
+        box-sizing: border-box !important;
+        border-radius: 20px !important;
+        background: linear-gradient(135deg, #6366f1, #7c3aed) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+        cursor: pointer !important;
+        isolation: isolate !important;
+        color: #ffffff !important;
+    }
+
+        .patient-status-card .card-content-row {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 8px !important;
+            width: 100% !important;
+            position: relative !important;
+            z-index: 2 !important;
+            margin-top: auto !important;
+        }
+
+        .patient-status-card h3 {
+            position: relative !important;
+            z-index: 2 !important;
+            width: auto !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: #ffffff !important;
+            font-size: 17px !important;
+            font-weight: 800 !important;
+            line-height: 1.2 !important;
+            text-align: left !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        .patient-status-card .status-icon {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            z-index: 2 !important;
+            width: 40px !important;
+            height: 40px !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 12px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            box-shadow: none !important;
+            margin-bottom: 8px !important;
+        }
+
+            .patient-status-card .status-icon i {
+                color: #ffffff !important;
+                font-size: 18px !important;
+            }
+
+        .patient-status-card .status-arrow {
+            position: relative !important;
+            right: auto !important;
+            bottom: auto !important;
+            z-index: 3 !important;
+            width: 32px !important;
+            height: 32px !important;
+            flex-shrink: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+            line-height: 1 !important;
+        }
+
+        .patient-status-card .bg-icon {
+            position: absolute !important;
+            right: -15px !important;
+            bottom: -15px !important;
+            top: auto !important;
+            left: auto !important;
+            z-index: 1 !important;
+            font-size: 90px !important;
+            line-height: 1 !important;
+            color: rgba(255, 255, 255, 0.15) !important;
+            transform: rotate(-15deg) !important;
+            pointer-events: none !important;
+        }
+
+    @@media (max-width: 480px) {
+        .patient-status-card {
+            min-height: 110px !important;
+            padding: 16px 20px !important;
+            margin: 8px 0 !important;
+            border-radius: 20px !important;
+        }
+
+            .patient-status-card h3 {
+                font-size: 16px !important;
+            }
+
+            .patient-status-card .bg-icon {
+                font-size: 80px !important;
+                right: -10px !important;
+                bottom: -10px !important;
+            }
+    }
+
+    @@media (max-width: 360px) {
+        .patient-status-card {
+            padding: 14px 16px !important;
+        }
+
+            .patient-status-card h3 {
+                font-size: 15px !important;
+            }
+
+            .patient-status-card .status-arrow {
+                width: 28px !important;
+                height: 28px !important;
+            }
+
+            .patient-status-card .bg-icon {
+                font-size: 70px !important;
+                right: -8px !important;
+                bottom: -8px !important;
+            }
+    }
+
+    @@media (min-width: 481px) {
+        .patient-status-card {
+            min-height: 130px !important;
+            padding: 18px 24px !important;
+        }
+
+            .patient-status-card h3 {
+                font-size: 18px !important;
+            }
+
+            .patient-status-card .bg-icon {
+                font-size: 110px !important;
+                right: -20px !important;
+                bottom: -20px !important;
+            }
+    }
+
+    .rs-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 999999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+        .rs-modal-overlay.show {
+            display: flex;
+        }
+
+    .rs-modal-content {
+        background: #ffffff;
+        width: 100%;
+        max-width: 800px;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        border-radius: 20px;
+        padding: 0;
+        box-sizing: border-box;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        animation: rsModalSlideUp 0.3s ease-out;
+        overflow: hidden;
+    }
+
+    @@keyframes rsModalSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .rs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        background: #ffffff;
+        padding: 16px 20px;
+        margin-bottom: 0;
+        border-bottom: 1px solid #e2e8f0;
+        z-index: 10;
+    }
+
+    .rs-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .rs-header-icon {
+        width: 24px;
+        height: 24px;
+        color: #64748b;
+    }
+
+    .rs-header h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+
+    .rs-close-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: none;
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 20px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+        .rs-close-btn:hover {
+            background: #e2e8f0;
+        }
+
+    .rs-section {
+        margin-bottom: 20px;
+    }
+
+    .rs-section-title {
+        font-size: 11px;
+        font-weight: 800;
+        color: #64748b;
+        text-transform: uppercase;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #e2e8f0;
+        margin-bottom: 10px;
+    }
+
+        .rs-section-title.active-title {
+            color: #0d9488;
+        }
+
+    .rs-active-card {
+        border: 1.5px solid #fcd34d;
+        background: #fffbeb;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .rs-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .rs-card-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .rs-status-badge {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #475569;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+
+    .rs-progress-tracker {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .rs-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 54px;
+        flex-shrink: 0;
+    }
+
+    .rs-step-circle {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: 2px solid #e2e8f0;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .rs-step-circle svg {
+            width: 14px;
+            height: 14px;
+        }
+
+    .rs-step-label {
+        font-size: 9px;
+        font-weight: 500;
+        color: #94a3b8;
+        text-align: center;
+        line-height: 1.1;
+    }
+
+    .rs-step.completed .rs-step-circle {
+        background: #ff8500;
+        border-color: #ff8500;
+        color: #ffffff;
+    }
+
+    .rs-step.current .rs-step-circle {
+        background: #fffbeb;
+        border-color: #ff8500;
+        color: #ff8500;
+    }
+
+    .rs-step.completed .rs-step-label,
+    .rs-step.current .rs-step-label {
+        color: #ff8500;
+        font-weight: 700;
+    }
+
+    .rs-step-line {
+        flex: 1;
+        height: 2px;
+        background: #e2e8f0;
+        margin-top: 12px;
+        border-radius: 2px;
+    }
+
+        .rs-step-line.completed {
+            background: #ff8500;
+        }
+
+    .rs-card-details {
+        border-top: 1px solid #fef3c7;
+        padding-top: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .rs-req-id {
+        font-size: 11px;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    .rs-req-desc {
+        font-size: 11px;
+        color: #334155;
+        font-weight: 500;
+    }
+
+    .rs-completed-card {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+
+    .rs-completed-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .rs-completed-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 2px;
+    }
+
+    .rs-completed-id {
+        font-size: 11px;
+        color: #64748b;
+    }
+
+    .rs-completed-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid #10b981;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .rs-completed-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+    .rs-scroll-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 8px;
+    }
+
+    @@media (max-width: 600px) {
+        .rs-modal-content {
+            padding: 0 !important;
+            border-radius: 16px;
+            max-height: 95vh;
+        }
+
+        .rs-header {
+            padding: 12px 16px;
+        }
+
+        .rs-scroll-body {
+            padding: 12px 16px;
+        }
+
+        .rs-active-card {
+            padding: 12px;
+        }
+    }
+
+    @@media (min-width: 768px) {
+        html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) {
+            grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr) !important;
+            grid-template-rows: minmax(clamp(180px, 20dvh, 260px), auto) minmax(clamp(240px, 28dvh, 360px), auto) !important;
+            grid-auto-rows: auto !important;
+            align-items: stretch !important;
+            align-content: start !important;
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
+            max-height: 100% !important;
+            overflow-y: auto !important;
+        }
+
+            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > #interactiveCard {
+                grid-column: 1 !important;
+                grid-row: 1 / 3 !important;
+                height: auto !important;
+                min-height: 420px !important;
+                max-height: none !important;
+            }
+
+            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patient-status-card {
+                grid-column: 2 !important;
+                grid-row: 1 !important;
+                height: auto !important;
+                min-height: 170px !important;
+                margin: 0 !important;
+            }
+
+            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card {
+                grid-column: 2 !important;
+                grid-row: 2 !important;
+                height: auto !important;
+                min-height: 220px !important;
+                margin: 0 !important;
+            }
+
+                html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card .card-pill {
+                    position: static !important;
+                    align-self: flex-start !important;
+                    margin: 0 0 8px 0 !important;
+                }
+
+            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) .grace-idle {
+                background: transparent !important;
+                margin: 0 !important;
+            }
+    }
+
+    </style>
+<script>
+    (function () {
+        if (document.body && !document.body.hasAttribute("data-state")) {
+            document.body.setAttribute("data-state", "idle");
+        }
+        var params = new URLSearchParams(window.location.search);
+        var autoStart = params.get("autoStartCall") === "1"
+                     || sessionStorage.getItem("autoStartCall") === "1";
+
+        if (autoStart) {
+            document.documentElement.setAttribute("data-autostart", "pending");
+        }
+    })();
+
+</script>
+
+<div class="app-wrapper">
+    <partial name="_header"></partial>
+
+    <partial name="_BedContext" />
+
+    <div id="pageNav">
+        <partial name="_nav"></partial>
+    </div>
+
+    <div class="assistant-titlebar" id="assistantTitlebar">
+        <button type="button" class="assistant-back-btn" id="assistantBackBtn" aria-label="Go back">
+            <img src="~/images/voice-agent/arrow.png" alt="Back" class="back-arrow-icon">
+        </button>
+        <h1 class="assistant-title">Room Assistant</h1>
+    </div>
+
+    <div class="content" id="pageContent">
+ 
+            <div id="interactiveCard">
+
+                <div class="idle-layer">
+                    <div class="grace-idle">
+                        <p class="grace-idle-desc">
+                            Click to Speak with Grace – <br />
+                            AI Assistant!
+                        </p>
+
+                        <button type="button"
+                                class="grace-idle-btn"
+                                id="idleBtn"
+                                aria-label="Chat now with Grace">
+                            <div class="grace-idle-avatar">
+                                <img src="~/images/avatar.png" alt="Grace avatar">
+                                <span class="grace-idle-pill">
+                                    Talk to AI
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="call-layer" id="callLayer" data-status="dialing">
+                    <div class="call-rings">
+                        <div class="ring ring--1"></div>
+                        <div class="ring ring--2"></div>
+                        <div class="ring ring--3"></div>
+                        <div class="call-dots">
+                            <span></span><span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <div class="call-avatar">
+                            <img src="~/images/apollo-logo.png" alt="Apollo" class="call-avatar-icon" />
+                        </div>
+                    </div>
+                    <h2 class="call-title" id="callTitle">Dial50 Demo Hospital</h2>
+                    <div class="call-status-row">
+                        <span class="status-dot"></span>
+                        <span class="call-status-text" id="callStatus">Connecting voice / audio...</span>
+                    </div>
+                    <div class="call-controls">
+                        <div class="control-btn-wrap">
+                            <button type="button" class="control-btn" id="micBtn" aria-label="Mute microphone">
+                                <img src="~/images/voice-agent/music.png" class="control-icon" alt="Mute microphone" />
+                            </button>
+                            <span class="control-label">Mute</span>
+                        </div>
+                        <div class="control-btn-wrap">
+                            <button type="button" class="control-btn speaker-btn" id="speakerBtn" aria-label="Speaker on">
+                                <img src="~/images/voice-agent/volume.png" class="control-icon" alt="Speaker" />
+                            </button>
+                            <span class="control-label">Speaker</span>
+                        </div>
+                    </div>
+                    <button type="button" class="hangup-btn" id="endChatBtn" aria-label="End Call">
+                        <img src="~/images/voice-agent/end-call.png" class="end-call-icon" alt="End Call" />
+                    </button>
+                </div>
+
+                <div class="ended-layer" id="endedLayer">
+                    <div class="ended-avatar-wrapper">
+                        <div class="ended-ring ring-1"></div>
+                        <div class="ended-ring ring-2"></div>
+                        <div class="ended-ring ring-3"></div>
+                        <div class="ended-avatar-container">
+                            <img src="~/images/apollo-logo.png" alt="Apollo" class="ended-avatar-icon-img" />
+                        </div>
+                    </div>
+                    <h2 class="ended-hospital-name">Dial50 Demo Hospital</h2>
+                    <div class="ended-status">
+                        <span class="ended-status-dot"></span>
+                        <span>Ended</span>
+                    </div>
+                    <div class="ended-bottom-controls">
+                        <button type="button" class="ended-mic-btn" id="endedMicBtn" aria-label="Continue talking">
+                            <img src="~/images/voice-agent/music.png" alt="Microphone" />
+                        </button>
+                        <span class="continue-talking-text">Continue talking</span>
+                    </div>
+                </div>
+            </div>
+
+        <div class="bottom-card patient-status-card" onclick="loadAndOpenStatusModal()">
+            <div class="status-icon">
+                <i class="fa-regular fa-clipboard"></i>
+            </div>
+
+            <div class="card-content-row">
+                <h3>Request status updates</h3>
+                <div class="status-arrow">→</div>
+            </div>
+
+            <i class="fa-solid fa-clipboard-list bg-icon"></i>
+        </div>
+
+
+            <div class="food-card patfeedback-card" onclick="BedContext.go('OverAllFeedback/Index')">
+                <div class="card-pill">
+                    <i class="fa-solid fa-circle-info"></i>
+                    REQUIRED
+                </div>
+                <h3>We value your feed back</h3>
+                <p>Your feedback means a lot to us. Could you spare a moment to share your experience?</p>
+                <div class="card-link-row">
+                    <span>Submit Feedback →</span>
+                </div>
+                <i class="fa-solid fa-clipboard bg-icon"></i>
+            </div>
+
+        <div class="rs-modal-overlay" id="requestStatusModal">
+            <div class="rs-modal-content">
+
+                <div class="rs-header">
+                    <div class="rs-header-left">
+                        <svg class="rs-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                        </svg>
+                        <h2>Request Status Updates</h2>
+                    </div>
+                    <button class="rs-close-btn" onclick="document.getElementById('requestStatusModal').classList.remove('show')">×</button>
+                </div>
+
+                <div class="rs-scroll-body">
+                    <div class="rs-section">
+                        <div class="rs-section-title active-title" id="rs-active-section-title">ACTIVE</div>
+                        <div id="rs-active-container"></div>
+                    </div>
+
+                    <div class="rs-section">
+                        <div class="rs-section-title">RECENTLY COMPLETED</div>
+                        <div id="rs-completed-list"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <div class="video-overlay" id="videoOverlay">
+        <div class="video-modal">
+            <div class="video-modal-body" id="videoModalBody"></div>
+            <button class="video-overlay-back" onclick="goBackFromVideo()" aria-label="Back">← Back to Home</button>
+        </div>
+    </div>
+
+    <div id="requestLoadingScreen" class="modal-overlay request-loading-overlay">
+        <div class="request-loading-modal">
+
+            <div class="loading-icon-wrapper">
+                <div class="loading-ring ring-1"></div>
+                <div class="loading-ring ring-2"></div>
+
+                <div class="loading-icon-circle">
+                    <i class="fa-solid fa-wrench"></i>
+                </div>
+            </div>
+
+            <div class="loading-title">
+                Sending Request...
+            </div>
+
+            <div class="loading-subtitle">
+                Connecting to support station
+            </div>
+
+        </div>
+    </div>
+
+    <div id="requestSuccessScreen" class="modal-overlay">
+        <div class="request-modal">
+            <button type="button" class="modal-close-btn" onclick="closeSuccessModal()" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="modal-avatar">
+                <img src="/images/porter.png" alt="Staff"
+                     onerror="this.onerror=null;this.src='/images/porter.png';">
+            </div>
+
+            <div class="modal-request-id">
+                Request Id: <strong id="successReqId">#-</strong>
+            </div>
+
+            <div class="modal-details">
+                <p>
+                    Support staff
+                    <strong id="successStaffName">-</strong> assigned.
+                </p>
+                <p>
+                    Task Name:
+                    <strong id="successTaskName">-</strong>
+                </p>
+            </div>
+
+            <div class="eta-status-pill-box">
+                <div class="eta-item">
+                    <div class="pill-icon"><i class="fa-regular fa-clock"></i></div>
+                    <div class="pill-text">
+                        <small>ETA</small>
+                        <strong id="successEta">-</strong>
+                    </div>
+                </div>
+                <div class="pill-divider"></div>
+                <div class="eta-item">
+                    <div class="pill-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="pill-text">
+                        <small>STATUS</small>
+                        <strong id="successStatus" style="color:#00a86b;">-</strong>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" class="success-track-btn" onclick="goToTracking()">
+                Track Status
+            </button>
+
+            <div class="modal-footer-pagination">
+                <span class="nav-link" id="btnPrevRequest" onclick="prevRequest()">&lt; Previous</span>
+                <div class="dots" id="dotsContainer"></div>
+                <span class="nav-link" id="btnNextRequest" onclick="nextRequest()">Next &gt;</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var urlParams = new URLSearchParams(window.location.search);
+        var bed       = BedContext.get();
+        var bedInfo   = bed.bedInfo;
+        var region    = bed.region;
+
+        var lastVideoRequestId = null;
+        var pendingSuccessTaskId = null;
+        var pendingVideoData = null;
+
+        function isCallActive() {
+            var state = document.body ? document.body.getAttribute('data-state') : null;
+            return state === 'connecting' || state === 'connected' || state === 'ended';
+        }
+
+
+        (function () {
+            var bedInfoParam = new URLSearchParams(window.location.search).get('BedInfo');
+            if (!bedInfoParam && bedInfo) {
+                var newUrl = window.location.pathname
+                           + '?BedInfo=' + encodeURIComponent(bedInfo)
+                           + (region ? '&region=' + encodeURIComponent(region) : '');
+                window.location.href = newUrl;
+            }
+        })();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.setAttribute("data-state", "idle");
+
+            setTimeout(function () {
+                var s = document.body.getAttribute('data-state');
+                if (s === 'ended') {
+                    document.body.setAttribute('data-state', 'idle');
+                }
+            }, 3000);
+        });
+
+        var curpage = window.location.pathname.split("/").pop();
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".navBtn").forEach(function (button) {
+                if (button.dataset.page === curpage) button.classList.add("active");
+                button.addEventListener("click", function () {
+                    BedContext.go(this.getAttribute("data-page"));
+                });
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            var backBtn = document.getElementById('assistantBackBtn');
+            if (!backBtn) return;
+
+            backBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                pendingSuccessTaskId = null;
+                _postCallFetchInFlight = true;
+                hideRequestLoading();
+
+                if (document.body.getAttribute('data-state') !== 'idle') {
+                    if (typeof window.endChat === 'function') {
+                        window.endChat();
+                    }
+                    setTimeout(navigateHome, 100);
+                    return;
+                }
+
+                navigateHome();
+            });
+
+            function navigateHome() { BedContext.go('Home'); }
+        });
+
+        $("#modalSubmit").click(function () {
+            var remarks    = $("#modalRemarks").val();
+            var taskTypeId = $("#hdnTaskTypeId").val();
+
+            var requestData = {
+                    BedID: BedContext.get().bedId,
+                CategoryId: taskTypeId,
+                Remarks: remarks,
+                quantity: '0'
+            };
+
+            $.ajax({
+                url: "/api/Task/InsertTask",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(requestData),
+                success: function (response) {
+                    closeModal();
+                    GoToCurrentRequest();
+                }
+            });
+        });
+
+        function blinkPill() {
+            if (document.hidden || document.body.getAttribute('data-state') !== 'idle') {
+                setTimeout(blinkPill, 2000);
+                return;
+            }
+            $('.patfeedback-card .card-pill').fadeTo(500, 0.5).fadeTo(500, 1, function () {
+                setTimeout(blinkPill, 500);
+            });
+        }
+        $(document).ready(function () { setTimeout(blinkPill, 1000); });
+
+        function convertToEmbedUrl(url) {
+            if (!url) return '';
+            if (url.indexOf('youtube.com/embed') > -1) return url;
+
+            var videoId = '';
+            if (url.indexOf('youtu.be/') > -1) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.indexOf('youtube.com/watch') > -1) {
+                var params = url.split('?')[1];
+                if (params) {
+                    params.split('&').forEach(function (p) {
+                        if (p.indexOf('v=') === 0) videoId = p.substring(2);
+                    });
+                }
+            } else if (url.indexOf('youtube.com/shorts/') > -1) {
+                videoId = url.split('shorts/')[1].split('?')[0];
+            }
+
+            return videoId
+                ? 'https://www.youtube.com/embed/' + videoId + '?rel=0&modestbranding=1'
+                : url;
+        }
+
+        function openVideoOverlay(videoUrlOrList, title) {
+            var overlay = document.getElementById('videoOverlay');
+            var body    = document.getElementById('videoModalBody');
+            var links   = [];
+
+            if (Array.isArray(videoUrlOrList)) {
+                links = videoUrlOrList;
+            } else if (typeof videoUrlOrList === 'string') {
+                links = videoUrlOrList.trim().split(/\s+/).filter(function (u) {
+                    return u && u.indexOf('http') === 0;
+                });
+            }
+
+            if (links.length === 0) return;
+
+            body.innerHTML = '';
+            links.forEach(function (link) {
+                var embedUrl = convertToEmbedUrl(link);
+                var frame = document.createElement('div');
+                frame.className = 'video-frame';
+                frame.innerHTML =
+                    '<iframe src="' + embedUrl + '" ' +
+                    'frameborder="0" ' +
+                    'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" ' +
+                    'allowfullscreen></iframe>';
+                body.appendChild(frame);
+            });
+
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoOverlay() {
+            var overlay = document.getElementById('videoOverlay');
+            var body    = document.getElementById('videoModalBody');
+            body.innerHTML = '';
+            overlay.classList.remove('show');
+            document.body.style.overflow = '';
+            if (pendingSuccessTaskId) {
+                var reqId = pendingSuccessTaskId;
+                pendingSuccessTaskId = null;
+                showSuccessModal(reqId);
+            }
+        }
+
+        function goBackFromVideo() {
+            var hasPending = !!pendingSuccessTaskId;
+            closeVideoOverlay();
+            if (hasPending) return;
+            BedContext.go('Home');
+        }
+
+        window.openVideoOverlay  = openVideoOverlay;
+        window.closeVideoOverlay = closeVideoOverlay;
+        window.goBackFromVideo   = goBackFromVideo;
+
+        var lastSeenTaskId = null;
+        var taskPollInterval = null;
+        var taskPollInFlight = false;
+
+        var _successModalToken = 0;
+        var _currentModalRequestId = null;
+
+        function getTaskBedId()     { return BedContext.taskBedId(); }
+        function getTaskBedNumber() { return BedContext.taskBedNumber(); }
+
+        function getTaskField(obj, camel, pascal) {
+            if (!obj) return '';
+            if (obj[camel] !== undefined && obj[camel] !== null) return obj[camel];
+            if (obj[pascal] !== undefined && obj[pascal] !== null) return obj[pascal];
+            return '';
+        }
+
+        function getTaskId(r) {
+            return String(
+                getTaskField(r, 'taskId', 'TaskId') ||
+                getTaskField(r, 'requestId', 'RequestId') ||
+                ''
+            ).trim();
+        }
+
+        function getTaskName(r) {
+            return String(getTaskField(r, 'taskName', 'TaskName') || '').trim();
+        }
+
+        function getPorterName(r) {
+            return String(getTaskField(r, 'porterName', 'PorterName') || '').trim();
+        }
+
+        function getTaskStatus(r) {
+            return String(getTaskField(r, 'status', 'Status') || '').trim().toUpperCase();
+        }
+
+        function getTaskEta(r) {
+            return String(
+                getTaskField(r, 'eta', 'Eta') ||
+                getTaskField(r, 'ETA', 'ETA') ||
+                ''
+            ).trim();
+        }
+
+        function getTaskRequestDate(r) {
+            var raw = getTaskField(r, 'requestDate', 'RequestDate');
+            if (!raw) return null;
+            if (raw instanceof Date) return isNaN(raw) ? null : raw;
+
+            var s = String(raw).trim();
+            var iso = new Date(s);
+            if (!isNaN(iso)) return iso;
+
+            var m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+            if (m) {
+                var d = new Date(
+                    parseInt(m[3], 10),
+                    parseInt(m[1], 10) - 1,
+                    parseInt(m[2], 10),
+                    parseInt(m[4] || '0', 10),
+                    parseInt(m[5] || '0', 10),
+                    parseInt(m[6] || '0', 10)
+                );
+                return isNaN(d) ? null : d;
+            }
+            return null;
+        }
+
+        function statusColorFor(status) {
+            switch ((status || '').toUpperCase()) {
+                case 'READY':
+                case 'ACCEPTED':
+                case 'ASSIGNED':
+                    return '#3b82f6';
+                case 'IN-PROGRESS':
+                case 'INPROGRESS':
+                case 'EXECUTED':
+                    return '#3b82f6';
+                case 'COMPLETED':
+                case 'DELIVERED':
+                    return '#10b981';
+                case 'CANCELLED':
+                case 'CANCELED':
+                    return '#ef4444';
+                case 'ONHOLD':
+                    return '#f59e0b';
+                default:
+                    return '#00a86b';
+            }
+        }
+
+        function resolveEta(rawEta, porterName) {
+            var eta = String(rawEta || '').trim();
+            if (eta && eta !== '-') return eta;
+
+            var hasPorter = porterName && porterName.trim() !== '';
+            if (hasPorter) return '5 Mins';
+
+            return '-';
+        }
+
+        var successRequests = [];
+        var successIndex = 0;
+
+        function fetchTasksForModal() {
+            var bedId = encodeURIComponent(getTaskBedId());
+            var bedNumber = encodeURIComponent(getTaskBedNumber());
+            var url = '/Home/GetTasks?BedId=' + bedId + '&BedNumber=' + bedNumber;
+
+            return $.ajax({
+                url: url,
+                type: 'GET',
+                dataType: 'json'
+            })
+                .then(function (data) {
+                    return Array.isArray(data) ? data : [];
+                })
+                .catch(function () {
+                    return [];
+                });
+        }
+
+        function groupAllByRequestId(rows) {
+            var map = {};
+            var order = [];
+
+            rows.forEach(function (r) {
+                var id = getTaskId(r);
+                if (!id) return;
+
+                if (!map[id]) {
+                    map[id] = {
+                        RequestId: id,
+                        TaskNames: [],
+                        PorterName: '',
+                        Status: 'PENDING',
+                        Eta: '',
+                        RequestDate: getTaskRequestDate(r)
+                    };
+                    order.push(id);
+                }
+
+                var taskName = getTaskName(r);
+                if (taskName && map[id].TaskNames.indexOf(taskName) === -1) {
+                    map[id].TaskNames.push(taskName);
+                }
+
+                var porter = getPorterName(r);
+                if (!map[id].PorterName && porter !== '') {
+                    map[id].PorterName = porter;
+                }
+
+                var rowStatus = getTaskStatus(r);
+                var curStatus = String(map[id].Status || '').toUpperCase();
+
+                var priority = {
+                    'PENDING': 1, 'READY': 2, 'ACCEPTED': 2, 'ASSIGNED': 3,
+                    'IN-PROGRESS': 4, 'INPROGRESS': 4, 'EXECUTED': 5,
+                    'DELIVERED': 5, 'COMPLETED': 6, 'CANCELLED': 7,
+                    'CANCELED': 7, 'ONHOLD': 8
+                };
+
+                if ((priority[rowStatus] || 1) > (priority[curStatus] || 1)) {
+                    map[id].Status = rowStatus;
+                }
+
+                var eta = getTaskEta(r);
+                if (eta && (!map[id].Eta || map[id].Eta === '' || map[id].Eta === '-')) {
+                    map[id].Eta = eta;
+                }
+
+                var rd = getTaskRequestDate(r);
+                if (rd && (!map[id].RequestDate || rd > map[id].RequestDate)) {
+                    map[id].RequestDate = rd;
+                }
+            });
+
+            return order.map(function (id) {
+                var g = map[id];
+                g.TaskName = g.TaskNames.join(', ');
+                delete g.TaskNames;
+                g.Eta = resolveEta(g.Eta, g.PorterName);
+                return g;
+            });
+        }
+
+        function paintTaskRequest() {
+            if (!successRequests.length) {
+                successRequests = [{
+                    RequestId: '',
+                    TaskName: '',
+                    PorterName: '',
+                    Status: 'PENDING',
+                    Eta: '-'
+                }];
+                successIndex = 0;
+            }
+
+            if (successIndex < 0) successIndex = 0;
+            if (successIndex > successRequests.length - 1) successIndex = successRequests.length - 1;
+
+            var req = successRequests[successIndex];
+            var porter = (req.PorterName || '').trim();
+
+            var reqIdEl = document.getElementById('successReqId');
+            var staffEl = document.getElementById('successStaffName');
+            var taskEl = document.getElementById('successTaskName');
+            var etaEl = document.getElementById('successEta');
+            var statEl = document.getElementById('successStatus');
+
+            if (reqIdEl) reqIdEl.textContent = req.RequestId ? '#' + req.RequestId : '#-';
+            if (staffEl) staffEl.textContent = porter ? porter.toUpperCase() : 'will be';
+            if (taskEl) taskEl.textContent = req.TaskName || '-';
+            if (etaEl) etaEl.textContent = req.Eta || '-';
+
+            if (statEl) {
+                statEl.textContent = req.Status ? req.Status.toUpperCase() : 'PENDING';
+                statEl.style.color = statusColorFor(req.Status);
+            }
+
+            var dotsEl = document.getElementById('dotsContainer');
+            if (dotsEl) {
+                var total = successRequests.length;
+                var maxDots = 7;
+
+                if (total <= maxDots) {
+                    dotsEl.innerHTML = successRequests.map(function (r, i) {
+                        return '<span class="dot' + (i === successIndex ? ' active' : '') +
+                            '" onclick="goToRequestIndex(' + i + ')"></span>';
+                    }).join('');
+                } else {
+                    var half = Math.floor(maxDots / 2);
+                    var start = successIndex - half;
+                    var end = successIndex + half;
+
+                    if (start < 0) { start = 0; end = maxDots - 1; }
+                    if (end > total - 1) { end = total - 1; start = total - maxDots; }
+
+                    var html = '';
+
+                    if (start > 0) {
+                        html += '<span class="dot" onclick="goToRequestIndex(0)"></span>';
+                        if (start > 1) html += '<span class="dot-gap">…</span>';
+                    }
+
+                    for (var i = start; i <= end; i++) {
+                        html += '<span class="dot' + (i === successIndex ? ' active' : '') +
+                            '" onclick="goToRequestIndex(' + i + ')"></span>';
+                    }
+
+                    if (end < total - 1) {
+                        if (end < total - 2) html += '<span class="dot-gap">…</span>';
+                        html += '<span class="dot" onclick="goToRequestIndex(' + (total - 1) + ')"></span>';
+                    }
+
+                    dotsEl.innerHTML = html;
+                }
+            }
+
+            var prevEl = document.getElementById('btnPrevRequest');
+            var nextEl = document.getElementById('btnNextRequest');
+
+            if (prevEl) {
+                if (successIndex === 0) prevEl.classList.add('disabled');
+                else prevEl.classList.remove('disabled');
+            }
+
+            if (nextEl) {
+                if (successIndex === successRequests.length - 1) nextEl.classList.add('disabled');
+                else nextEl.classList.remove('disabled');
+            }
+        }
+
+        function goToRequestIndex(i) {
+            if (i < 0 || i > successRequests.length - 1) return;
+            successIndex = i;
+            paintTaskRequest();
+        }
+
+        function prevRequest() {
+            if (successIndex <= 0) return;
+            successIndex--;
+            paintTaskRequest();
+        }
+
+        function nextRequest() {
+            if (successIndex >= successRequests.length - 1) return;
+            successIndex++;
+            paintTaskRequest();
+        }
+
+        function showSuccessModal(requestNo) {
+            var overlay = document.getElementById('requestSuccessScreen');
+            if (!overlay) return;
+
+            var normalized = requestNo ? String(requestNo) : null;
+            if (!normalized) return;
+
+            if (overlay.classList.contains('show') &&
+                _currentModalRequestId &&
+                String(_currentModalRequestId) !== normalized) {
+                overlay.classList.remove('show');
+                overlay.style.display = '';
+                document.body.style.overflow = '';
+                _currentModalRequestId = null;
+            }
+
+            if (_currentModalRequestId === normalized && overlay.classList.contains('show')) {
+                return;
+            }
+
+            _currentModalRequestId = normalized;
+            saveLastSeenTaskId(normalized);
+
+            // Show the centered loading modal while we fetch latest request data.
+            showRequestLoading();
+
+            var myToken = ++_successModalToken;
+
+            fetchTasksForModal().then(function (rows) {
+                if (myToken !== _successModalToken) return;
+
+                successRequests = groupAllByRequestId(rows);
+
+                if (!successRequests.length) {
+                    successRequests = [{
+                        RequestId: normalized,
+                        TaskName: '',
+                        PorterName: '',
+                        Status: 'PENDING',
+                        Eta: '-'
+                    }];
+                    successIndex = 0;
+                } else {
+                    successIndex = 0;
+                    for (var i = 0; i < successRequests.length; i++) {
+                        if (String(successRequests[i].RequestId) === normalized) {
+                            successIndex = i;
+                            break;
+                        }
+                    }
+                }
+
+                paintTaskRequest();
+
+                overlay.classList.add('show');
+                overlay.style.display = '';
+                document.body.style.overflow = 'hidden';
+
+                hideRequestLoading();
+            }).catch(function () {
+
+                successRequests = [{
+                    RequestId: normalized,
+                    TaskName: '',
+                    PorterName: '',
+                    Status: 'PENDING',
+                    Eta: '-'
+                }];
+                successIndex = 0;
+                paintTaskRequest();
+
+                overlay.classList.add('show');
+                overlay.style.display = '';
+                document.body.style.overflow = 'hidden';
+
+                hideRequestLoading();
+            });
+        }
+
+        function closeSuccessModal() {
+            var overlay = document.getElementById('requestSuccessScreen');
+            if (overlay) {
+                overlay.classList.remove('show');
+                overlay.style.display = '';
+                document.body.style.overflow = '';
+            }
+            _currentModalRequestId = null;
+        }
+
+        function showRequestLoading() {
+            var loadingScreen = document.getElementById("requestLoadingScreen");
+
+            if (loadingScreen) {
+                loadingScreen.classList.add("show");
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function hideRequestLoading() {
+            var loadingScreen = document.getElementById("requestLoadingScreen");
+
+            if (loadingScreen) {
+                loadingScreen.classList.remove("show");
+                document.body.style.overflow = "";
+            }
+        }
+
+        window.showRequestLoading = showRequestLoading;
+        window.hideRequestLoading = hideRequestLoading;
+
+        function goToTracking() {
+            var req = successRequests[successIndex] || {};
+            if (!req.RequestId) return;
+                BedContext.go('Tracking', { RequestID: req.RequestId });
+        }
+
+        function getLastSeenTaskKey() {
+            var bed = getTaskBedId() || getTaskBedNumber() || 'unknown';
+            return 'lastSeenTaskId_' + bed;
+        }
+
+        function loadLastSeenTaskId() {
+            try {
+                lastSeenTaskId = sessionStorage.getItem(getLastSeenTaskKey()) || null;
+            } catch (e) {
+                lastSeenTaskId = null;
+            }
+        }
+
+        function saveLastSeenTaskId(id) {
+            lastSeenTaskId = String(id);
+            try {
+                sessionStorage.setItem(getLastSeenTaskKey(), String(id));
+            } catch (e) { }
+        }
+
+        function pollForNewTask() {
+            if (isCallActive()) return;
+            var vOverlay = document.getElementById('videoOverlay');
+            if (vOverlay && vOverlay.classList.contains('show')) return;
+            if (taskPollInFlight) return;
+
+            var bedId = getTaskBedId();
+            var bedNumber = getTaskBedNumber();
+            if (!bedId && !bedNumber) return;
+
+            taskPollInFlight = true;
+
+            $.ajax({
+                url: '/Home/GetFreshTask',
+                type: 'GET',
+                data: {
+                    bedId: bedId,
+                    bedNumber: bedNumber,
+                    token: '',
+                    lastSeenTaskId: lastSeenTaskId || ''
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (!res || !res.hasFreshTask) return;
+
+                    var taskId = String(res.taskId || '').trim();
+                    if (!taskId) return;
+
+                    if (taskId === String(lastSeenTaskId)) return;
+
+                    saveLastSeenTaskId(taskId);
+                    showSuccessModal(taskId);
+                },
+                complete: function () {
+                    taskPollInFlight = false;
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var params = new URLSearchParams(window.location.search);
+            var autoStart = params.get("autoStartCall") === "1"
+                         || sessionStorage.getItem("autoStartCall") === "1";
+
+            if (!autoStart) {
+                document.documentElement.removeAttribute("data-autostart");
+                return;
+            }
+
+            sessionStorage.removeItem("autoStartCall");
+
+            var attempts = 0;
+            var tryStart = setInterval(function () {
+                attempts++;
+
+                var btn = document.getElementById("idleBtn");
+                var hasFn = typeof window.connectToAvatarBackend === "function";
+
+                if (btn && hasFn) {
+                    clearInterval(tryStart);
+
+                    var state = document.body.getAttribute("data-state");
+                    if (state === "connecting" || state === "connected") {
+                        document.documentElement.removeAttribute("data-autostart");
+                        return;
+                    }
+
+                     acquireScreenWakeLock();
+                    if (typeof window.setState === "function") {
+                        window.setState("connecting");
+                    } else {
+                        document.body.setAttribute("data-state", "connecting");
+                    }
+
+                    if (typeof window.setCallStatus === "function") {
+                        window.setCallStatus("dialing");
+                    }
+
+                    window.connectToAvatarBackend();
+
+                    var url = new URL(window.location.href);
+                    url.searchParams.delete("autoStartCall");
+                    window.history.replaceState({}, "", url.toString());
+
+                    document.documentElement.removeAttribute("data-autostart");
+                    return;
+                }
+
+                if (attempts > 40) {
+                    clearInterval(tryStart);
+                    document.documentElement.removeAttribute("data-autostart");
+                    console.warn("[autoStartCall] voice-agent never became ready");
+                }
+            }, 100);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            loadLastSeenTaskId();
+
+            var bedKey = getTaskBedId() || getTaskBedNumber() || 'unknown';
+            var pendingVLinks = sessionStorage.getItem('pendingVideoLinks_' + bedKey);
+            var pendingVTitle = sessionStorage.getItem('pendingVideoTitle_' + bedKey) || '';
+            if (pendingVLinks) {
+                sessionStorage.removeItem('pendingVideoLinks_' + bedKey);
+                sessionStorage.removeItem('pendingVideoTitle_' + bedKey);
+                if (!isCallActive()) {
+                    openVideoOverlay(pendingVLinks, pendingVTitle);
+                } else {
+                    pendingVideoData = { links: pendingVLinks, title: pendingVTitle };
+                }
+            }
+
+            var pendingFromChat = sessionStorage.getItem('pendingSuccessTaskId_' + bedKey);
+            if (pendingFromChat) {
+                sessionStorage.removeItem('pendingSuccessTaskId_' + bedKey);
+                saveLastSeenTaskId(pendingFromChat);
+                if (!isCallActive()) {
+                    showSuccessModal(pendingFromChat);
+                } else {
+                    pendingSuccessTaskId = pendingFromChat;
+                }
+            }
+
+            (function loop() {
+                taskPollInterval = setTimeout(function () {
+                    if (!document.hidden && !isCallActive()) pollForNewTask();
+                    loop();
+                }, 5000);
+            })();
+            setTimeout(pollForNewTask, 500);
+        });
+
+        document.addEventListener("visibilitychange", function () {
+            if (!document.hidden) {
+                pollForNewTask();
+            }
+        });
+
+        window.addEventListener("focus", function () {
+            pollForNewTask();
+        });
+
+        window.addEventListener("message", function (e) {
+            if (!e || !e.data) return;
+
+            if (e.data.type === "call-ended") {
+                if (typeof flushPendingPopups === "function") {
+                    flushPendingPopups();
+                }
+                return;
+            }
+
+            if (e.data.type === "task-created" && e.data.requestId) {
+                var incomingId = String(e.data.requestId);
+                if (incomingId === String(lastSeenTaskId)) return;
+
+                if (isCallActive()) {
+                    pendingSuccessTaskId = incomingId;
+                } else {
+                    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                        showSuccessModal(incomingId);
+                    } else {
+                        document.addEventListener('DOMContentLoaded', function () {
+                            showSuccessModal(incomingId);
+                        }, { once: true });
+                    }
+                }
+            }
+        });
+
+            var _postCallFetchInFlight = false;
+            function fetchPostCallUpdates() {
+                if (_postCallFetchInFlight) return;
+                _postCallFetchInFlight = true;
+
+                var bedId = getTaskBedId();
+                var bedNumber = getTaskBedNumber();
+
+                var videoPromise = bedId
+                    ? $.ajax({
+                        url: '/Home/CheckLatestVideo',
+                        type: 'GET',
+                        data: { bedNo: bedId },
+                        dataType: 'json',
+                        timeout: 8000,
+                        cache: false
+                    }).then(function (v) { return v || null; })
+                      .catch(function () { return null; })
+                    : Promise.resolve(null);
+
+                var taskPromise = (bedId || bedNumber)
+                    ? $.ajax({
+                        url: '/Home/GetFreshTask',
+                        type: 'GET',
+                        data: {
+                            bedId: bedId,
+                            bedNumber: bedNumber,
+                            token: '',
+                            lastSeenTaskId: lastSeenTaskId || ''
+                        },
+                        dataType: 'json',
+                        timeout: 8000,
+                        cache: false
+                    }).then(function (t) { return t || null; })
+                      .catch(function () { return null; })
+                    : Promise.resolve(null);
+
+                Promise.all([videoPromise, taskPromise]).then(function (r) {
+                    var v = r[0];
+                    var t = r[1];
+
+                    _postCallFetchInFlight = false;
+
+                    var taskId = '';
+                    if (t && t.hasFreshTask) {
+                        taskId = String(t.taskId || '').trim();
+                        if (taskId && taskId === String(lastSeenTaskId)) taskId = '';
+                    }
+
+                    var hasNewVideo = v && v.hasVideo && v.videoLinks && lastVideoRequestId !== v.requestId;
+
+                    if (hasNewVideo) {
+                        lastVideoRequestId = v.requestId;
+
+                        showRequestLoading();
+
+                        if (taskId) {
+                            saveLastSeenTaskId(taskId);
+                            pendingSuccessTaskId = taskId;
+                        }
+
+                        setTimeout(function () {
+                            hideRequestLoading();
+                            openVideoOverlay(v.videoLinks, v.categoryName);
+                        }, 1500);
+                        return;
+                    }
+
+                    if (taskId) {
+                        saveLastSeenTaskId(taskId);
+                        showSuccessModal(taskId);
+                        return;
+                    }
+
+                    hideRequestLoading();
+                }, function () {
+                    _postCallFetchInFlight = false;
+                    hideRequestLoading();
+                });
+            }
+
+        window.addEventListener("beforeunload", function () {
+            if (taskPollInterval) clearInterval(taskPollInterval);
+        });
+
+        window.fetchPostCallUpdates = fetchPostCallUpdates;
+        window.flushPendingPopups = fetchPostCallUpdates;
+        window.showSuccessModal = showSuccessModal;
+        window.closeSuccessModal = closeSuccessModal;
+        window.goToTracking = goToTracking;
+        window.prevRequest = prevRequest;
+        window.nextRequest = nextRequest;
+        window.goToRequestIndex = goToRequestIndex;
+
+
+
+        let screenWakeLock = null;
+
+        async function acquireScreenWakeLock() {
+            if (!("wakeLock" in navigator)) {
+                console.warn("[Chat AI] Screen Wake Lock API is not supported by this browser.");
+                return;
+            }
+            try {
+                screenWakeLock = await navigator.wakeLock.request("screen");
+                console.debug("[Chat AI] Screen Wake Lock acquired.");
+                screenWakeLock.addEventListener("release", () => {
+                    console.debug("[Chat AI] Screen Wake Lock released.");
+                    screenWakeLock = null;
+                });
+            } catch (error) {
+                console.warn("[Chat AI] Unable to acquire screen wake lock:", error);
+                screenWakeLock = null;
+            }
+        }
+
+        async function releaseScreenWakeLock() {
+            if (!screenWakeLock) return;
+            try {
+                await screenWakeLock.release();
+                console.debug("[Chat AI] Screen Wake Lock manually released.");
+            } catch (error) {
+                console.warn("[Chat AI] Failed to release screen wake lock:", error);
+            }
+            screenWakeLock = null;
+        }
+
+        document.addEventListener("visibilitychange", async () => {
+            if (document.visibilityState === "visible" && !screenWakeLock) {
+                const state = document.body.getAttribute('data-state');
+                if (state === 'connecting' || state === 'connected') {
+                    await acquireScreenWakeLock();
+                }
+            }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === "attributes" && mutation.attributeName === "data-state") {
+                        const state = document.body.getAttribute('data-state');
+                        if (state === 'connecting' || state === 'connected') {
+                            acquireScreenWakeLock();
+                        }
+                        else if (state === 'idle' || state === 'ended') {
+                            releaseScreenWakeLock();
+                        }
+                    }
+                });
+            });
+
+            observer.observe(document.body, { attributes: true });
+        });
+    </script>
+    <script>
+        function loadAndOpenStatusModal() {
+            var bedId = encodeURIComponent(BedContext.taskBedId() || '');
+            var bedNumber = encodeURIComponent(BedContext.taskBedNumber() || '');
+
+            document.getElementById('rs-active-section-title').textContent = "LOADING...";
+            document.getElementById('rs-active-container').innerHTML = '<p style="color:#64748b; font-size:14px;">Fetching status...</p>';
+            document.getElementById('rs-completed-list').innerHTML = '';
+            document.getElementById('requestStatusModal').classList.add('show');
+
+            fetch('/Home/GetTasks?BedId=' + bedId + '&BedNumber=' + bedNumber)
+                .then(res => res.json())
+                .then(data => {
+                    if (!Array.isArray(data)) data = [];
+
+                    let activeTasks = [];
+                    let completedTasks = [];
+
+                    data.forEach(t => {
+                        let status = String(t.status || t.Status || "").toLowerCase().trim();
+                        let isDone = ["completed", "delivered", "cancelled", "canceled"].includes(status);
+
+                        if (isDone) completedTasks.push(t);
+                        else activeTasks.push(t);
+                    });
+
+                    if (activeTasks.length > 0) {
+                        document.getElementById('rs-active-section-title').textContent = `ACTIVE (${activeTasks.length})`;
+
+                        let html = "";
+                        activeTasks.forEach(task => {
+                            let statusKey = String(task.status || task.Status || "").toLowerCase().trim();
+                            let service = String(task.service || task.Service || "").toUpperCase().trim();
+                            let isFood = service.includes("FOOD");
+
+                            // Define steps based on Service Type
+                            let steps = isFood
+                                ? ["Placed", "Received", "Preparing", "Ready", "Delivering"]
+                                : ["Pending", "Assigned", "In-Progress", "Completed"];
+
+                            // Map status to step number
+                            let currentStep = 1;
+                            if (isFood) {
+                                if (["accepted", "confirmed", "assigned"].includes(statusKey)) currentStep = 2;
+                                if (["in-progress", "inprogress", "preparing", "assembling"].includes(statusKey)) currentStep = 3;
+                                if (["ready", "ready-for-pickup", "readyforpickup"].includes(statusKey)) currentStep = 4;
+                                if (["delivering", "out-for-delivery"].includes(statusKey)) currentStep = 5;
+                            } else {
+                                if (["assigned", "accepted", "ready"].includes(statusKey)) currentStep = 2;
+                                if (["in-progress", "inprogress", "preparing", "assembling"].includes(statusKey)) currentStep = 3;
+                                if (["completed", "delivered", "cancelled"].includes(statusKey)) currentStep = 4;
+                            }
+
+                            let trackerHtml = "";
+                            for (let i = 0; i < steps.length; i++) {
+                                let stepNum = i + 1;
+                                let stepClass = "";
+                                let lineClass = "";
+
+                                if (stepNum < currentStep) { stepClass = "completed"; lineClass = "completed"; }
+                                else if (stepNum === currentStep) { stepClass = "current"; }
+
+                                let circleContent = stepNum < currentStep
+                                    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>`
+                                    : stepNum;
+
+                                trackerHtml += `
+                                    <div class="rs-step ${stepClass}">
+                                        <div class="rs-step-circle">${circleContent}</div>
+                                        <span class="rs-step-label">${steps[i]}</span>
+                                    </div>
+                                `;
+                                if (i < steps.length - 1) {
+                                    trackerHtml += `<div class="rs-step-line ${lineClass}"></div>`;
+                                }
+                            }
+
+                            html += `
+                            <div class="rs-active-card">
+                                <div class="rs-card-header">
+                                    <span class="rs-card-title">${task.taskName || task.TaskName || 'Request'}</span>
+                                    <span class="rs-status-badge">${statusKey.toUpperCase()}</span>
+                                </div>
+                                <div class="rs-progress-tracker">${trackerHtml}</div>
+                                <div class="rs-card-details">
+                                    <div class="rs-req-id">REQ-${task.taskId || task.TaskId}</div>
+                                    <div class="rs-req-desc">${task.description || task.Description || task.remarks || 'Processing'}</div>
+                                </div>
+                            </div>`;
+                        });
+
+                        document.getElementById('rs-active-container').innerHTML = html;
+                    } else {
+                        document.getElementById('rs-active-section-title').textContent = "ACTIVE (0)";
+                        document.getElementById('rs-active-container').innerHTML = '<p style="color:#64748b; font-size:14px; padding:10px 0;">No active requests right now.</p>';
+                    }
+
+                    if (completedTasks.length > 0) {
+                        let completedHtml = "";
+                        completedTasks.forEach(t => {
+                            completedHtml += `
+                            <div class="rs-completed-card">
+                                <div class="rs-completed-info">
+                                    <div class="rs-completed-name">${t.taskName || t.TaskName || 'Request'}</div>
+                                    <div class="rs-completed-id">REQ-${t.taskId || t.TaskId}</div>
+                                </div>
+                                <div class="rs-completed-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
+                                </div>
+                            </div>`;
+                        });
+                        document.getElementById('rs-completed-list').innerHTML = completedHtml;
+                    } else {
+                        document.getElementById('rs-completed-list').innerHTML = '<p style="color:#64748b; font-size:13px; padding:10px 0;">No completed requests yet.</p>';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('rs-active-section-title').textContent = "ERROR";
+                    document.getElementById('rs-active-container').innerHTML = '<p style="color:#ef4444; font-size:14px;">Failed to load tasks. Please try again.</p>';
+                });
+        }
+    </script>
+</div>
+
+<script src="~/js/layout_DailyCare.js"></script>
+

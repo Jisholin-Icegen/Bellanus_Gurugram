@@ -1,0 +1,720 @@
+﻿@model List<Dial50_MVC_Core.Models.OrderSuccessVM>
+@{
+    ViewData["Title"] = ":: Food Services ::";
+    var isPreorder = Convert.ToInt32(ViewBag.IsPreorder ?? 0) == 1;
+    var servingWindows = ViewBag.ServingTimings as List<ServingWindowVM>;
+    var order1 = Model.FirstOrDefault();
+
+    var masterStatus = Model.FirstOrDefault(x => x.Status != "Denied")?.Status ?? order1?.Status;
+
+    var statusLevel = masterStatus switch
+    {
+        "Placed" => 1,
+        "Confirmed" => 2,
+        "Preparing" => 3,
+        "Ready" => 4,
+        "Assembling" => 5,
+        "Ready for Pickup" => 5,
+        "In-Transit" => 6,
+        "Delivered" => 7,
+        _ => 1
+    };
+
+    var statusClass = masterStatus?.ToLower().Replace("-", "");
+
+    var liquidKeywords = new[] { "Juice", "Broth", "Tea", "Soup", "Smoothie", "Milkshake", "Drink", "Water", "Coffee" };
+    bool hasSolidFood = order1.Items.Any(item =>
+        !liquidKeywords.Any(k => item.ItemName.Contains(k, StringComparison.OrdinalIgnoreCase))
+    );
+
+    int calculatedBase = hasSolidFood ? 40 : 20;
+    int dbManualTime = 0;
+    int.TryParse(order1.Estimatedtime, out dbManualTime);
+
+    int activeBase = dbManualTime > 0 ? dbManualTime : calculatedBase;
+
+    int currentETA = 0;
+    if (statusLevel <= 3)
+    {
+        currentETA = activeBase;
+    }
+    else
+    {
+        currentETA = statusLevel switch
+        {
+            4 => (int)(activeBase * 0.40),
+            5 => (int)(activeBase * 0.25),
+            6 => (int)(activeBase * 0.12),
+            7 => 0,
+            _ => 0
+        };
+        if (statusLevel < 7 && currentETA < 2) currentETA = 2;
+    }
+
+    string arrivalClockTime = DateTime.Now.AddMinutes(currentETA).ToString("hh:mm tt", System.Globalization.CultureInfo.InvariantCulture);
+}
+
+<link rel="stylesheet" href="~/css/Food.css">
+<link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+
+<style>
+    #otpModal {
+        display: none !important;
+    }
+</style>
+
+<div class="app-wrapper" data-locale-base="@Url.Content("~/locales/")">
+
+    <partial name="_header"></partial>
+    <partial name="_nav"></partial>
+
+    <div id="servicesMenuContainer" class="content review-order-page">
+        <div id="cancel-toast" class="toast-notification-container" style="display:none;">
+            <div class="toast-content">
+                <i class="fas fa-check-circle toast-check-icon"></i>
+                <span id="toast-message-text" class="toast-text"></span>
+            </div>
+        </div>
+        @if (Model != null && Model.Count > 0)
+        {
+            @if (isPreorder)
+            {
+                var mealCount = Model.Select(x => x.MealType).Distinct().Count();
+                <div class="top-nav-info-row">
+                    <a href="javascript:void(0)" onclick="goTo('/FoodDining/MyOrders')" class="all-orders-link">
+                        <i class="fa-regular fa-calendar-check"></i> All my orders
+                    </a>
+                    <div class="patient-room-meta">
+                        @order1?.PatientName · Room @order1?.RoomNo
+                    </div>
+                </div>
+                <div class="preorder-summary-card">
+                    <div class="summary-icon-purple">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <div class="summary-info-content">
+                        <span class="summary-label">YOUR PRE-ORDERS FOR</span>
+                        <h2 class="summary-date">
+                            @Model.First().OrderDate.ToString("dddd, MMMM d", System.Globalization.CultureInfo.InvariantCulture)
+                        </h2>
+                        <p class="summary-subtext">
+                            @mealCount meal(s) scheduled · cancel anytime before the kitchen starts prep.
+                        </p>
+                    </div>
+                </div>
+                @foreach (var order in Model)
+                {
+                    <div class="preorder-ticket-v2">
+                        <div class="ticket-header-purple">
+                            <div class="ticket-meta-top">
+                                <span class="status-badge-outline">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> PRE-ORDER · SCHEDULED
+                                </span>
+                                <div class="order-no-box">
+                                    <small>ORDER NO</small>
+                                    <strong>@order.OrderId</strong>
+                                </div>
+                            </div>
+
+                            <div class="meal-info-row">
+                                <div class="meal-icon-circle">
+                                    @if (order.MealType?.Contains("Breakfast") == true)
+                                    {
+                                        <i class="fa-solid fa-mug-hot"></i>
+                                    }
+                                    else if (order.MealType?.Contains("Lunch") == true)
+                                    {
+                                        <i class="fa-solid fa-utensils"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-solid fa-moon"></i>
+                                    }
+                                </div>
+                                <div class="meal-text-details">
+                                    <span class="meal-name-label">@order.MealType?.ToUpper()</span>
+                                    <h2 class="meal-date-title">@order.OrderDate.ToString("dddd, MMMM d", System.Globalization.CultureInfo.InvariantCulture)</h2>
+                                    @{
+                                        var serving = servingWindows?.FirstOrDefault(x => x.CategoryName.Equals(order.MealType, StringComparison.OrdinalIgnoreCase));
+                                    }
+
+                                    <span class="meal-time-sub">
+                                        <i class="fa-regular fa-clock"></i>
+
+                                        @if (serving != null)
+                                        {
+                                            <text>Served @serving.StartTime – @serving.EndTime</text>
+                                        }
+                                        else
+                                        {
+                                            <text>Service Timing Not Available</text>
+                                        }
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ticket-perforation">
+                            <div class="notch-left"></div>
+                            <div class="dashed-line"></div>
+                            <div class="notch-right"></div>
+                        </div>
+                        <div class="ticket-body-white">
+                            <div class="tray-count-header">
+                                ON THE TRAY (@order.Items.Count ITEM@(order.Items.Count > 1 ? "S" : ""))
+                            </div>
+
+                            @{
+                                var preActiveItems = order.Items.Where(x => !x.IsDenied).ToList();
+                                var preDeniedItems = order.Items.Where(x => x.IsDenied).ToList();
+                            }
+
+                            @foreach (var item in preActiveItems)
+                            {
+                                <div class="ticket-item-row">
+                                    <div class="item-name-group">
+                                        <span class="item-main-name">
+                                            @item.ItemName
+                                            @if (item.MenuChanged)
+                                            {
+                                                <span style="font-size: 11px; background: #f5f3ff; color: #6d28d9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight:600;">ALTERNATE</span>
+                                            }
+                                        </span>
+                                        <small class="item-sub-id">
+                                            Item @order.OrderId-1
+                                            @if (item.MenuChanged)
+                                            {
+                                                <span style="color:#6d28d9; font-weight: 600; display: block; margin-top: 2px;">(Original: @item.OldMenu)</span>
+                                            }
+                                        </small>
+                                    </div>
+                                    <span class="item-qty-val">×@item.Quantity</span>
+                                </div>
+                            }
+
+                            @if (preDeniedItems.Count > 0)
+                            {
+                                <div style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px;">
+                                    <div class="item-count-label" style="color: #64748b;">DENIED ITEMS (@preDeniedItems.Count)</div>
+                                    @foreach (var item in preDeniedItems)
+                                    {
+                                        <div class="ticket-item-row" style="align-items: center;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span class="item-main-name" style="text-decoration: line-through; color: #94a3b8; font-weight: 500;">
+                                                    @item.ItemName
+                                                </span>
+                                                <span style="font-size: 12px; color: #64748b; font-style: italic;">
+                                                    (Reason: @item.DeniedReason)
+                                                </span>
+                                            </div>
+                                            <span class="item-qty-val" style="color: #94a3b8; text-decoration: line-through;">×@item.Quantity</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+
+                            <div class="cooking-info-banner">
+                                <i class="fa-regular fa-calendar-check banner-icon"></i>
+                                <div class="banner-text">
+                                    <strong>We'll start cooking on the meal day.</strong>
+                                    <p>You'll see live progress here (cooking → on the way → delivered) once the kitchen picks this up around @order.MealType.ToLower() service.</p>
+                                </div>
+                            </div>
+
+                            <div class="policy-info-box">
+                                <i class="fa-solid fa-circle-info"></i>
+                                @{
+                                    string cancelText = "kitchen prep starts";
+                                    if (serving != null && DateTime.TryParse(serving.StartTime, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime startTime))
+                                    {
+                                        DateTime cutoffTime = startTime.AddHours(-1);
+                                        string cutoffStr = cutoffTime.ToString("h tt", System.Globalization.CultureInfo.InvariantCulture);
+
+                                        if (order.MealType.Replace(" ", "").Equals("Breakfast", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            cancelText = cutoffStr + " the night before the meal";
+                                        }
+                                        else
+                                        {
+                                            cancelText = cutoffStr + " on the day of the meal";
+                                        }
+                                    }
+                                }
+
+                                <span>
+                                    Need to make changes? You can cancel this pre-order up until
+                                    <strong>@cancelText</strong>.
+                                </span>
+                            </div>
+                            <div class="cancel-section-wrapper" id="section_@order.OrderId">
+
+                                @if (order.Status == "Cancelled")
+                                {
+                                    <div id="cancelledView_@order.OrderId">
+                                        <div class="cancelled-status-banner">
+                                            <i class="fa-solid fa-xmark"></i>
+                                            <span>This pre-order was cancelled.</span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div id="initialView_@order.OrderId">
+                                        <button class="cancel-ticket-btn" onclick="toggleCancelDisplay('@order.OrderId', 'confirm')">
+                                            <i class="fa-solid fa-xmark"></i> Cancel pre-order
+                                        </button>
+                                    </div>
+                                    <div id="confirmView_@order.OrderId" style="display:none;">
+                                        <div class="confirm-cancel-card">
+                                            <div class="confirm-header">
+                                                <i class="fa-solid fa-xmark text-danger"></i>
+                                                <span class="confirm-title">Cancel this pre-order?</span>
+                                            </div>
+                                            <p class="confirm-msg">
+                                                This will remove your @order.MealType.ToLower() pre-order.
+                                            </p>
+                                            <div class="confirm-actions">
+                                                <button class="btn-confirm-final" onclick="processCancel('@order.OrderId')">Yes, cancel</button>
+                                                <button class="btn-keep-it" onclick="toggleCancelDisplay('@order.OrderId', 'initial')">Keep it</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="cancelledView_@order.OrderId" style="display:none;">
+                                        <div class="cancelled-status-banner">
+                                            <i class="fa-solid fa-xmark"></i>
+                                            <span>This pre-order was cancelled.</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                var order = Model.First();
+                <div class="order-header-container">
+                    <div class="order-header-meta">
+                        <span class="order-label-muted">ORDER NUMBER</span>
+                        <span class="sync-text-muted">Auto-syncing every 5s · last synced just now</span>
+                    </div>
+                    <div class="order-id-display">@order.OrderId</div>
+                </div>
+                <div class="order-success-card">
+                    <div class="success-flex-row">
+
+                        <div class="success-check-icon @statusClass">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+
+                        <div class="success-text-content">
+                            <h2>
+                                Loading Status...
+                            </h2>
+                            <p>
+                                @order.PatientName · Room @order.RoomNo · @order.MealType
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="eta-message" id="eta-display">
+                        @if (masterStatus == "Delivered")
+                        {
+                            <text>Enjoy your meal!</text>
+                        }
+                        else
+                        {
+                            <text>Arriving in @currentETA min (@arrivalClockTime)</text>
+                        }
+                    </div>
+                </div>
+
+                <div class="ordered-items-card">
+                    @{
+                        var activeItems = order.Items.Where(x => !x.IsDenied).ToList();
+                        var deniedItems = order.Items.Where(x => x.IsDenied).ToList();
+                        var totalActiveCount = activeItems.Count;
+                    }
+
+                    @if (totalActiveCount > 0)
+                    {
+                        <div class="item-count-label">@totalActiveCount ACTIVE ITEM@(totalActiveCount > 1 ? "S" : "")</div>
+                        @foreach (var item in activeItems)
+                        {
+                            <div class="ordered-item-row" style="align-items: flex-start;">
+                                <span class="item-name">
+                                    @item.ItemName
+                                    @if (item.MenuChanged)
+                                    {
+                                        <span style="font-size: 10px; background: #f5f3ff; color: #6d28d9; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight:700;">ALTERNATE</span>
+                                    }
+                                </span>
+                                <span class="item-qty">× @item.Quantity</span>
+
+                                @if (item.MenuChanged)
+                                {
+                                    <div style="width: 100%; font-size: 11px; color: #6d28d9; margin-top: 4px; margin-left: 0;">
+                                        <i class="fa-solid fa-arrow-right-arrow-left" style="font-size:9px;"></i> Original: <span style="text-decoration: line-through;">@item.OldMenu</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+
+                    @if (deniedItems.Count > 0)
+                    {
+                        <div style="margin-top: 15px; border-top: 1px dashed #eee; padding-top: 10px;">
+                            <div class="item-count-label" style="color: #64748b;">DENIED ITEMS (@deniedItems.Count)</div>
+                            @foreach (var item in deniedItems)
+                            {
+                                <div class="ordered-item-row" style="align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="item-name" style="text-decoration: line-through; color: #94a3b8; font-weight: 500;">
+                                            @item.ItemName
+                                        </span>
+                                        <span style="font-size: 12px; color: #64748b; font-style: italic;">
+                                            (Reason: @item.DeniedReason)
+                                        </span>
+                                    </div>
+                                    <span class="item-qty" style="color: #94a3b8; text-decoration: line-through;">× @item.Quantity</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @{
+                        var instruction = order.Items.FirstOrDefault(x => !string.IsNullOrEmpty(x.SpecialInstruction))?.SpecialInstruction;
+                    }
+                    @if (!string.IsNullOrEmpty(instruction))
+                    {
+                        <div class="item-special-container" style="border-top: 1px dashed #eee; margin-top: 10px; padding-top: 10px;">
+                            <div class="special-label">SPECIAL INSTRUCTIONS</div>
+                            <div class="special-content">"@instruction"</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="order-progress-card">
+                    <div class="progress-title">ORDER PROGRESS</div>
+                    <div class="progress-timeline">
+                        <div class="progress-step @(statusLevel >= 1 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-check"></i></div>
+                            <div class="step-content">
+                                <h4>Order placed</h4>
+                                <p>Submitted to the kitchen.</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 2 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-circle-dot"></i></div>
+                            <div class="step-content">
+                                <h4>Kitchen received</h4>
+                                <p>Routed to assigned kitchen and queued for prep.</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 3 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-utensils"></i></div>
+                            <div class="step-content">
+                                <h4>In prep</h4>
+                                <p>Your meal is being cooked at relevant stations.</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 4 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-box-open"></i></div>
+                            <div class="step-content">
+                                <h4>Cooked</h4>
+                                <p>Every item is ready. Awaiting assembly.</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 5 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-bowl-food"></i></div>
+                            <div class="step-content">
+                                <h4>Assembling tray</h4>
+                                <p>A staff member is collecting items onto a tray.</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 6 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-truck-fast"></i></div>
+                            <div class="step-content" style="position: relative; padding-right: 100px;">
+                                <h4>Out for delivery</h4>
+                                <p>Delivery runner is on the way to your room.</p>
+                                <small class="status-time"></small>
+                                <button type="button"
+                                        class="track-pill-btn"
+                                        id="trackBtn"
+                                        style="display: none;">
+                                    <i class="fa-solid fa-stopwatch"></i> Track
+                                </button>
+                            </div>
+                        </div>
+                        <div class="progress-step @(statusLevel >= 7 ? "active" : "")">
+                            <div class="step-icon"><i class="fa-solid fa-house-chimney"></i></div>
+                            <div class="step-content">
+                                <h4>Delivered</h4>
+                                <p>Enjoy your meal!</p>
+                                <small class="status-time"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rating-box-@order.OrderId" style="display:none; margin-top: 20px;" class="rating-feedback-box-v2">
+                    <div class="rating-header">
+                        <div class="rating-header-left">
+                            <div class="rating-icon-wrap"><i class="fa-solid fa-comment-dots"></i></div>
+                            <div>
+                                <h4 id="feedback-title">How was your @order.MealType.ToLower()?</h4>
+                                <p>Your feedback helps us serve you better</p>
+                            </div>
+                        </div>
+                        <button type="button" class="rating-close-btn" onclick="$('#rating-box-@order.OrderId').fadeOut()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <div class="rating-options-row" id="options-@order.OrderId">
+                        <button type="button" class="rating-opt-btn satisfied" onclick="selectOption('@order.OrderId', 2, this)">
+                            <i class="fa-regular fa-face-smile"></i>
+                            <span>Satisfied</span>
+                        </button>
+                        <button type="button" class="rating-opt-btn neutral" onclick="selectOption('@order.OrderId', 1, this)">
+                            <i class="fa-regular fa-face-meh"></i>
+                            <span>Neutral</span>
+                        </button>
+                        <button type="button" class="rating-opt-btn unsatisfied" onclick="selectOption('@order.OrderId', 0, this)">
+                            <i class="fa-regular fa-face-frown"></i>
+                            <span>Unsatisfied</span>
+                        </button>
+                    </div>
+
+                    <textarea class="rating-textarea" id="comment-@order.OrderId" placeholder="Any comments? (optional)"></textarea>
+                    <button class="btn-submit-feedback muted" id="btn-submit-@order.OrderId" onclick="submitRating('@order.OrderId')" disabled>
+                        <i class="fa-solid fa-paper-plane"></i> Submit Feedback
+                    </button>
+                </div>
+
+                <div id="feedback-success-msg-@order.OrderId" style="display:none;" class="feedback-thanks">
+                    <i class="fa-solid fa-circle-check"></i> Thank you for your feedback!
+                </div>
+                <div class="success-btn-row">
+                    <button class="success-secondary-btn" onclick="GoToBack()">Back to home</button>
+                    <button class="success-primary-btn" onclick="TrackAnotherMeal()">Track another meal</button>
+                </div>
+            }
+        }
+        else
+        {
+            <div style="text-align:center;padding:40px;">
+                <h3>No order found</h3>
+            </div>
+        }
+
+    </div>
+
+    <partial name="_footer"></partial>
+
+    <script>
+        var urlParams  = new URLSearchParams(window.location.search);
+        var urlBedInfo = urlParams.get('BedInfo');
+
+        if (urlBedInfo) sessionStorage.setItem('bedInfo', urlBedInfo);
+
+        var bedInfo = sessionStorage.getItem('bedInfo') || '';
+
+        var serverPatientName = '@ViewBag.PatientName';
+        var serverRoomNumber  = '@ViewBag.RoomNumber';
+        var serverBed         = '@ViewBag.BedNumber';
+        var serverRoomBed     = '@ViewBag.RoomBed';
+        var serverWard        = '@ViewBag.Ward';
+        var serverUhid        = '@ViewBag.Uhid';
+        var serverGender      = '@ViewBag.Gender';
+        var serverAge         = '@ViewBag.Age';
+        var serverDietType    = '@ViewBag.DietType';
+        var serverAllergies   = '@ViewBag.Allergies';
+        var serverHasPatient  = '@ViewBag.HasPatient' === 'True';
+
+        if (serverPatientName) sessionStorage.setItem('PatientName',  serverPatientName);
+        if (serverRoomNumber)  sessionStorage.setItem('RoomNumber',   serverRoomNumber);
+        if (serverBed)         sessionStorage.setItem('BedNumber',    serverBed);
+        if (serverRoomBed)     sessionStorage.setItem('RoomBed',      serverRoomBed);
+        if (serverWard)        sessionStorage.setItem('Ward',         serverWard);
+        if (serverUhid)        sessionStorage.setItem('Uhid',         serverUhid);
+        if (serverGender)      sessionStorage.setItem('Gender',       serverGender);
+        if (serverAge)         sessionStorage.setItem('Age',          serverAge);
+        if (serverDietType)    sessionStorage.setItem('DietType',     serverDietType);
+        if (serverAllergies)   sessionStorage.setItem('Allergies',    serverAllergies);
+
+        sessionStorage.setItem('hasPatient', serverHasPatient ? '1' : '0');
+
+        console.log('[OrderSuccess Bootstrap] bedInfo=', bedInfo,
+                    '| patient=', serverPatientName,
+                    '| room=', serverRoomNumber,
+                    '| roomBed=', serverRoomBed);
+
+        if (typeof window.refreshHeaderFromSession === 'function') {
+            window.refreshHeaderFromSession();
+        }
+
+        window.orderId = '@(Model != null && Model.Any() ? Model.First().OrderId : "")';
+        var curpage = window.location.pathname.split("/").pop();
+
+        function GoToChat(){
+            BedContext.go('AI/Chat');
+        }
+
+        function GoToCurrentRequest(){
+            BedContext.go('CurrentRequests/Index');
+        }
+
+        function GoToBack() {
+            BedContext.go('FoodDining');
+        }
+
+        function TrackAnotherMeal(){
+            BedContext.go('FoodDining/MyOrders');
+        }
+
+        window.isFoodOrderingShown = @(ViewBag.IsFoodOrderingShown != null && (bool)ViewBag.IsFoodOrderingShown ? "true" : "false");
+        document.addEventListener("DOMContentLoaded", function () {
+            let orderId = '@(Model != null && Model.Any() ? Model.First().OrderId : "")';
+            let refreshInterval;
+
+            refreshOrder();
+            startAutoRefresh();
+            setInterval(function() {
+                updateRelativeSyncText();
+            }, 1000);
+
+            if (localStorage.getItem("ShowOrderSuccessToast") === "true") {
+                showCancelToast("Order placed successfully!");
+                localStorage.removeItem("ShowOrderSuccessToast");
+            }
+
+            const trackBtn = document.getElementById('trackBtn');
+            if (trackBtn) {
+                trackBtn.addEventListener('click', function() {
+                    const oid = new URLSearchParams(window.location.search).get('orderIds');
+                    if (oid) {
+                        BedContext.go('Tracking', { orderIds: oid });
+                    } else {
+                        alert('Order ID not found');
+                    }
+                });
+            }
+
+            function updateRelativeSyncText() {
+                let now = new Date();
+                let secondsPast = Math.floor((now - lastSyncTimestamp) / 1000);
+                let displayMsg = "";
+                if (secondsPast < 2) {
+                    displayMsg = "just now";
+                } else {
+                    displayMsg = secondsPast + "s ago";
+                }
+                $(".sync-text-muted").text("Auto-syncing every 5s · last synced " + displayMsg);
+            }
+
+            var toastMsg = '@(TempData["OrderToast"] ?? "")';
+            if (toastMsg !== "") {
+                showCancelToast(toastMsg);
+            }
+
+            function refreshOrder() {
+                $.ajax({
+                    url: '/FoodDining/GetOrderStatus',
+                    type: 'GET',
+                    data: { orderId: orderId },
+                    success: function (res) {
+                        if (res.success) {
+                            updateOrderUI(res);
+                        }
+                    }
+                });
+            }
+
+            function startAutoRefresh() {
+                if (refreshInterval) {
+                    clearInterval(refreshInterval);
+                }
+                refreshInterval = setInterval(refreshOrder, 5000);
+            }
+
+            checkOtp();
+            setInterval(function () {
+                checkOtp();
+            }, 30000);
+
+            var buttons = document.querySelectorAll(".navBtn");
+            buttons.forEach(function (button) {
+                if(button.dataset.page === curpage)
+                    button.classList.add("active");
+
+                button.addEventListener("click", function () {
+                    var page = this.getAttribute("data-page");
+                    if (!page) return;
+                    BedContext.go(page === 'FoodDining' ? 'FoodDining/FoodDining' : page);
+                });
+            });
+        });
+    </script>
+</div>
+
+<div class="modal fade" id="otpModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content otp-popup">
+            <div class="otp-header">
+                <h3> <i class="fa-solid fa-utensils me-2"></i> Your Meal has arrived</h3>
+                <p>Please read this 4-digit code aloud to the delivery person. </p>
+            </div>
+            <div class="otp-body">
+                <div class="otp-title">
+                    <i class="fa-solid fa-key me-2"></i>YOUR DELIVERY CODE
+                </div>
+                <div id="otpNumber" class="otp-number">0000</div>
+                <p class="otp-desc"> Please read this code <strong>out loud</strong> to the person delivering your meal.</p>
+                <p class="otp-note"> Don't worry — they cannot complete the delivery without it. </p>
+            </div>
+            <div class="otp-footer">
+                <button type="button" class="btn btn-success otp-btn" id="confirmOtpBtn">Got it</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/Food.js"></script>
+<script>
+    function translateOrderSuccessItems() {
+        if (!window.i18n || !i18n.dict || Object.keys(i18n.dict).length === 0) return;
+        $('.ticket-item-row .item-main-name, .ordered-item-row .item-name').each(function () {
+            if (!$(this).attr('data-orig')) {
+                $(this).attr('data-orig', $(this).text().trim());
+            }
+            let originalName = $(this).attr('data-orig');
+            $(this).text(i18n.t(originalName, originalName));
+        });
+    }
+
+    document.addEventListener("languageChanged", translateOrderSuccessItems);
+    document.addEventListener("DOMContentLoaded", function () {
+        if (window.i18nReady) window.i18nReady.then(translateOrderSuccessItems);
+    });
+
+    function localizeOrderDates() {
+        const localeMap = {
+            en:'en-US', zh:'zh-CN', hi:'hi-IN', es:'es-ES', fr:'fr-FR',
+            ar:'ar-EG', bn:'bn-BD', pt:'pt-PT', ru:'ru-RU', ur:'ur-PK', ta:'ta-IN'
+        };
+        const loc = localeMap[(window.i18n && i18n.current) || 'en'] || 'en-US';
+        document.querySelectorAll('[data-date]').forEach(function (el) {
+            const p = el.getAttribute('data-date').split('-');
+            const d = new Date(+p[0], +p[1] - 1, +p[2]);
+            el.textContent = d.toLocaleDateString(loc, { weekday: 'long', month: 'long', day: 'numeric' });
+        });
+    }
+    document.addEventListener("languageChanged", localizeOrderDates);
+</script>
