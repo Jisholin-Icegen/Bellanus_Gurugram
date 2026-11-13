@@ -1,0 +1,1399 @@
+﻿
+
+Skip to content
+Using ICEGEN COMPUTING Mail with screen readers
+
+4 of 27
+Pre-Order sheets
+Inbox
+Summarize this email
+
+Jisholin CL <jisholin@icegen.net >
+Attachments
+Mon, Jul 27, 10:09  AM (3 days ago)
+to me
+
+
+3 Attachments
+• Scanned by Gmail
+
+Jisholin CL
+Attachments
+Mon, Jul 27, 10:13  AM (3 days ago)
+On Mon, Jul 27, 2026 at 10:09 AM Jisholin CL <jisholin@icegen.net > wrote:
+
+Jisholin CL <jisholin@icegen.net >
+Tue, Jul 28, 5:02  PM (2 days ago)
+to me
+
+case "GETPREORDERSHEETS":
+data = GetPreOrderSheets();
+break;
+case "PRINTPREORDERDOCKETS":
+data = PrintPreOrderDockets();
+break;
+case "GETPREORDERPRINTDATA":
+data = GetPreOrderPrintData();
+break;
+case "LOCKPREORDERSHEET":
+data = LockPreOrderSheet();
+break;
+case "UNLOCKPREORDERSHEET":
+data = UnlockPreOrderSheet();
+break;
+
+
+private DataSet GetPreOrderSheets() {
+    DataSet ds = new DataSet();
+    DataTable dt = DataAccess.GetPreOrderSheets();
+    ds .Tables.Add(dt);
+    return ds;
+}
+
+private DataSet PrintPreOrderDockets() {
+    DataSet ds = new DataSet();
+    string id = Request["ID"];
+
+    if (!string.IsNullOrEmpty(id)) {
+        id = AESEncrytDecry.DecryptStringAES(id);
+    }
+
+    DataTable dt = DataAccess.PrintPreOrderDockets(id);
+    ds .Tables.Add(dt);
+    return ds;
+}
+
+private DataSet GetPreOrderPrintData() {
+    DataSet ds = new DataSet();
+    DataTable dt = DataAccess.GetPreOrderPrintData();
+    ds .Tables.Add(dt);
+    return ds;
+}
+
+private DataSet LockPreOrderSheet() {
+    DataSet ds = new DataSet();
+    string id = string.IsNullOrEmpty(Request["ID"]) ? null : AESEncrytDecry.DecryptStringAES(Request["ID"]);
+    string date = string.IsNullOrEmpty(Request["DATE"]) ? null : AESEncrytDecry.DecryptStringAES(Request["DATE"]);
+    string mealType = string.IsNullOrEmpty(Request["MEALTYPE"]) ? null : AESEncrytDecry.DecryptStringAES(Request["MEALTYPE"]);
+    string updatedBy = string.IsNullOrEmpty(Request["UPDATEDBY"]) ? "System" : AESEncrytDecry.DecryptStringAES(Request["UPDATEDBY"]);
+    DataTable dt = DataAccess.LockPreOrderSheet(id, date, mealType, updatedBy);
+    ds .Tables.Add(dt);
+    return ds;
+}
+
+private DataSet UnlockPreOrderSheet() {
+    DataSet ds = new DataSet();
+    string id = string.IsNullOrEmpty(Request["ID"]) ? null : AESEncrytDecry.DecryptStringAES(Request["ID"]);
+    string date = string.IsNullOrEmpty(Request["DATE"]) ? null : AESEncrytDecry.DecryptStringAES(Request["DATE"]);
+    string mealType = string.IsNullOrEmpty(Request["MEALTYPE"]) ? null : AESEncrytDecry.DecryptStringAES(Request["MEALTYPE"]);
+    string updatedBy = string.IsNullOrEmpty(Request["UPDATEDBY"]) ? "System" : AESEncrytDecry.DecryptStringAES(Request["UPDATEDBY"]);
+    DataTable dt = DataAccess.UnlockPreOrderSheet(id, date, mealType, updatedBy);
+    ds .Tables.Add(dt);
+    return ds;
+}
+
+
+
+public static DataTable GetPreOrderSheets() {
+    DataTable dt = new DataTable();
+    SqlConnection Con = new SqlConnection(Tenant.ConnectionString);
+
+    try {
+        SqlCommand cmd = new SqlCommand("SP_GETPREORDERSHEETS", Con);
+        cmd .CommandType = CommandType.StoredProcedure;
+        cmd .Parameters.AddWithValue("@Process", "GETPREORDERSHEETS");
+        cmd .Parameters.AddWithValue("@UpdatedBy", DBNull.Value);
+        cmd .Parameters.AddWithValue("@IsPrinted", DBNull.Value);
+        cmd .Parameters.AddWithValue("@ID", DBNull.Value);
+        cmd .Parameters.AddWithValue("@Date", DBNull.Value);
+        cmd .Parameters.AddWithValue("@MealType", DBNull.Value);
+        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+        if (Con.State == ConnectionState.Closed) Con.Open();
+        adpt .Fill(dt);
+    }
+
+    catch (Exception ex) {
+        InsertError(ex.Message, "SP_GETPREORDERSHEETS_GETPREORDERSHEETS");
+    }
+
+    finally {
+        if (Con.State == ConnectionState.Open) Con.Close();
+    }
+
+    return dt;
+}
+
+public static DataTable PrintPreOrderDockets(string id) {
+    DataTable dt = new DataTable();
+    SqlConnection Con = new SqlConnection(Tenant.ConnectionString);
+
+    try {
+        SqlCommand cmd = new SqlCommand("SP_GETPREORDERSHEETS", Con);
+        cmd .CommandType = CommandType.StoredProcedure;
+        cmd .Parameters.AddWithValue("@Process", "PRINTPREORDERDOCKETS");
+        cmd .Parameters.AddWithValue("@UpdatedBy", DBNull.Value);
+        cmd .Parameters.AddWithValue("@IsPrinted", DBNull.Value);
+        cmd .Parameters.AddWithValue("@ID", string.IsNullOrEmpty(id) ? (object)DBNull.Value : Convert.ToInt32(id));
+        cmd .Parameters.AddWithValue("@Date", DBNull.Value);
+        cmd .Parameters.AddWithValue("@MealType", DBNull.Value);
+        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+        if (Con.State == ConnectionState.Closed) Con.Open();
+        adpt .Fill(dt);
+    }
+
+    catch (Exception ex) {
+        InsertError(ex.Message, "SP_GETPREORDERSHEETS_PRINTPREORDERDOCKETS");
+    }
+
+    finally {
+        if (Con.State == ConnectionState.Open) Con.Close();
+    }
+
+    return dt;
+}
+
+public static DataTable GetPreOrderPrintData() {
+    DataTable dt = new DataTable();
+    SqlConnection Con = new SqlConnection(Tenant.ConnectionString);
+
+    try {
+        SqlCommand cmd = new SqlCommand("SP_GETPREORDERSHEETS", Con);
+        cmd .CommandType = CommandType.StoredProcedure;
+        cmd .Parameters.AddWithValue("@Process", "GETPREORDERPRINTDATA");
+        cmd .Parameters.AddWithValue("@UpdatedBy", DBNull.Value);
+        cmd .Parameters.AddWithValue("@IsPrinted", DBNull.Value);
+        cmd .Parameters.AddWithValue("@ID", DBNull.Value);
+        cmd .Parameters.AddWithValue("@Date", DBNull.Value);
+        cmd .Parameters.AddWithValue("@MealType", DBNull.Value);
+        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+        if (Con.State == ConnectionState.Closed) Con.Open();
+        adpt .Fill(dt);
+    }
+
+    catch (Exception ex) {
+        InsertError(ex.Message, "SP_GETPREORDERSHEETS_GETPREORDERPRINTDATA");
+    }
+
+    finally {
+        if (Con.State == ConnectionState.Open) Con.Close();
+    }
+
+    return dt;
+}
+
+public static DataTable LockPreOrderSheet(string id, string date, string mealType, string updatedBy) {
+    DataTable dt = new DataTable();
+    SqlConnection Con = new SqlConnection(Tenant.ConnectionString);
+
+    try {
+        SqlCommand cmd = new SqlCommand("SP_GETPREORDERSHEETS", Con);
+        cmd .CommandType = CommandType.StoredProcedure;
+        cmd .Parameters.AddWithValue("@Process", "LOCKPREORDERSHEET");
+        cmd .Parameters.AddWithValue("@UpdatedBy", updatedBy ?? "System");
+        cmd .Parameters.AddWithValue("@IsPrinted", DBNull.Value);
+        cmd .Parameters.AddWithValue("@ID", string.IsNullOrEmpty(id) ? (object)DBNull.Value : Convert.ToInt32(id));
+        cmd .Parameters.AddWithValue("@Date", string.IsNullOrEmpty(date) ? (object)DBNull.Value : date);
+        cmd .Parameters.AddWithValue("@MealType", string.IsNullOrEmpty(mealType) ? (object)DBNull.Value : mealType);
+        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+        if (Con.State == ConnectionState.Closed) Con.Open();
+        adpt .Fill(dt);
+    }
+
+    catch (Exception ex) {
+        InsertError(ex.Message, "SP_GETPREORDERSHEETS_LOCKPREORDERSHEET");
+    }
+
+    finally {
+        if (Con.State == ConnectionState.Open) Con.Close();
+    }
+
+    return dt;
+}
+
+public static DataTable UnlockPreOrderSheet(string id, string date, string mealType, string updatedBy) {
+    DataTable dt = new DataTable();
+    SqlConnection Con = new SqlConnection(Tenant.ConnectionString);
+
+    try {
+        SqlCommand cmd = new SqlCommand("SP_GETPREORDERSHEETS", Con);
+        cmd .CommandType = CommandType.StoredProcedure;
+        cmd .Parameters.AddWithValue("@Process", "UNLOCKPREORDERSHEET");
+        cmd .Parameters.AddWithValue("@UpdatedBy", updatedBy ?? "System");
+        cmd .Parameters.AddWithValue("@IsPrinted", DBNull.Value);
+        cmd .Parameters.AddWithValue("@ID", string.IsNullOrEmpty(id) ? (object)DBNull.Value : Convert.ToInt32(id));
+        cmd .Parameters.AddWithValue("@Date", string.IsNullOrEmpty(date) ? (object)DBNull.Value : date);
+        cmd .Parameters.AddWithValue("@MealType", string.IsNullOrEmpty(mealType) ? (object)DBNull.Value : mealType);
+        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+        if (Con.State == ConnectionState.Closed) Con.Open();
+        adpt .Fill(dt);
+    }
+
+    catch (Exception ex) {
+        InsertError(ex.Message, "SP_GETPREORDERSHEETS_UNLOCKPREORDERSHEET");
+    }
+
+    finally {
+        if (Con.State == ConnectionState.Open) Con.Close();
+    }
+
+    return dt;
+}
+
+﻿#preorderCardsContainer,
+#preorderCardsContainer * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+.curvy-card {
+    border-radius: 24px;
+    border: 1px solid #e8edf5;
+    padding: 18px 22px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    background-color: #ffffff;
+    margin-bottom: 16px;
+}
+
+    .curvy-card.locked-card {
+        border: 1px solid #b8e6b8 !important;
+        background: #fafffe;
+    }
+
+        .curvy-card.locked-card .status-badge {
+            border-radius: 9999px;
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #b8e6b8 !important;
+        }
+
+
+.meal-card {
+    border-radius: 16px;
+    border: 1px solid #e8edf5;
+    padding: 18px 22px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    background-color: #ffffff;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+    .meal-card.locked-card {
+        border: 2px solid #86efac !important;
+        background: #fafffe;
+        box-shadow: 0 0 0 1px rgba(22, 163, 74, 0.1), 0 2px 8px rgba(22, 163, 74, 0.08);
+    }
+
+        .meal-card.locked-card .status-badge {
+            background: #dcfce7 !important;
+            color: #16a34a !important;
+            border-color: #b8e6b8 !important;
+        }
+
+.meal-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 14px;
+}
+
+.meal-card-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.meal-card-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.status-badge {
+    padding: 4px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid #dce3ed;
+    color: #475569;
+    background: #f9fafb;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+    .status-badge .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .status-badge .lock-icon-badge {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        display: inline-block;
+    }
+
+    .status-badge.open {
+        background: #f9fafb;
+        color: #475569;
+        border-color: #dce3ed;
+    }
+
+        .status-badge.open .dot {
+            background: #9ca3af;
+        }
+
+    .status-badge.locked {
+        background: #dcfce7;
+        color: #16a34a;
+        border-color: #86efac;
+        padding: 5px 18px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+        .status-badge.locked .dot {
+            background: #16a34a;
+        }
+
+        /* Dark Green filter for lock icon when locked */
+        .status-badge.locked .lock-icon-badge {
+            filter: brightness(0) saturate(100%) invert(28%) sepia(91%) saturate(1895%) hue-rotate(126deg) brightness(95%) contrast(101%);
+        }
+
+    .status-badge.completed {
+        background: #f3f4f6;
+        color: #374151;
+        border-color: #dce3ed;
+    }
+
+        .status-badge.completed .dot {
+            background: #6b7280;
+        }
+
+.avatar-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+    .avatar-circle img {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+    }
+
+    .avatar-circle.breakfast {
+        background-color: #fef3c7;
+    }
+
+    .avatar-circle.lunch {
+        background-color: #dbeafe;
+    }
+
+    .avatar-circle.dinner {
+        background-color: #e0e7ff;
+    }
+
+.meal-title-row {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+.meal-date-text {
+    font-weight: 700;
+    color: #6b7280;
+}
+
+.meta-indicators {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #1a1a2e;
+    font-weight: 400;
+}
+
+    .meta-item .stat-number {
+        font-weight: 400;
+        display: inline;
+        color: #1a1a2e;
+    }
+
+.meta-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 1;
+    object-fit: contain;
+}
+
+.meal-card:not(.locked-card) .meta-item .stat-number {
+    color: #1a1a2e;
+}
+
+.meal-card.locked-card .meta-item .stat-number {
+    color: #1a1a2e;
+}
+
+/* ===== CLOSES IN STYLING ===== */
+.meta-item.closes-in {
+    display: none;
+}
+
+/* Has patients - Show and make grey */
+.meal-card:not(.locked-card) .meta-item.closes-in.has-patients {
+    display: flex;
+    color: #6b7280;
+}
+
+    .meal-card:not(.locked-card) .meta-item.closes-in.has-patients .stat-number {
+        color: #6b7280 !important;
+        font-weight: 600;
+    }
+
+    .meal-card:not(.locked-card) .meta-item.closes-in.has-patients .meta-icon {
+        filter: brightness(0) saturate(100%) invert(40%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(95%) contrast(90%);
+    }
+
+/* Locked - Show with orange color */
+.meal-card.locked-card .meta-item.closes-in.has-patients {
+    display: flex;
+    color: #C2680A;
+}
+
+    .meal-card.locked-card .meta-item.closes-in.has-patients .stat-number {
+        color: #C2680A !important;
+        font-weight: 600;
+    }
+
+    .meal-card.locked-card .meta-item.closes-in.has-patients .meta-icon {
+        filter: brightness(0) saturate(100%) invert(44%) sepia(100%) saturate(1500%) hue-rotate(5deg) brightness(95%) contrast(95%);
+    }
+
+/* When expired */
+.meta-item.closes-in.expired {
+    color: #dc2626 !important;
+}
+
+    .meta-item.closes-in.expired .stat-number {
+        color: #dc2626 !important;
+    }
+
+    .meta-item.closes-in.expired .meta-icon {
+        filter: brightness(0) saturate(100%) invert(27%) sepia(98%) saturate(1600%) hue-rotate(344deg) brightness(95%) contrast(95%) !important;
+    }
+
+.locked-message {
+    display: none;
+}
+
+.meal-card.locked-card .locked-message.has-patients {
+    display: flex;
+    background: #f0fdf4;
+    border: 1px solid #d4edda;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin: 14px 0 14px 52px;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #065f46;
+}
+
+.locked-message .lock-icon {
+    flex-shrink: 0;
+}
+
+    .locked-message .lock-icon img {
+        width: 18px;
+        height: 18px;
+        display: block;
+    }
+
+.locked-message .lock-text {
+    line-height: 1.4;
+    font-weight: 400;
+    color: #065f46;
+}
+
+    .locked-message .lock-text strong {
+        color: #065f46;
+        font-weight: 700;
+    }
+
+/* ===== CATEGORY GRID - FIXED 4 COLUMNS ===== */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 14px 0 14px 52px;
+}
+
+/* Hide category grid when no patients */
+.meal-card:not(.has-patients) .category-grid {
+    display: none;
+}
+
+.category-card {
+    background: #fafcff;
+    border: 1px solid #e8edf5;
+    border-radius: 10px;
+    padding: 12px 16px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-shadow: none;
+    width: 100%;
+}
+
+.category-title {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #475569;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.category-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+    margin-top: 0;
+}
+
+.category-subtitle {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 400;
+}
+
+.view-patient-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #7c3aed;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    margin-left: 52px;
+    transition: all 0.2s ease;
+    margin-top: 4px;
+}
+
+/* Hide view patient button when no patients */
+.meal-card:not(.has-patients) .view-patient-btn {
+    display: none;
+}
+
+.view-patient-btn:hover {
+    background: #f5f3ff;
+    color: #6d28d9;
+}
+
+.view-patient-btn .arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
+    font-size: 11px;
+    transform: rotate(-90deg);
+}
+
+    .view-patient-btn .arrow.open {
+        transform: rotate(0deg);
+    }
+
+.patient-details {
+    margin-left: 52px;
+    margin-top: 10px;
+    display: none;
+    overflow: hidden;
+}
+
+    .patient-details.open {
+        display: block;
+        animation: slideDown 0.3s ease;
+    }
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.patient-card {
+    background: #fafcff;
+    border: 1px solid #e8edf5;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    box-shadow: none;
+    position: relative;
+}
+
+    .patient-card:last-child {
+        margin-bottom: 0;
+    }
+
+.patient-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.patient-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.patient-room {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.diet-warning {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #991b1b;
+    font-weight: 500;
+    font-size: 12px;
+    position: absolute;
+    top: 10px;
+    right: 14px;
+}
+
+    .diet-warning .warning-icon {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        flex-shrink: 0;
+        filter: brightness(0) saturate(100%) invert(15%) sepia(97%) saturate(2500%) hue-rotate(340deg) brightness(95%) contrast(95%);
+    }
+
+.patient-food {
+    margin-top: 6px;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.5;
+    padding-right: 80px;
+}
+
+.action-links-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    padding-left: 52px;
+}
+
+.action-btn {
+    background: #ffffff;
+    border: 1px solid #dce3ed;
+    border-radius: 10px;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+    .action-btn:hover {
+        background: #f3f4f6;
+        border-color: #c8d0dc;
+    }
+
+    .action-btn .action-icon {
+        width: 15px;
+        height: 15px;
+        opacity: 0.8;
+        object-fit: contain;
+    }
+
+    .action-btn.btn-print {
+        color: #334155;
+        border-color: #dce3ed;
+    }
+
+        .action-btn.btn-print:hover {
+            background: #f3f4f6;
+            border-color: #c8d0dc;
+            color: #334155;
+        }
+
+    .action-btn.btn-lock {
+        color: #334155;
+        border-color: #dce3ed;
+    }
+
+        .action-btn.btn-lock:hover {
+            background: #f3f4f6;
+            border-color: #c8d0dc;
+            color: #334155;
+        }
+
+    .action-btn.btn-disabled,
+    .action-btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: #f9fafb;
+    }
+
+.locked-time {
+    display: none !important;
+}
+
+.preorder-empty {
+    text-align: center;
+    padding: 50px 25px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e8edf5;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+    .preorder-empty .empty-icon {
+        font-size: 48px;
+        opacity: 0.4;
+        margin-bottom: 14px;
+    }
+
+    .preorder-empty h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #0f172a;
+        margin: 0 0 6px 0;
+    }
+
+    .preorder-empty p {
+        font-size: 15px;
+        color: #64748b;
+        margin: 0;
+        line-height: 1.5;
+    }
+
+.preorder-skeleton {
+    background: #ffffff;
+    border: 1px solid #e8edf5;
+    border-radius: 16px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    animation: pulse-skeleton 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-skeleton {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.preorder-skeleton .skeleton-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.preorder-skeleton .skeleton-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.preorder-skeleton .skeleton-line {
+    height: 11px;
+    background: #f1f5f9;
+    border-radius: 6px;
+}
+
+    .preorder-skeleton .skeleton-line.short {
+        width: 30%;
+    }
+
+    .preorder-skeleton .skeleton-line.medium {
+        width: 50%;
+    }
+
+    .preorder-skeleton .skeleton-line.long {
+        width: 70%;
+    }
+
+/* ===== NOTIFICATION STYLES ===== */
+.notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    font-size: 20px;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+    .notification-bell:hover {
+        background: #f3f4f6;
+    }
+
+        .notification-bell:hover .bell-icon {
+            opacity: 1;
+        }
+
+.bell-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    display: block;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 10px;
+    padding: 1px 5px;
+    min-width: 18px;
+    text-align: center;
+    font-weight: 600;
+    border: 2px solid #fff;
+    display: none;
+    line-height: 18px;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+    .notification-badge.show {
+        display: block;
+    }
+
+.notification-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-dropdown {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    width: 420px;
+    max-height: 500px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .notification-dropdown.show {
+        display: block;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+    .notification-header h6 {
+        font-weight: 600;
+        margin: 0;
+        color: #1a1a2e;
+        font-size: 15px;
+    }
+
+.mark-all-read {
+    font-size: 12px;
+    color: #16a34a;
+    cursor: pointer;
+    font-weight: 500;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+    .mark-all-read:hover {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+.notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+.notification-item {
+    display: flex;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f9fafb;
+    gap: 14px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.5s ease, transform 0.3s ease;
+}
+
+    .notification-item:hover {
+        background: #f8fafc;
+    }
+
+    .notification-item.unread {
+        background: #f0fdf4;
+        border-left: 3px solid #16a34a;
+    }
+
+        .notification-item.unread:hover {
+            background: #dcfce7;
+        }
+
+    .notification-item.read {
+        background: #f9fafb;
+        opacity: 0.7;
+        border-left: 3px solid transparent;
+    }
+
+        .notification-item.read:hover {
+            background: #f3f4f6;
+            opacity: 0.9;
+        }
+
+    .notification-item .notification-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+.notification-icon.info {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.notification-icon.success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.notification-icon.warning {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.notification-icon.error {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.notification-item .notification-icon img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.notification-item .notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.notification-item .notification-text h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 3px 0;
+}
+
+.notification-item .notification-text p {
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+}
+
+.notification-item .notification-time {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.unread-dot {
+    width: 10px;
+    height: 10px;
+    background: #16a34a;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+    box-shadow: 0 0 8px rgba(22, 163, 74, 0.4);
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(22, 163, 74, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 16px rgba(22, 163, 74, 0.8);
+    }
+}
+
+.dash-toast-notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: #012d16;
+    color: #59f0a5;
+    border-radius: 14px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    transform: translateX(120%);
+    transition: transform .35s ease, opacity .35s ease;
+    opacity: 0;
+    z-index: 99999;
+    min-width: 340px;
+}
+
+    .dash-toast-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .dash-toast-notification i {
+        font-size: 22px;
+        color: #59f0a5;
+        flex-shrink: 0;
+    }
+
+    .dash-toast-notification span {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 600;
+        color: #59f0a5;
+        line-height: 1.4;
+        font-family: "Segoe UI", sans-serif;
+        letter-spacing: 0.2px;
+    }
+
+    .dash-toast-notification .toast-close {
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        font-size: 20px;
+        padding: 0 4px;
+        transition: color 0.2s;
+    }
+
+        .dash-toast-notification .toast-close:hover {
+            color: #fff;
+        }
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 992px) {
+    .meal-card {
+        padding: 16px 18px;
+    }
+
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .view-patient-btn {
+        margin-left: 0;
+    }
+
+    .patient-details {
+        margin-left: 0;
+    }
+
+    .action-links-row {
+        padding-left: 0;
+    }
+
+    .locked-message {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .meal-card {
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+    }
+
+    .meal-card-top {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .meal-card-left {
+        flex-wrap: wrap;
+    }
+
+    .meal-card-right {
+        justify-content: flex-start;
+        margin-top: 4px;
+    }
+
+    .category-grid {
+        margin-left: 0;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .locked-message {
+        margin-left: 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+    }
+
+    .view-patient-btn {
+        margin-left: 0;
+    }
+
+    .patient-details {
+        margin-left: 0;
+    }
+
+    .action-links-row {
+        padding-left: 0;
+        gap: 10px;
+    }
+
+    .action-btn {
+        padding: 5px 14px;
+        font-size: 12px;
+        border-radius: 8px;
+    }
+
+    .meta-indicators {
+        gap: 12px;
+    }
+
+    .meta-item {
+        font-size: 12px;
+    }
+
+    .notification-dropdown {
+        width: 350px;
+        right: -50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .meal-card {
+        padding: 12px 14px;
+        min-height: 50px;
+        border-radius: 12px;
+    }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .meal-title-row {
+        font-size: 15px;
+    }
+
+    .avatar-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+    }
+
+        .avatar-circle img {
+            width: 18px;
+            height: 18px;
+        }
+
+    .category-count {
+        font-size: 26px;
+    }
+
+    .category-card {
+        padding: 10px 14px;
+        min-height: 55px;
+        border-radius: 10px;
+    }
+
+    .patient-card {
+        padding: 10px 12px;
+        border-radius: 10px;
+    }
+
+    .patient-name {
+        font-size: 13px;
+    }
+
+    .action-links-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-btn {
+        justify-content: center;
+        width: 100%;
+        padding: 8px 16px;
+        border-radius: 8px;
+    }
+
+    .status-badge {
+        font-size: 10px;
+        padding: 2px 10px;
+    }
+
+    .preorder-empty {
+        padding: 35px 18px;
+        border-radius: 14px;
+    }
+
+        .preorder-empty h3 {
+            font-size: 16px;
+        }
+
+        .preorder-empty p {
+            font-size: 13px;
+        }
+
+    .notification-dropdown {
+        width: 280px;
+        right: -80px;
+    }
+
+    .dash-toast-notification {
+        top: 16px;
+        right: 16px;
+        min-width: 180px;
+        padding: 10px 14px;
+    }
+
+        .dash-toast-notification span {
+            font-size: 12px;
+        }
+}
+
+.mark-all-read {
+    font-size: 12px;
+    color: #16a34a;
+    cursor: pointer;
+    font-weight: 500;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+    .mark-all-read:hover {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+    .mark-all-read .check-icon {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        display: inline-block;
+    }
+
+PreOrderSheets.css
+Displaying PreOrderSheets.css.

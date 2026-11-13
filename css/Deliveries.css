@@ -1,0 +1,1261 @@
+﻿.deliveries-page {
+    padding: 20px 30px !important;
+    background: #f5f7fb !important;
+    min-height: 100vh !important;
+}
+
+    .deliveries-page .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 0 0 16px 0;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .deliveries-page .top-bar-left h1 {
+        display: flex;
+        align-items: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 4px 0;
+    }
+
+    .deliveries-page .top-bar-left p {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }
+
+    .deliveries-page .page-icon {
+        width: 44px;
+        height: 44px;
+        margin-right: 14px;
+        vertical-align: middle;
+        filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(2000%) hue-rotate(130deg) brightness(85%) contrast(110%);
+    }
+
+    .deliveries-page .top-bar-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+
+    .deliveries-page .btn-refresh {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        padding: 12px 24px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 44px;
+        white-space: nowrap;
+    }
+
+        .deliveries-page .btn-refresh span {
+            font-weight: 700;
+        }
+
+        .deliveries-page .btn-refresh:hover {
+            background: #f8fafc;
+            border-color: #d1d5db;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .deliveries-page .btn-refresh:active {
+            transform: scale(0.97);
+        }
+
+        .deliveries-page .btn-refresh .refresh-icon {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            opacity: 0.7;
+            transition: all 0.2s ease;
+        }
+
+        .deliveries-page .btn-refresh:hover .refresh-icon {
+            opacity: 1;
+            transform: rotate(180deg);
+        }
+
+        .deliveries-page .btn-refresh:active .refresh-icon {
+            transform: rotate(360deg);
+            transition: transform 0.5s ease;
+        }
+
+        .deliveries-page .btn-refresh.spinning .refresh-icon {
+            animation: spin 0.8s linear infinite;
+            opacity: 1;
+        }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==========================================================
+   NOTIFICATION STYLES (MATCHING PATIENT SATISFACTION)
+   ========================================================== */
+.deliveries-page .notification-wrapper {
+    position: relative;
+}
+
+.deliveries-page .notification-bell {
+    position: relative;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background .2s;
+    background: transparent;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+    .deliveries-page .notification-bell:hover {
+        background: #f3f4f6;
+    }
+
+        .deliveries-page .notification-bell:hover .bell-icon {
+            opacity: 1;
+        }
+
+.deliveries-page .bell-icon {
+    width: 22px;
+    height: 22px;
+    opacity: .7;
+    transition: opacity .2s;
+    object-fit: contain;
+    display: block;
+}
+
+.deliveries-page .notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ef4444;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 10px;
+    padding: 1px 5px;
+    min-width: 18px;
+    text-align: center;
+    font-weight: 600;
+    border: 2px solid #fff;
+    display: none;
+    line-height: 18px;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+    .deliveries-page .notification-badge.show {
+        display: block;
+    }
+
+.deliveries-page .notification-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 48px;
+    width: 420px;
+    max-height: 500px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    z-index: 1000;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: all .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+    .deliveries-page .notification-dropdown.show {
+        display: block;
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+.deliveries-page .notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+    .deliveries-page .notification-header h6 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a1a2e;
+        margin: 0;
+    }
+
+        .deliveries-page .notification-header h6 span {
+            color: #6b7280;
+            font-weight: 400;
+            font-size: 13px;
+            margin-left: 4px;
+        }
+
+.deliveries-page .mark-all-read {
+    background: none;
+    border: none;
+    color: #16a34a;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: .2s;
+}
+
+    .deliveries-page .mark-all-read:hover {
+        background: #f0fdf4;
+        color: #15803d;
+    }
+
+    .deliveries-page .mark-all-read .check-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+.deliveries-page .notification-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px 0;
+}
+
+    .deliveries-page .notification-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .deliveries-page .notification-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .deliveries-page .notification-list::-webkit-scrollbar-thumb {
+        background: #d1d5db;
+        border-radius: 10px;
+    }
+
+        .deliveries-page .notification-list::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+
+.deliveries-page .notification-item {
+    display: flex;
+    padding: 14px 20px;
+    gap: 14px;
+    align-items: flex-start;
+    cursor: pointer;
+    border-bottom: 1px solid #f9fafb;
+    transition: background .2s, opacity .5s ease, transform .3s ease;
+}
+
+    .deliveries-page .notification-item:hover {
+        background: #f8fafc;
+    }
+
+    .deliveries-page .notification-item.unread {
+        background: #f0fdf4 !important;
+        border-left: 3px solid #16a34a !important;
+    }
+
+        .deliveries-page .notification-item.unread:hover {
+            background: #dcfce7 !important;
+        }
+
+    .deliveries-page .notification-item.read {
+        background: #f9fafb;
+        opacity: .7;
+        border-left: 3px solid transparent !important;
+    }
+
+        .deliveries-page .notification-item.read:hover {
+            background: #f3f4f6;
+            opacity: .9;
+        }
+
+    .deliveries-page .notification-item .notification-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+.deliveries-page .notification-icon.info {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+.deliveries-page .notification-icon.success {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.deliveries-page .notification-icon.warning {
+    background: #fef3c7;
+    color: #f59e0b;
+}
+
+.deliveries-page .notification-icon.error {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.deliveries-page .notification-item .notification-icon img {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.deliveries-page .notification-icon.info img {
+    filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(1715%) hue-rotate(205deg);
+}
+
+.deliveries-page .notification-icon.success img {
+    filter: brightness(0) saturate(100%) invert(46%) sepia(89%) saturate(671%) hue-rotate(86deg);
+}
+
+.deliveries-page .notification-icon.error img {
+    filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(2300%) hue-rotate(345deg);
+}
+
+.deliveries-page .notification-item .notification-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.deliveries-page .notification-text h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 3px;
+}
+
+.deliveries-page .notification-text p {
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0 0 4px;
+    line-height: 1.4;
+}
+
+.deliveries-page .notification-time {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+.deliveries-page .unread-dot {
+    width: 10px;
+    height: 10px;
+    background: #16a34a !important;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 8px;
+    box-shadow: 0 0 8px rgba(22, 163, 74, 0.4) !important;
+    animation: patientNotificationPulse 2s infinite;
+}
+
+@keyframes patientNotificationPulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(22, 163, 74, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 16px rgba(22, 163, 74, 0.8);
+    }
+}
+
+/* ==========================================================
+   STATS & DISTRIBUTION (UNCHANGED)
+   ========================================================== */
+.deliveries-page .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.deliveries-page .stat-card {
+    background: #ffffff !important;
+    border-radius: 16px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid #e5e7eb;
+    box-shadow: none !important;
+    transition: none !important;
+}
+
+    .deliveries-page .stat-card .stat-content {
+        flex: 1;
+        text-align: left;
+    }
+
+    .deliveries-page .stat-card .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: left;
+    }
+
+    .deliveries-page .stat-card .stat-number {
+        font-size: 42px;
+        font-weight: 700;
+        margin: 2px 0 1px 0;
+        text-align: left;
+        color: #000000 !important;
+    }
+
+.deliveries-page .stat-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 10px;
+    margin-top: -4px;
+    margin-bottom: auto;
+    position: relative;
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: inset 1.5px 1.5px 4px rgba(255, 255, 255, 0.3), inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.06), 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+    .deliveries-page .stat-badge::before {
+        content: '';
+        position: absolute;
+        top: 10%;
+        left: 16%;
+        width: 35%;
+        height: 15%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+        border-radius: 50% / 40%;
+        transform: rotate(-15deg);
+        pointer-events: none;
+    }
+
+    .deliveries-page .stat-badge img {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+        border-radius: 50%;
+        background: transparent !important;
+        display: block;
+        position: relative;
+        z-index: 1;
+        image-rendering: auto;
+        filter: brightness(0) saturate(100%) contrast(1.4) drop-shadow(0 0 3px rgba(0,0,0,0.15));
+    }
+
+.deliveries-page .stat-card.stat-ready .stat-badge {
+    background: rgba(107, 114, 128, 0.10);
+    border-color: rgba(107, 114, 128, 0.25);
+    box-shadow: inset 1.5px 1.5px 4px rgba(107, 114, 128, 0.12), inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.03), 0 3px 8px rgba(107, 114, 128, 0.05);
+}
+
+    .deliveries-page .stat-card.stat-ready .stat-badge img {
+        filter: brightness(0) saturate(100%) invert(45%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(60%) contrast(140%);
+    }
+
+.deliveries-page .stat-card.stat-transit .stat-badge {
+    background: rgba(30, 64, 175, 0.10);
+    border-color: rgba(30, 64, 175, 0.25);
+    box-shadow: inset 1.5px 1.5px 4px rgba(30, 64, 175, 0.12), inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.03), 0 3px 8px rgba(30, 64, 175, 0.05);
+}
+
+    .deliveries-page .stat-card.stat-transit .stat-badge img {
+        filter: brightness(0) saturate(100%) invert(15%) sepia(90%) saturate(4000%) hue-rotate(215deg) brightness(80%) contrast(140%);
+    }
+
+.deliveries-page .stat-card.stat-delivered .stat-badge {
+    background: rgba(21, 128, 61, 0.10);
+    border-color: rgba(21, 128, 61, 0.25);
+    box-shadow: inset 1.5px 1.5px 4px rgba(21, 128, 61, 0.12), inset -1.5px -1.5px 4px rgba(0, 0, 0, 0.03), 0 3px 8px rgba(21, 128, 61, 0.05);
+}
+
+    .deliveries-page .stat-card.stat-delivered .stat-badge img {
+        filter: brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(1500%) hue-rotate(120deg) brightness(80%) contrast(140%);
+    }
+
+.deliveries-page .distribution-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.deliveries-page .distribution-section {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #eef2f8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+    .deliveries-page .distribution-section.section-ready {
+        border: 1px solid #e5e7eb;
+    }
+
+        .deliveries-page .distribution-section.section-ready .section-header {
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+            .deliveries-page .distribution-section.section-ready .section-header h3 {
+                color: #6b7280;
+            }
+
+        .deliveries-page .distribution-section.section-ready .section-header-icon {
+            filter: brightness(0) saturate(100%) invert(45%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(60%) contrast(140%);
+        }
+
+    .deliveries-page .distribution-section.section-transit {
+        border: 1px solid #bfdbfe;
+    }
+
+        .deliveries-page .distribution-section.section-transit .section-header {
+            border-bottom: 1px solid #bfdbfe;
+            background: #eff6ff;
+        }
+
+            .deliveries-page .distribution-section.section-transit .section-header h3 {
+                color: #2563eb;
+            }
+
+        .deliveries-page .distribution-section.section-transit .section-header-icon {
+            filter: brightness(0) saturate(100%) invert(15%) sepia(90%) saturate(4000%) hue-rotate(215deg) brightness(80%) contrast(140%);
+        }
+
+    .deliveries-page .distribution-section.section-delivered {
+        border: 1px solid #86efac;
+    }
+
+        .deliveries-page .distribution-section.section-delivered .section-header {
+            border-bottom: 1px solid #86efac;
+            background: #f0fdf4;
+        }
+
+            .deliveries-page .distribution-section.section-delivered .section-header h3 {
+                color: #16a34a;
+            }
+
+        .deliveries-page .distribution-section.section-delivered .section-header-icon {
+            filter: brightness(0) saturate(100%) invert(25%) sepia(95%) saturate(1500%) hue-rotate(120deg) brightness(80%) contrast(140%);
+        }
+
+.deliveries-page .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    flex-shrink: 0;
+}
+
+.deliveries-page .section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.deliveries-page .section-header-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
+.deliveries-page .section-header h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.deliveries-page .section-header .section-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    background: transparent !important;
+    border: none !important;
+}
+
+.deliveries-page .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 4px 10px 4px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.deliveries-page .category-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #5D2B06;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+    .deliveries-page .category-title .category-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background-color: #FFA726;
+        border-radius: 6px;
+        border: none;
+        box-shadow: none;
+        flex-shrink: 0;
+    }
+
+    .deliveries-page .category-title .category-icon {
+        width: 14px;
+        height: 14px;
+        object-fit: contain;
+        filter: brightness(0) invert(1);
+        display: block;
+    }
+
+    .deliveries-page .category-title span {
+        font-size: 13px;
+        font-weight: 700;
+        color: #5D2B06;
+        letter-spacing: 0.3px;
+    }
+
+.deliveries-page .count-ready,
+.deliveries-page .count-transit,
+.deliveries-page .count-delivered {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #FEF7DC;
+    border: 1px solid #FBE8A4;
+    color: #7E420E;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    padding: 0 6px;
+}
+
+.deliveries-page .section-body {
+    padding: 10px 14px;
+    overflow: visible;
+    flex: 1;
+}
+
+.deliveries-page .order-card {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    margin-bottom: 10px;
+    transition: all 0.2s;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    position: relative;
+}
+
+    .deliveries-page .order-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .deliveries-page .order-card:hover {
+        background: #f8fafc;
+        border-color: #d1d5db;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .deliveries-page .order-card.card-overdue {
+        border-left: 3px solid #FF9800;
+        padding-left: 13px;
+    }
+
+    .deliveries-page .order-card .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .deliveries-page .order-card .badge-instant {
+        background-color: #FEF3C7;
+        color: #78350F;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border: 1px solid #fde68a;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .deliveries-page .order-card .badge-instant .badge-icon {
+            width: 12px;
+            height: 12px;
+            filter: brightness(0) saturate(100%) invert(22%) sepia(89%) saturate(1812%) hue-rotate(12deg) brightness(85%) contrast(97%);
+        }
+
+    .deliveries-page .order-card .badge-preorder {
+        background-color: #fef3c7;
+        color: #78350f;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 4px 12px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        border: 1px solid #fde68a;
+    }
+
+    .deliveries-page .order-card .order-id {
+        background-color: #F1F5F9;
+        border: 1px solid #E2E8F0;
+        color: #1E293B;
+        font-weight: 700;
+        font-size: 12px;
+        padding: 3px 10px;
+        border-radius: 4px;
+        display: inline-block;
+    }
+
+    .deliveries-page .order-card .room-info {
+        color: #000000;
+        font-size: 14px;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
+        margin-left: 2px;
+    }
+
+    .deliveries-page .order-card .meal-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #FFFFFF !important;
+        border: 1px solid #E2E8F0 !important;
+        border-radius: 20px;
+        padding: 4px 10px 4px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #0F172A !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+        .deliveries-page .order-card .meal-badge img {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            filter: brightness(0) saturate(100%) invert(9%) sepia(38%) saturate(2453%) hue-rotate(211deg) brightness(98%) contrast(93%) !important;
+        }
+
+        .deliveries-page .order-card .meal-badge.breakfast,
+        .deliveries-page .order-card .meal-badge.lunch,
+        .deliveries-page .order-card .meal-badge.dinner,
+        .deliveries-page .order-card .meal-badge.snacks {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #0F172A !important;
+        }
+
+            .deliveries-page .order-card .meal-badge.breakfast img,
+            .deliveries-page .order-card .meal-badge.lunch img,
+            .deliveries-page .order-card .meal-badge.dinner img,
+            .deliveries-page .order-card .meal-badge.snacks img {
+                filter: brightness(0) saturate(100%) invert(9%) sepia(38%) saturate(2453%) hue-rotate(211deg) brightness(98%) contrast(93%) !important;
+            }
+
+    .deliveries-page .order-card .customer-info {
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 1px;
+        padding-right: 80px;
+    }
+
+        .deliveries-page .order-card .customer-info strong {
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+    .deliveries-page .order-card .item-name {
+        color: #334155;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        padding-right: 80px;
+    }
+
+    .deliveries-page .order-card .tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 10px;
+        padding-right: 80px;
+    }
+
+    .deliveries-page .order-card .tag {
+        background-color: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #86efac;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+        .deliveries-page .order-card .tag.allergy {
+            background-color: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            font-weight: 600;
+            border-radius: 20px;
+        }
+
+    .deliveries-page .order-card .status-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        border-top: 1px solid #e2e8f0;
+        padding-top: 10px;
+        margin-top: 4px;
+    }
+
+    .deliveries-page .order-card .status-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+    }
+
+        .deliveries-page .order-card .status-row .status-icon {
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+
+        .deliveries-page .order-card .status-row.status-unassigned {
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+            .deliveries-page .order-card .status-row.status-unassigned .status-icon {
+                filter: brightness(0) saturate(100%) invert(45%) sepia(4%) saturate(1356%) hue-rotate(195deg) brightness(91%) contrast(88%);
+            }
+
+        .deliveries-page .order-card .status-row.status-eta {
+            color: #DC2626;
+            font-weight: 600;
+        }
+
+            .deliveries-page .order-card .status-row.status-eta .status-icon {
+                filter: brightness(0) saturate(100%) invert(26%) sepia(92%) saturate(3280%) hue-rotate(348deg) brightness(92%) contrast(90%);
+            }
+
+        .deliveries-page .order-card .status-row.status-eta-ontime {
+            color: #16a34a;
+            font-weight: 500;
+        }
+
+            .deliveries-page .order-card .status-row.status-eta-ontime .status-icon {
+                filter: brightness(0) saturate(100%) invert(40%) sepia(87%) saturate(1132%) hue-rotate(113deg) brightness(94%) contrast(96%);
+            }
+
+        .deliveries-page .order-card .status-row.status-picked {
+            color: #4F46E5;
+            font-weight: 500;
+        }
+
+            .deliveries-page .order-card .status-row.status-picked .status-icon {
+                filter: brightness(0) saturate(100%) invert(21%) sepia(87%) saturate(2815%) hue-rotate(230deg) brightness(92%) contrast(96%);
+            }
+
+        .deliveries-page .order-card .status-row.status-delivered {
+            color: #16a34a;
+            font-weight: 500;
+        }
+
+            .deliveries-page .order-card .status-row.status-delivered .status-icon {
+                filter: brightness(0) saturate(100%) invert(40%) sepia(87%) saturate(1132%) hue-rotate(113deg) brightness(94%) contrast(96%);
+            }
+
+.dash-toast-notification {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    min-width: 350px;
+    max-width: 480px;
+    background: #012d16;
+    color: #59f0a5;
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transform: translateX(120%);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    opacity: 0;
+    z-index: 99999;
+    border-left: 4px solid #22c55e;
+}
+
+    .dash-toast-notification.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    .dash-toast-notification i {
+        font-size: 22px;
+        color: #22c55e;
+        flex-shrink: 0;
+    }
+
+    .dash-toast-notification span {
+        flex: 1;
+        font-size: 14px;
+        font-weight: 500;
+        color: #59f0a5;
+        line-height: 1.4;
+        font-family: "Segoe UI", sans-serif;
+        letter-spacing: 0.2px;
+    }
+
+    .dash-toast-notification .toast-close {
+        background: none;
+        border: none;
+        color: rgba(89, 240, 165, 0.4);
+        cursor: pointer;
+        font-size: 20px;
+        padding: 0 4px;
+        transition: all 0.2s;
+        line-height: 1;
+    }
+
+        .dash-toast-notification .toast-close:hover {
+            color: #59f0a5;
+            transform: scale(1.1);
+        }
+
+    .dash-toast-notification.success {
+        background: #012d16;
+        border-left-color: #22c55e;
+    }
+
+        .dash-toast-notification.success i {
+            color: #22c55e;
+        }
+
+        .dash-toast-notification.success span {
+            color: #59f0a5;
+        }
+
+    .dash-toast-notification.error {
+        background: #2d0116;
+        border-left-color: #ef4444;
+    }
+
+        .dash-toast-notification.error i {
+            color: #ef4444;
+        }
+
+        .dash-toast-notification.error span {
+            color: #f0a5a5;
+        }
+
+    .dash-toast-notification.warning {
+        background: #2d1f01;
+        border-left-color: #f59e0b;
+    }
+
+        .dash-toast-notification.warning i {
+            color: #f59e0b;
+        }
+
+        .dash-toast-notification.warning span {
+            color: #f0c95a;
+        }
+
+    .dash-toast-notification.info {
+        background: #011a2d;
+        border-left-color: #3b82f6;
+    }
+
+        .dash-toast-notification.info i {
+            color: #3b82f6;
+        }
+
+        .dash-toast-notification.info span {
+            color: #5aa9f0;
+        }
+
+@media (max-width: 1200px) {
+    .deliveries-page .distribution-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .deliveries-page .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .deliveries-page {
+        padding: 16px !important;
+    }
+
+        .deliveries-page .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .deliveries-page .top-bar-right {
+            justify-content: flex-start;
+            margin-top: 8px;
+        }
+
+        .deliveries-page .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .deliveries-page .distribution-container {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .deliveries-page .stat-card {
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
+            .deliveries-page .stat-card .stat-number {
+                font-size: 32px;
+            }
+
+        .deliveries-page .stat-badge {
+            width: 30px;
+            height: 30px;
+        }
+
+            .deliveries-page .stat-badge img {
+                width: 16px;
+                height: 16px;
+            }
+
+        .deliveries-page .section-body {
+            padding: 10px 12px;
+        }
+
+        .deliveries-page .section-header {
+            padding: 12px 16px;
+        }
+
+        .deliveries-page .section-header-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .deliveries-page .section-header h3 {
+            font-size: 12px;
+        }
+
+        .deliveries-page .category-header {
+            padding: 6px 2px 8px 2px;
+        }
+
+        .deliveries-page .category-title {
+            font-size: 12px;
+            gap: 8px;
+        }
+
+            .deliveries-page .category-title .category-icon-wrapper {
+                width: 20px;
+                height: 20px;
+                border-radius: 5px;
+            }
+
+            .deliveries-page .category-title .category-icon {
+                width: 12px;
+                height: 12px;
+            }
+
+            .deliveries-page .category-title span {
+                font-size: 11px;
+            }
+
+        .deliveries-page .section-header .section-count {
+            min-width: 20px;
+            height: 20px;
+            font-size: 12px;
+            padding: 0 5px;
+        }
+
+        .deliveries-page .count-ready,
+        .deliveries-page .count-transit,
+        .deliveries-page .count-delivered {
+            min-width: 20px;
+            height: 20px;
+            font-size: 10px;
+            padding: 0 5px;
+        }
+
+    .dash-toast-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        min-width: unset;
+        max-width: unset;
+        padding: 14px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .deliveries-page .stat-card .stat-number {
+        font-size: 28px;
+    }
+
+    .deliveries-page .stat-card {
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+
+    .deliveries-page .stat-badge {
+        width: 28px;
+        height: 28px;
+    }
+
+        .deliveries-page .stat-badge img {
+            width: 14px;
+            height: 14px;
+        }
+
+    .deliveries-page .section-body {
+        padding: 8px 10px;
+    }
+
+    .deliveries-page .order-card {
+        padding: 10px 12px;
+    }
+
+    .deliveries-page .section-header {
+        padding: 10px 14px;
+    }
+
+    .deliveries-page .section-header-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    .deliveries-page .section-header h3 {
+        font-size: 11px;
+    }
+
+    .deliveries-page .category-header {
+        padding: 4px 2px 6px 2px;
+    }
+
+    .deliveries-page .category-title {
+        font-size: 10px;
+        gap: 6px;
+    }
+
+        .deliveries-page .category-title .category-icon-wrapper {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+        }
+
+        .deliveries-page .category-title .category-icon {
+            width: 10px;
+            height: 10px;
+        }
+
+        .deliveries-page .category-title span {
+            font-size: 10px;
+        }
+
+    .deliveries-page .count-ready,
+    .deliveries-page .count-transit,
+    .deliveries-page .count-delivered {
+        min-width: 18px;
+        height: 18px;
+        font-size: 9px;
+        padding: 0 4px;
+    }
+
+    .deliveries-page .btn-refresh {
+        padding: 8px 16px;
+        height: 38px;
+        font-size: 12px;
+    }
+
+        .deliveries-page .btn-refresh .refresh-icon {
+            width: 16px;
+            height: 16px;
+        }
+}
