@@ -1,0 +1,39 @@
+{
+	"info": {
+		"_postman_id": "cec1aec4-09ad-49b3-bd73-97175adcf011",
+		"name": "New Collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://portzo.net/Traczo/GetBranches",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{'ServerIp':'10.44.32.35'}"
+				},
+				"url": {
+					"raw": "http://portzo.net/Traczo/GetBranches",
+					"protocol": "http",
+					"host": [
+						"portzo",
+						"net"
+					],
+					"path": [
+						"Traczo",
+						"GetBranches"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

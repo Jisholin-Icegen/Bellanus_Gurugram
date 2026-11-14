@@ -1,0 +1,568 @@
+﻿live 
+C:\Users\933167\source\repos\SocketClient\SocketClient
+C:\Users\933167\source\repos\SocketServer\SocketServer
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\s\winsocservice\Service1
+
+http://localhost:1681/Traczo/GetProfile
+{
+    "userId": "9342"
+}
+{
+    "status": true,
+    "message": "1 Row Found",
+    "data": {
+        "uhid": "APJ1.0032114257",
+        "patientName": "Mrs. CHOWKACHERLA  VISHNUPRIYA",
+        "gender": "FEMALE",
+        "age": "53",
+        "dateofAdmisison": "2025-10-16 02:19:12",
+        "userId": "9342",
+        "userName": "Mrs. CHOWKACHERLA  VISHNUPRIYA"
+    }
+}
+
+
+
+
+
+
+jd
+
+StatusUpdate
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                RtnCatClsRemarksList rtnRst; CateringCleaningRemarks rows = new CateringCleaningRemarks();
+                        rows.AppType = "";
+                        rows.CateringGroupNames = new List<CateringGroup> { };
+
+                        try
+                        {
+
+
+                            DataSet dts = DataAccess.DACateringGroup("GET", usrlgn.HospitalId.Split('_')[1]);
+
+
+
+                                if (dts != null && dts.Tables.Count > 0)
+                            {
+
+                                rtnRst = new RtnCatClsRemarksList
+                                {
+                                    status = dts.Tables[0].Rows.Count > 0 ? true : false,
+                                    message = dts.Tables[0].Rows.Count > 0 ? dts.Tables[0].Rows.Count.ToString() + GlobalVar.NoOfrecords : "No data found",
+                                    data = new CateringCleaningRemarks()
+                                    {
+                                        AppType = dt.Rows[0]["apptype"].ToString(),
+                                        IsHaywood= dt.Rows[0]["IsHaywood"].ToString() ,
+                                        IsRoyalStoke = dt.Rows[0]["IsRoyalStoke"].ToString(),
+                                        CateringGroupNames = (from rw in dts.Tables[0].AsEnumerable()
+                                                              select
+                                  new CateringGroup()
+                                  {
+                                      CateringGroupId = Convert.ToString(rw["CateringGroupId"]),
+                                      CateringGroupName = Convert.ToString(rw["CateringGroupName"]),
+
+                                  }).ToList(),
+                                        CleaningZones = (from rw in dts.Tables[1].AsEnumerable()
+                                                         select
+                             new CleaningZone()
+                             {
+                                 CleaningZoneId = Convert.ToString(rw["CleaningZoneId"]),
+                                 CleaningZoneName = Convert.ToString(rw["CleaningZoneName"]),
+
+                             }).ToList()
+                                    }
+                                };
+
+                            }
+
+                            else
+                            {
+                                rtnRst = new RtnCatClsRemarksList
+                                {
+                                    status = false,
+                                    message = GlobalVar.NoDataFound,
+                                    data = rows
+                                };
+                            }
+
+
+                        }
+                        catch (Exception ex)
+                        {
+                            DataAccess.InsertError(ex.Message, "CateringRemarks", conStr);
+
+                            rtnRst = new RtnCatClsRemarksList
+                            {
+                                status = false,
+                                message = GlobalVar.PlsChkData,
+                                data = rows
+                            };
+                            rtnBool = false;
+                        }
+
+      
+      
+      
+      
+      
+      [Authorize]
+        [HttpPost]
+        [Route("StartCleaningTask")]
+        public HttpResponseMessage StartCleaningTask([FromBody] StartCompleteTask loc)
+        {
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            RtnPorterStartEndData dumd = new RtnPorterStartEndData();
+            rslt = "FALSE"; RtnPorterStartEnd rtnRst; DataTable dt = new DataTable();
+            try
+            {
+                if ((ModelState.IsValid))
+                {
+                    loc.HospitalId = AesOperation.DecryptString(loc.HospitalId);
+                    loc.Process = "STARTTASK";
+                    loc.RequestStatus = "STARTTASK";
+                    loc.EndTime = "";
+                    hosID = loc.HospitalId.Split('_')[0]; conStr = loc.HospitalId.Split('_')[1];
+
+                    dt = DataAccess.AddCleaningRequest(loc.PorterId, loc.RequestId, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, loc.RequestStatus, loc.PorterRemarks, loc.StartTime, string.Empty, string.Empty, loc.Process, conStr).Tables[0];
+                    rslt = dt.Rows[0]["RESULt"].ToString();
+                    rtnRst = new RtnPorterStartEnd
+                    {
+                        status = (rslt.Split('_')[0].Equals("TRUE") ? true : false),
+                        message = rslt.Split('_')[0].Equals("TRUE") ? "Updated successfully" : rslt.Equals("FALSE") ? GlobalVar.PlsChkData : rslt.Split('_')[1].ToString(),
+                        data = new RtnPorterStartEndData { Result = rslt.Equals("TRUE") ? "Task started" : rslt.Split('_')[1].ToString() }
+                    };
+
+                }
+                else
+                {
+                    rtnRst = new RtnPorterStartEnd
+                    {
+                        status = false,
+                        message = GlobalVar.PlsChkData,
+                        data = dumd
+                    };
+                }
+            }
+            catch
+            {
+                rtnRst = new RtnPorterStartEnd
+                {
+                    status = false,
+                    message = GlobalVar.PlsChkData,
+                    data = dumd
+                };
+            }
+
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, rtnRst);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("CompleteCleaningTask")]
+        public HttpResponseMessage CompleteCleaningTask([FromBody] StartCompleteTask loc)
+        {
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            RtnPorterStartEndData dumd = new RtnPorterStartEndData();
+            rslt = "FALSE"; RtnPorterStartEnd rtnRst; DataTable dt = new DataTable();
+            try
+            {
+                if ((ModelState.IsValid))
+                {
+                    loc.HospitalId = AesOperation.DecryptString(loc.HospitalId);
+                    loc.Process = "CompleteTask";
+                    loc.RequestStatus = "COMPLETETASK";
+                    loc.StartTime = "";
+                    hosID = loc.HospitalId.Split('_')[0]; conStr = loc.HospitalId.Split('_')[1];
+                    dt = DataAccess.StartEndTask(loc, conStr);
+                    dt = DataAccess.AddCleaningRequest(loc.PorterId, loc.RequestId, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, loc.RequestStatus, loc.PorterRemarks, string.Empty, loc.EndTime, string.Empty, loc.Process, conStr).Tables[0];
+
+                    rslt = dt.Rows[0]["RESULt"].ToString();
+                    rtnRst = new RtnPorterStartEnd
+                    {
+                        status = (rslt.Split('_')[0].Equals("TRUE") ? true : false),
+                        message = rslt.Split('_')[0].Equals("TRUE") ? "Updated successfully" : rslt.Equals("FALSE") ? GlobalVar.PlsChkData : rslt.Split('_')[1].ToString(),
+                        data = new RtnPorterStartEndData { Result = rslt.Equals("TRUE") ? "Task completed" : rslt.Split('_')[1].ToString() }
+                    };
+
+                }
+                else
+                {
+                    rtnRst = new RtnPorterStartEnd
+                    {
+                        status = false,
+                        message = GlobalVar.PlsChkData,
+                        data = dumd
+                    };
+                }
+            }
+            catch
+            {
+                rtnRst = new RtnPorterStartEnd
+                {
+                    status = false,
+                    message = GlobalVar.PlsChkData,
+                    data = dumd
+                };
+            }
+
+
+
+            return Request.CreateResponse(HttpStatusCode.OK, rtnRst);
+        }
+
+
+
+        [HttpPost]
+        [Route("CleaningTasks")]
+        public HttpResponseMessage CleaningTasks([FromBody] GetPorterTasks loc)
+        {
+
+            rslt = "FALSE"; RtnCleaningTaskList rtnRst; DataSet dt = new DataSet(); CleaningTaskDetails rows = new CleaningTaskDetails();
+            rows.CleaningTask = new List<Currentcleaningtask> { };
+            rows.CheckList = new List<CleaningCheckList> { };
+            rows.PreviousCleaningTask = new List<Previouscleaningtask> { };
+            rows.OtherMessage = new List<OtherCleaningMessage> { };
+            try
+            {
+                if ((ModelState.IsValid))
+                {
+                    loc.HospitalId = AesOperation.DecryptString(loc.HospitalId);
+                    hosID = loc.HospitalId.Split('_')[0]; conStr = loc.HospitalId.Split('_')[1];
+                    loc.Process = "GET";
+                    dt = DataAccess.AddCleaningRequest(loc.PorterId, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "Get", conStr); ;
+
+
+
+                    if (dt != null && dt.Tables.Count > 0)
+                    {
+
+                        rtnRst = new RtnCleaningTaskList
+                        {
+                            status = true,//(loc.Process.ToUpper() == "GETPORTERTASK" && dt.Tables[0].Rows[0]["result"].ToString().ToUpper() == "TRUE") ? true :  false ,
+                            message = (loc.Process.ToUpper() == "GET" && dt.Tables[0].Rows.Count > 0 && dt.Tables[0].Rows[0]["result"].ToString().ToUpper() == "TRUE") ? dt.Tables[0].Rows.Count.ToString() + GlobalVar.NoOfrecords : "No task found",
+                            data = new CleaningTaskDetails()
+                            {
+                                CleaningTask = (from rw in dt.Tables[0].AsEnumerable()
+                                                select
+                    new Currentcleaningtask()
+                    {
+                        RequestId = Convert.ToString(rw["RequestId"]),
+                        Location = Convert.ToString(rw["Location"]),
+                        RequestStatus = Convert.ToString(rw["RequestStatus"]),
+                        RequestDeskRemarks = Convert.ToString(rw["RequestDeskRemarks"]),
+                        PatientName = Convert.ToString(rw["PatientName"]),
+                        RequestorName = Convert.ToString(rw["RequestorName"]),
+                        PorterName = Convert.ToString(rw["PorterName"]),
+                        RequestTime = Convert.ToString(rw["RequestTime"]),
+                        RequestStatusId = Convert.ToString(rw["RequestStatusId"]),
+                        MultiTaskFlag = Convert.ToString(rw["MultiTaskFlag"]),
+                        AssignedTime = Convert.ToString(rw["AssignedTime"]),
+                        StartTime = Convert.ToString(rw["StartTime"]),
+                        ThresholdForStartTime = Convert.ToString(rw["ThresholdForStartTime"]),
+                        ThresholdForEndTime = Convert.ToString(rw["ThresholdForEndTime"]),
+                        NoResponseTime = Convert.ToString(rw["NoResponseTime"]),
+                        RequestNo = Convert.ToString(rw["RequestNo"]),
+                        Priority = Convert.ToString(rw["Priority"]),
+                        StartLocationMac = Convert.ToString(rw["StartLocationMac"]),
+                        EndLocationMac = Convert.ToString(rw["EndLocationMac"]),
+                        PorterRemarks = Convert.ToString(rw["PorterRemarks"]),
+                        PorterId = Convert.ToString(rw["PorterId"]),
+                        SubPorterId = Convert.ToString(rw["SubPorterId"]),
+                        IsAdhoc = Convert.ToString(rw["IsAdhoc"]),
+
+                        IsMultiPorter = Convert.ToString(rw["IsMultiPorter"]),
+                        PorterStartFlag = Convert.ToString(rw["PorterStartFlag"]),
+                        SubPorterStartFlag = Convert.ToString(rw["SubPorterStartFlag"]),
+                        PorterEndFlag = Convert.ToString(rw["PorterEndFlag"]),
+                        SubPorterEndFlag = Convert.ToString(rw["SubPorterEndFlag"]),
+
+                        CleaningType = Convert.ToString(rw["CleaningType"]),
+                        Result = Convert.ToString(rw["Result"])
+
+
+                    }).ToList(),
+                                CheckList = (from rw in dt.Tables[1].AsEnumerable()
+                                             select
+                 new CleaningCheckList()
+                 {
+                     RequestId = Convert.ToString(rw["RequestId"]),
+                     CleaningType = Convert.ToString(rw["CleaningType"]),
+                     CheckListId = Convert.ToString(rw["CheckListId"]),
+                     CheckListName = Convert.ToString(rw["CheckListName"]),
+                     InputType = Convert.ToString(rw["InputType"]),
+                     Mandatory = Convert.ToString(rw["Mandatory"])
+                        /* InputValue = Convert.ToString(rw["InputValue"]),
+                         BeforeName = Convert.ToString(rw["BeforeName"]),
+                         AfterName = Convert.ToString(rw["AfterName"]),
+                         Photo = Convert.ToString(rw["Photo"]) */
+
+                 }).ToList(),
+                                PreviousCleaningTask = (from rw in dt.Tables[2].AsEnumerable()
+                                                        select
+                            new Previouscleaningtask()
+                            {
+
+                                RequestId = Convert.ToString(rw["RequestId"]),
+                                RequestNo = Convert.ToString(rw["RequestNo"]),
+                                RequestStatus = Convert.ToString(rw["RequestStatus"])
+
+                            }).ToList(),
+                                OtherMessage = (from rw in dt.Tables[3].AsEnumerable()
+                                                select
+                    new OtherCleaningMessage()
+                    {
+
+                        MsgId = Convert.ToString(rw["MsgId"]),
+                        Message = Convert.ToString(rw["Message"])
+
+                    }).ToList()
+                            },
+
+                        };
+                    }
+
+                    else
+                    {
+                        rtnRst = new RtnCleaningTaskList
+                        {
+                            status = false,
+                            message = GlobalVar.NoDataFound,
+                            data = rows
+                        };
+                    }
+                }
+                else
+                {
+                    rtnRst = new RtnCleaningTaskList
+                    {
+                        status = false,
+                        message = GlobalVar.PlsChkData,
+                        data = rows
+                    };
+                    rtnBool = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                DataAccess.InsertError(ex.Message, "Cleanntask", conStr);
+
+                rtnRst = new RtnCleaningTaskList
+                {
+                    status = false,
+                    message = GlobalVar.PlsChkData,
+                    data = rows
+                };
+                rtnBool = false;
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, rtnRst);
+        }
+
+
+        /*
+        [HttpPost]
+        [Route("CleaningTasks")]
+        public HttpResponseMessage CleaningTasks([FromBody] GetPorterTasks loc)  //working jun3
+        {
+
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            rslt = "FALSE"; RtnList rtnRst; DataTable dt = new DataTable();
+            try
+            {
+                loc.HospitalId = AesOperation.DecryptString(loc.HospitalId);
+                hosID = loc.HospitalId.Split('_')[0]; conStr = loc.HospitalId.Split('_')[1];
+                loc.Process = "NORESPONSE";
+                dt = DataAccess.AddCleaningRequest(loc.PorterId,string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "Get", conStr);
+
+                string[] columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToArray();
+                IEnumerable<Dictionary<string, object>> result = dt.Rows.Cast<DataRow>()
+                        .Select(dr => columns.ToDictionary(c => c, c => dr[c]));
+
+                if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["Result"].ToString() == "TRUE")
+                {
+
+                    rtnRst = new RtnList
+                    {
+                        status = true,
+                        message = result.Count().ToString() + GlobalVar.NoOfrecords,
+                        data = result
+                    };
+                }
+
+                else
+                {
+                    rtnRst = new RtnList
+                    {
+                        status = false,
+                        message = GlobalVar.NoDataFound,
+                        data = rows
+                    };
+                }
+            }
+            catch
+            {
+                rtnRst = new RtnList
+                {
+                    status = false,
+                    message = GlobalVar.PlsChkData,
+                    data = rows
+                };
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, rtnRst);
+        }
+
+        */
+        //  [Authorize]
+        [HttpPost]
+        [Route("CleaningRequest")]
+        public HttpResponseMessage CleaningRequest()
+        {
+            string hosid = HttpContext.Current.Request.Form["HospitalId"].ToString(), pid = HttpContext.Current.Request.Form["UserId"].ToString(), rid = HttpContext.Current.Request.Form["RequestId"].ToString();
+            List<MultiImageFiles> fdl = JsonConvert.DeserializeObject<List<MultiImageFiles>>(HttpContext.Current.Request.Form["MultiImageFiles"].ToString());
+
+            ProfileDetails loc = new ProfileDetails();
+            loc.HospitalId = AesOperation.DecryptString(hosid);
+            hosID = loc.HospitalId.Split('_')[0]; conStr = loc.HospitalId.Split('_')[1];
+            DataTable dt = new DataTable();
+            string bef = string.Empty, aft = string.Empty, ph = string.Empty, alldata = string.Empty;
+
+            string[] photos = { "Before", "After", "Photo" };
+            foreach (var k in fdl)
+            {
+                bef = string.Empty; aft = string.Empty; ph = string.Empty;
+
+                var compath = pid + "_" + rid + "_" + k.CheckListId + "_" + DateTime.Now.ToString().Replace("/", "_").Replace(":", "_").Replace(" ", "");
+                List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+
+                rslt = "FALSE";
+                try
+                {
+
+                    if (!string.IsNullOrEmpty(k.Before) || !string.IsNullOrEmpty(k.After) || !string.IsNullOrEmpty(k.Photo))
+                    {
+
+                        foreach (string ik in photos)
+                        {
+                            var file = (HttpPostedFile)null;
+
+                            if (HttpContext.Current.Request.Files[k.Before] != null && ik == "Before")
+                                file = HttpContext.Current.Request.Files[k.Before];
+                            else if (HttpContext.Current.Request.Files[k.After] != null && ik == "After")
+                                file = HttpContext.Current.Request.Files[k.After];
+                            else if (HttpContext.Current.Request.Files[k.Photo] != null && ik == "Photo")
+                                file = HttpContext.Current.Request.Files[k.Photo];
+                            // var file = HttpContext.Current.Request.Files[k.Before] != null ? HttpContext.Current.Request.Files[k.Before] : HttpContext.Current.Request.Files[k.After] != null ? HttpContext.Current.Request.Files[k.After] : HttpContext.Current.Request.Files[k.Photo] != null ? HttpContext.Current.Request.Files[k.Photo] : null;
+
+                            if (file != null)
+                            {
+                                rtnBool = (!Request.Content.IsMimeMultipartContent() ? false : true);
+
+                                if (!Request.Content.IsMimeMultipartContent())
+                                {
+                                    rtnBool = false;
+                                    break;
+                                    //throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+                                }
+
+                                var fileName = "";
+                                if (rtnBool && file != null && file.ContentLength > 0 && (new[] { ".jpg", ".jpeg", ".png", ".bmp" }.Contains(Path.GetExtension(file.FileName.ToLower())) ? true : false))
+                                {
+                                    // compath = compath + Path.GetExtension(file.FileName.ToLower());
+
+                                    if (ik == "Before")
+                                    {
+                                        bef = string.IsNullOrEmpty(k.Before) ? string.Empty : "Before" + compath + Path.GetExtension(file.FileName.ToLower());
+                                        fileName = bef;
+                                    }
+                                    else if (ik == "After")
+                                    {
+                                        aft = string.IsNullOrEmpty(k.After) ? string.Empty : "After" + compath + Path.GetExtension(file.FileName.ToLower());
+                                        fileName = aft;
+                                    }
+                                    else if (ik == "Photo")
+                                    {
+                                        ph = string.IsNullOrEmpty(k.Photo) ? string.Empty : "Photo" + compath + Path.GetExtension(file.FileName.ToLower());
+                                        fileName = ph;
+                                    }
+
+
+
+                                    //   var fileName = (!string.IsNullOrEmpty(bef) ? "Before" + compath : !string.IsNullOrEmpty(aft) ? "After" + compath : !string.IsNullOrEmpty(ph) ? "Photo" + compath : string.Empty) + Path.GetExtension(file.FileName.ToLower());
+                                    var path = Path.Combine(
+                               HttpContext.Current.Server.MapPath("~/Images/Cleaning"),
+                               fileName
+                                        );
+                                    file.SaveAs(path);
+                                }
+                            }
+                        }
+
+
+                    }
+
+                    alldata = alldata + (alldata != "" ? "$" : "") + (k.CheckListId + "|" + k.Value + "|" + bef + "|" + aft + "|" + ph);
+                    /* dt = DataAccess.AddCleaningRequest(pid,rid,k.CheckListId,k.Value, bef, aft, ph, k.InputType,"AddCheckList", conStr);
+
+                    if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["RESULt"].ToString() == "TRUE")
+                    {                          
+
+                        rslt = " {\"status\": true,\"message\": \"Updated sucessfully\",\"data\": {\"Result\":\"TRUE\" }}";
+                    }
+                    rtnBool = true;*/
+
+                }
+                catch (Exception e)
+                {
+                    DataAccess.InsertError(e.Message, "CleaningReqeustCtl", conStr);
+                    rtnBool = false;
+                }
+
+
+            }
+
+            dt = DataAccess.AddCleaningRequest(pid, rid, "", "", bef, aft, ph, "", alldata, "", "", "", "", "AddCheckList", conStr).Tables[0];
+
+            if (dt != null && dt.Rows.Count > 0 && dt.Rows[0]["RESULt"].ToString() == "TRUE")
+            {
+
+                rslt = " {\"status\": true,\"message\": \"Updated sucessfully\",\"data\": {\"Result\":\"TRUE\" }}";
+                rtnBool = true;
+            }
+            else
+                rtnBool = false;
+
+
+
+            rslt = rtnBool ? rslt : " {\"status\": false,\"message\": \"Please check the data.\",\"data\": { } }";
+
+            return Request.CreateResponse(HttpStatusCode.OK, JsonConvert.DeserializeObject(rslt));
+        }

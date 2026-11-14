@@ -1,0 +1,1246 @@
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Traczo.dll.config
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Traczo.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Traczo.pdb
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csc.exe
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csc.exe.config
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csc.rsp
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csi.exe
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csi.exe.config
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\csi.rsp
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Console.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\vbc.exe
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\vbc.exe.config
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\vbc.rsp
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\EntityFramework.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Owin.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\EntityFramework.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\Users\DELL\source\repos\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+C:\Users\DELL\source\repos\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+C:\Users\DELL\source\repos\Traczo\Traczo\obj\Release\Traczo.csproj.CopyComplete
+C:\Users\DELL\source\repos\Traczo\Traczo\obj\Release\Traczo.dll
+C:\Users\DELL\source\repos\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Traczo.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Traczo.pdb
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\obj\Release\Traczo.csproj.CopyComplete
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\ARSENTHIL\projects\EQUANS\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Traczo.dll.config
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Traczo.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Traczo.pdb
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csc.exe
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csi.exe
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\EntityFramework.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\EntityFramework.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\obj\Release\Traczo.csproj.CopyComplete
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\obj\Release\Traczo.dll
+D:\ARSENTHIL\projects\EQUANS\API\new\API\api\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Traczo.dll.config
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Traczo.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Traczo.pdb
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csc.exe
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csi.exe
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\EntityFramework.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Owin.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\EntityFramework.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\obj\Release\Traczo.csproj.CopyComplete
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\obj\Release\Traczo.dll
+D:\ARSENTHIL\projects\DIAL50\Traczo\Traczo\obj\Release\Traczo.pdb
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Traczo.dll.config
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Traczo.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Traczo.pdb
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csc.exe
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csc.exe.config
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csc.rsp
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csi.exe
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csi.exe.config
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\csi.rsp
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Console.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\vbc.exe
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\vbc.exe.config
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\vbc.rsp
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\EntityFramework.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Owin.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\EntityFramework.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\obj\Release\Traczo.csproj.CopyComplete
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\obj\Release\Traczo.dll
+C:\dial50v1\dial50v9\dial50v9\sc to apollo\sc to apollo\a\Traczo\Traczo\obj\Release\Traczo.pdb
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Traczo.dll.config
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Traczo.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Traczo.pdb
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csc.exe
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csc.exe.config
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csc.rsp
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csi.exe
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csi.exe.config
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\csi.rsp
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Console.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\vbc.exe
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\vbc.exe.config
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\vbc.rsp
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\EntityFramework.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Owin.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Buffers.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Memory.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Cors.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\EntityFramework.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Buffers.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Memory.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\obj\Release\Traczo.dll
+E:\PORTZO SOURCE CODE\API FOR AI\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.pdb
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Owin.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Buffers.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Memory.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Buffers.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Memory.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\FOOD & DINING\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Traczo.pdb
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Owin.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Buffers.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Memory.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Buffers.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Memory.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\FOOD & DINING - DEV\F&D APPLICATIONS\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.pdb
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Owin.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\APOLLO - SEG & FULL QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.pdb
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Owin.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\DIAL50 - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll.config
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Traczo.pdb
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Owin.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Buffers.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Memory.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\INHOUSE - QR AND WEBAPP\API\Traczo\Traczo\obj\Release\Traczo.pdb
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Traczo.dll.config
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Traczo.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Traczo.pdb
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csc.exe
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csc.exe.config
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csc.rsp
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csi.exe
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csi.exe.config
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\csi.rsp
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.AppContext.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Collections.Immutable.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Console.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Net.Http.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Net.Sockets.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.ValueTuple.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\vbc.exe
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\vbc.exe.config
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\vbc.rsp
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\roslyn\VBCSCompiler.exe.config
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\EntityFramework.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\EntityFramework.SqlServer.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Owin.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Buffers.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Memory.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Net.Http.Formatting.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Numerics.Vectors.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Cors.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.Cors.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.Owin.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.WebHost.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\EntityFramework.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\EntityFramework.SqlServer.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.pdb
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Newtonsoft.Json.Bson.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Buffers.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Memory.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Net.Http.Formatting.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Numerics.Vectors.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Threading.Tasks.Extensions.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.Cors.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.Owin.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\System.Web.Http.WebHost.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\obj\Release\Traczo.csproj.Up2Date
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\obj\Release\Traczo.dll
+E:\BMC\WFH - 31-Oct-2026\API\Traczo\Traczo\obj\Release\Traczo.pdb
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Traczo.dll.config
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Traczo.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Traczo.pdb
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csc.exe
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csc.exe.config
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csc.rsp
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csi.exe
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csi.exe.config
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\csi.rsp
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.Build.Tasks.CodeAnalysis.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CodeAnalysis.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CodeAnalysis.Scripting.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CodeAnalysis.VisualBasic.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.CSharp.Core.targets
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.amd64.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.DiaSymReader.Native.x86.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.Managed.Core.targets
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.VisualBasic.Core.targets
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\Microsoft.Win32.Primitives.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.AppContext.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Collections.Immutable.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Console.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Diagnostics.DiagnosticSource.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Diagnostics.FileVersionInfo.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Diagnostics.StackTrace.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Globalization.Calendars.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.IO.Compression.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.IO.Compression.ZipFile.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.IO.FileSystem.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.IO.FileSystem.Primitives.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Net.Http.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Net.Sockets.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Reflection.Metadata.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Runtime.InteropServices.RuntimeInformation.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Security.Cryptography.Algorithms.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Security.Cryptography.Encoding.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Security.Cryptography.Primitives.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Security.Cryptography.X509Certificates.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Text.Encoding.CodePages.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.ValueTuple.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Xml.ReaderWriter.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Xml.XmlDocument.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Xml.XPath.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\System.Xml.XPath.XDocument.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\vbc.exe
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\vbc.exe.config
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\vbc.rsp
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\VBCSCompiler.exe
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\roslyn\VBCSCompiler.exe.config
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\EntityFramework.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\EntityFramework.SqlServer.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.AspNet.Identity.Core.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.AspNet.Identity.Owin.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Host.SystemWeb.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.Cookies.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.OAuth.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Newtonsoft.Json.Bson.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Owin.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Buffers.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Memory.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Net.Http.Formatting.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Numerics.Vectors.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Runtime.CompilerServices.Unsafe.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Threading.Tasks.Extensions.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Cors.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.Cors.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.Owin.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.WebHost.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\EntityFramework.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\EntityFramework.SqlServer.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.AspNet.Identity.Core.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.AspNet.Identity.Owin.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Host.SystemWeb.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.Cookies.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.Owin.Security.OAuth.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Newtonsoft.Json.Bson.pdb
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Newtonsoft.Json.Bson.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Buffers.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Memory.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Net.Http.Formatting.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Numerics.Vectors.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Runtime.CompilerServices.Unsafe.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Threading.Tasks.Extensions.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.Cors.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.Owin.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\System.Web.Http.WebHost.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\obj\Release\Traczo.csproj.AssemblyReference.cache
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\obj\Release\Traczo.csproj.CoreCompileInputs.cache
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\obj\Release\Traczo.csproj.Up2Date
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\obj\Release\Traczo.dll
+D:\PROJECT\BMC\WEB QR API Applictaion\API\BMC_Traczo_API\Traczo\obj\Release\Traczo.pdb
