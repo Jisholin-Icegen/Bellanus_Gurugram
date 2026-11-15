@@ -1,6 +1,10 @@
 ﻿@{
     Layout = null;
     ViewData["Title"] = "Patient Login";
+
+    var currentTenant = Context.Request.Query["XTenentID"].ToString();
+    if (string.IsNullOrWhiteSpace(currentTenant))
+        currentTenant = Context.Session.GetString("XTenentID") ?? "";
 }
 
 <!DOCTYPE html>
@@ -9,8 +13,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Dial50.ai - Patient Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="~/css/login.css">
+    <link rel="stylesheet" href="~/css/login.css?v=3">
 </head>
 <body>
 
@@ -27,9 +30,19 @@
         <form asp-controller="Login" asp-action="Index" method="post" novalidate>
             @Html.AntiForgeryToken()
 
+            <input type="hidden" name="XTenentID" value="@currentTenant" />
+
             <div class="input-group">
                 <div class="input-wrapper">
-                    <i class="fas fa-door-open"></i>
+
+                    <svg class="field-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <path d="M3 21h18" />
+                        <path d="M5 21V7l7-4 7 4v14" />
+                        <path d="M9 21v-6h6v6" />
+                    </svg>
                     <input type="text"
                            id="roomNumber"
                            name="roomNumber"
@@ -41,14 +54,29 @@
                            class="@(ViewData["Error"] != null ? "input-error" : "")">
                 </div>
                 <button type="submit" class="arrow-btn" aria-label="Submit room number">
-                    <i class="fas fa-arrow-right"></i>
+
+                    <svg width="25" height="25" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.4"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="13 6 19 12 13 18" />
+                    </svg>
                 </button>
             </div>
 
             @if (ViewData["Error"] != null)
             {
                 <div class="error-message">
-                    <i class="fas fa-circle-exclamation"></i>
+
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.2"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
                     <span>@ViewData["Error"]</span>
                 </div>
             }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "QDhpPb8gsgk=",
+  "dgSpecHash": "6RW4rSyEM9Q=",
   "success": true,
-  "projectFilePath": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\QR APP\\Dial50_MVC_Core_BMC\\Hospital.API\\Hospital.API.csproj",
+  "projectFilePath": "D:\\PROJECT\\BELLANUS & GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Hospital.API\\Hospital.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Icege\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.24\\microsoft.aspnetcore.authentication.jwtbearer.8.0.24.nupkg.sha512",
     "C:\\Users\\Icege\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",

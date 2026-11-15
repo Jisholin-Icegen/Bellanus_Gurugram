@@ -3,101 +3,83 @@ using Dial50_MVC_Core.Models;
 using Dial50_MVC_Core.Models.HIS;
 using Dial50_MVC_Core.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace Dial50_MVC_Core.Controllers
 {
     public class PreLandingController : Controller
     {
-        private readonly IBedService _service;
         private readonly IPatientRepository _patientRepository;
         private readonly LandingProtector _protector;
         private readonly HospitalSettings _hospital;
-        private readonly IWebHostEnvironment _env;
+        private readonly IConfiguration _config;
+        private readonly ILogger<PreLandingController> _logger;
 
-        public PreLandingController(IBedService service,
-                                    IPatientRepository patientRepository,
-                                    LandingProtector protector,
-                                    IOptions<HospitalSettings> hospitalOptions,
-                                    IWebHostEnvironment env)
+        public PreLandingController(
+            IPatientRepository patientRepository,
+            LandingProtector protector,
+            IOptions<HospitalSettings> hospitalOptions,
+            IConfiguration config,
+            ILogger<PreLandingController> logger)
         {
-            _service = service;
             _patientRepository = patientRepository;
             _protector = protector;
             _hospital = hospitalOptions.Value;
-            _env = env;
+            _config = config;
+            _logger = logger;
         }
 
-        public async Task<IActionResult> Index(string? BedInfo)
+        public async Task<IActionResult> Index(string? BedInfo, [FromQuery(Name = "XTenentID")] string? XTenentID)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(BedInfo))
                     return RenderInvalid();
 
+                bool isMultiTenant = IsMultiTenantApp();
+
+                if (isMultiTenant && string.IsNullOrWhiteSpace(XTenentID))
+                {
+                    _logger.LogWarning("PreLanding: Blocked. Multi-tenant is ON but XTenentID is missing in URL.");
+                    return RenderInvalid();
+                }
+
+                if (!string.IsNullOrWhiteSpace(XTenentID))
+                {
+                    HttpContext.Session.SetString("XTenentID", XTenentID);
+                }
+
                 string bedInfoActual = BedInfo;
-                bool wasEncrypted = false;
 
                 try
                 {
-                    var decrypted = _protector.DecryptAES(BedInfo);
+                    var fixedBedInfo = BedInfo.Replace(" ", "+");
+                    var decrypted = _protector.DecryptAES(fixedBedInfo);
                     if (!string.IsNullOrWhiteSpace(decrypted))
                     {
                         bedInfoActual = decrypted;
-                        wasEncrypted = true;
                     }
                 }
-                catch
-                {
-                }
+                catch { }
 
-                string _BedIDdial50;
-                string _bedIDHIS;
-                string _bedHIS;
+                string bedId = bedInfoActual.Contains("$$") ? bedInfoActual.Split("$$")[0] : bedInfoActual;
 
-                if (wasEncrypted && bedInfoActual.Contains("$$"))
-                {
-                    var parts = bedInfoActual.Split("$$", StringSplitOptions.None);
-                    _BedIDdial50 = parts.Length > 0 ? parts[0] : "";
-                    _bedIDHIS = parts.Length > 1 ? parts[1] : "";
-                    _bedHIS = parts.Length > 2 ? parts[2] : "";
-                }
-                else
-                {
-                    _BedIDdial50 = bedInfoActual;
-                    _bedIDHIS = "";
-                    _bedHIS = "";
-                }
-
-                if (string.IsNullOrWhiteSpace(_BedIDdial50) && string.IsNullOrWhiteSpace(_bedIDHIS))
-                    return RenderInvalid();
-
-                string resolvedBedId = !string.IsNullOrWhiteSpace(_BedIDdial50)
-                    ? _BedIDdial50
-                    : _bedIDHIS;
-
-                PatientBedDetails? patient;
-                try
-                {
-                    patient = await _patientRepository.GetPatientBedDetailsByBedIdAsync(resolvedBedId);
-                }
-                catch
-                {
-                    return RenderInvalid();
-                }
+                var patient = await _patientRepository.GetPatientBedDetailsByBedIdAsync(bedId);
 
                 if (patient == null || string.IsNullOrEmpty(patient.PatientName))
                     return RenderInvalid();
 
-                if (string.IsNullOrWhiteSpace(patient.BedId))
-                    return RenderInvalid();
-
-                string bedNumber = patient.RoomBed ?? _bedHIS ?? "";
+                string bedNumber = patient.RoomBed ?? "";
 
                 string bedInfoForHome = _protector.EncryptAES(
                     patient.BedId + "$$" + patient.BedId + "$$" + bedNumber + "$$"
@@ -106,7 +88,7 @@ namespace Dial50_MVC_Core.Controllers
                 ViewBag.IsInvalid = false;
                 ViewBag.bedInfoEncrypt = Uri.EscapeDataString(bedInfoForHome);
                 ViewBag.BedId = patient.BedId;
-
+                ViewBag.TenantId = XTenentID ?? HttpContext.Session.GetString("XTenentID");
                 ViewBag.Region = "IN";
                 ViewBag.HospitalName = _hospital.Name;
                 ViewBag.HospitalLogo = _hospital.LogoPath;
@@ -125,8 +107,9 @@ namespace Dial50_MVC_Core.Controllers
 
                 return View("Index", model);
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "PreLanding: Unhandled error");
                 return RenderInvalid();
             }
         }
@@ -137,6 +120,7 @@ namespace Dial50_MVC_Core.Controllers
             ViewBag.IsInvalid = true;
             ViewBag.bedInfoEncrypt = "";
             ViewBag.BedId = "";
+            ViewBag.TenantId = "";
             ViewBag.Region = "IN";
             ViewBag.HospitalName = _hospital.Name;
             ViewBag.HospitalLogo = _hospital.LogoPath;
@@ -152,6 +136,7 @@ namespace Dial50_MVC_Core.Controllers
             ViewBag.HospitalLogo = _hospital.LogoPath;
             ViewBag.IsInvalid = false;
             ViewBag.BedId = "";
+            ViewBag.TenantId = "";
             ViewBag.Region = "IN";
 
             var model = new List<BedInfo>();
@@ -204,6 +189,34 @@ namespace Dial50_MVC_Core.Controllers
             }
 
             return View("Logout", model);
+        }
+
+        private bool IsMultiTenantApp()
+        {
+            try
+            {
+                string centralConn = _config.GetConnectionString("CentralDB") ?? _config.GetConnectionString("Dial50");
+                if (string.IsNullOrEmpty(centralConn)) return false;
+
+                using (var conn = new SqlConnection(centralConn))
+                using (var cmd = new SqlCommand("dbo.SP_GET_APP_CONFIG", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@APPNAME", "qr_app");
+                    conn.Open();
+
+                    var result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        return Convert.ToInt32(result) == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "PreLanding: Error checking APP_CONFIG. Defaulting to single-tenant.");
+            }
+            return false;
         }
     }
 }

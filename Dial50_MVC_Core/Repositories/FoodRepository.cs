@@ -11,22 +11,26 @@ namespace Dial50_MVC_Core.Repositories
     public class FoodRepository : IFoodRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly TenantProvider _tenantProvider;
         private readonly ILogService _logService;
         private readonly ILogger<IFoodRepository> _logger;
 
-        public FoodRepository(IConfiguration configuration, ILogService logService, ILogger<IFoodRepository> logger)
+        public FoodRepository(IConfiguration configuration, TenantProvider tenantProvider, ILogService logService, ILogger<IFoodRepository> logger)
         {
             _configuration = configuration;
+            _tenantProvider = tenantProvider;
             _logService = logService;
             _logger = logger;
         }
+
+        private string GetCs() => _tenantProvider.GetConnectionString();
 
         public async Task<PatientVM> GetPatientDetailsByRoomAsync(string roomNo)
         {
             PatientVM patient = new PatientVM { IsFound = false };
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_PATIENT_DETAILS_BY_ROOM", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMBED", roomNo);
@@ -59,7 +63,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_FOODORDERING_FLAG", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -80,7 +84,7 @@ namespace Dial50_MVC_Core.Repositories
             MyOrdersDashboardVM dashboard = new MyOrdersDashboardVM();
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_MY_ORDERS_DASHBOARD", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMNO", roomNo);
@@ -152,7 +156,7 @@ namespace Dial50_MVC_Core.Repositories
             List<ServingWindowVM> windows = new List<ServingWindowVM>();
             try
             {
-                using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+                using (SqlConnection con = new SqlConnection(GetCs()))
                 {
                     using (SqlCommand cmd = new SqlCommand("SP_GET_ACTIVE_SERVING_WINDOWS", con))
                     {
@@ -187,7 +191,7 @@ namespace Dial50_MVC_Core.Repositories
             try
             {
 
-                using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+                using (SqlConnection con = new SqlConnection(GetCs()))
                 {
                     using (SqlCommand cmd = new SqlCommand("SP_GETMENUDETAILSFORFOODORDER", con))
                     {
@@ -242,7 +246,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_SAVEFOODCARTITEM", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMNO", cart.RoomNo);
@@ -265,7 +269,7 @@ namespace Dial50_MVC_Core.Repositories
             List<FoodCartModel> items = new();
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GETFOODCARTITEMS", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMNO", roomNo);
@@ -295,7 +299,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_DELETEFOODCARTITEM", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMNO", roomNo);
@@ -316,7 +320,7 @@ namespace Dial50_MVC_Core.Repositories
                 if (!DateTime.TryParseExact(orddate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime orderDate))
                     throw new ArgumentException($"Invalid orddate '{orddate}'. Expected format: yyyy-MM-dd.");
 
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_SUBMIT_FOOD_ORDER", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ORDERID", Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper());
@@ -343,7 +347,7 @@ namespace Dial50_MVC_Core.Repositories
             OrderSuccessVM model = new();
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_ORDER_SUCCESS_DETAILS", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ORDERID", orderId);
@@ -398,7 +402,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_CANCEL_FOOD_ORDER", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ORDERID", orderId);
@@ -411,7 +415,7 @@ namespace Dial50_MVC_Core.Repositories
 
         public async Task<string> SubmitRatingAsync(string orderId, int rating, string feedback)
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_SUBMIT_FEEDBACK", con);
 
             cmd.CommandType = CommandType.StoredProcedure;
@@ -440,7 +444,7 @@ namespace Dial50_MVC_Core.Repositories
             string result = "FALSE|"; // Default
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_CHECK_PATIENT_NPO_STATUS", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@ROOMBED", roomNo);
@@ -470,7 +474,7 @@ namespace Dial50_MVC_Core.Repositories
             List<FoodServiceVM> services = new();
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_FOOD_SERVICES", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -500,7 +504,7 @@ namespace Dial50_MVC_Core.Repositories
 
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_INSERT_FOOD_SERVICE_REQUEST", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
@@ -535,7 +539,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_GET_ORDER_OTP", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@OrderId", orderId);
@@ -572,7 +576,7 @@ namespace Dial50_MVC_Core.Repositories
         {
             try
             {
-                using (SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+                using (SqlConnection con = new SqlConnection(GetCs()))
                 {
                     using (SqlCommand cmd = new SqlCommand("SP_UPDATEDEFAULTFOODPREFERENCESTATUS", con))
                     {

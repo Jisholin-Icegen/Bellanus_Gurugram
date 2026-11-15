@@ -305,6 +305,7 @@ wwwroot\images\pwa\badge-96.png
 wwwroot\images\pwa\DIAL50.png
 wwwroot\images\pwa\icon-19.png
 wwwroot\images\pwa\icon-192.png
+wwwroot\images\pwa\icon-192_old.png
 wwwroot\images\pwa\notification-bg.png
 wwwroot\images\RequestIcon.png
 wwwroot\images\request_send_ok_icon.png
@@ -359,6 +360,7 @@ wwwroot\images\voice-agent\volume.png
 wwwroot\js\AI.js
 wwwroot\js\AI_Feedback.js
 wwwroot\js\Appointment.js
+wwwroot\js\bed-context.js
 wwwroot\js\config.js
 wwwroot\js\CurrentRequests.js
 wwwroot\js\Dailycare.js
@@ -457,4 +459,3 @@ wwwroot\locales\ur.json
 wwwroot\locales\zh.json
 wwwroot\manifest.json
 wwwroot\sw.js
-wwwroot\js\bed-context.js

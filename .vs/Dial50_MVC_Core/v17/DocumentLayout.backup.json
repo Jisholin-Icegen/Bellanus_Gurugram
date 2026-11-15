@@ -1,10 +1,94 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\QR APP\\Dial50_MVC_Core_BMC\\",
+  "WorkspaceRootPath": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bmc\\web qr api applictaion\\qr app\\dial50_mvc_core_bmc\\dial50_mvc_core\\wwwroot\\js\\bed-context.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\js\\bed-context.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\views\\fooddining\\fooddining.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\views\\fooddining\\fooddining.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\views\\aifeedback\\ai_feedback.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\views\\aifeedback\\ai_feedback.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\views\\mydailycare\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\views\\mydailycare\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\controllers\\prelandingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\controllers\\prelandingcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\repositories\\bedrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\repositories\\bedrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\repositories\\foodrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\repositories\\foodrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\repositories\\patientrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\repositories\\patientrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\repositories\\notificationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\repositories\\notificationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\repositories\\inotificationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\repositories\\inotificationrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\wwwroot\\css\\login.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\css\\login.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\views\\login\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\views\\login\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\services\\tenantprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\services\\tenantprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\controllers\\pushcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\controllers\\pushcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\wwwroot\\js\\push-client.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\js\\push-client.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\services\\pushsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\services\\pushsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\services\\pushstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\services\\pushstore.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\wwwroot\\manifest.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\manifest.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-qr\\dial50_mvc_core\\wwwroot\\sw.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\sw.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +98,64 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "sw.js",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\sw.js",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\sw.js",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\sw.js",
+              "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\sw.js",
+              "ViewState": "AgIAAHkAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-11-11T10:59:08.683Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "push-client.js",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\js\\push-client.js",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\js\\push-client.js",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\js\\push-client.js",
+              "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\js\\push-client.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-11-11T10:57:57.853Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "PushController.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\PushController.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Controllers\\PushController.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\PushController.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Controllers\\PushController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-14T07:47:34.482Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\appsettings.json",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\appsettings.json",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\appsettings.json",
+              "RelativeToolTip": "Dial50_MVC_Core\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-11-14T07:27:00.247Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
@@ -26,15 +166,236 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "AI_Feedback.cshtml",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\AIFeedback\\AI_Feedback.cshtml",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Views\\AIFeedback\\AI_Feedback.cshtml",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\AIFeedback\\AI_Feedback.cshtml",
+              "RelativeToolTip": "Dial50_MVC_Core\\Views\\AIFeedback\\AI_Feedback.cshtml",
+              "ViewState": "AgIAALMAAAAAAAAAAADgv8UAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-15T05:03:35.987Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "bed-context.js",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\QR APP\\Dial50_MVC_Core_BMC\\Dial50_MVC_Core\\wwwroot\\js\\bed-context.js",
-              "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\js\\bed-context.js",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\QR APP\\Dial50_MVC_Core_BMC\\Dial50_MVC_Core\\wwwroot\\js\\bed-context.js",
-              "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\js\\bed-context.js",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAABcAAAAyAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-11-11T09:36:38.276Z",
+              "Title": "FoodDining.cshtml",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\FoodDining\\FoodDining.cshtml",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Views\\FoodDining\\FoodDining.cshtml",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\FoodDining\\FoodDining.cshtml",
+              "RelativeToolTip": "Dial50_MVC_Core\\Views\\FoodDining\\FoodDining.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAcwB0AAAAUAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-15T05:03:09.837Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\MyDailyCare\\Index.cshtml",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Views\\MyDailyCare\\Index.cshtml",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\MyDailyCare\\Index.cshtml",
+              "RelativeToolTip": "Dial50_MVC_Core\\Views\\MyDailyCare\\Index.cshtml",
+              "ViewState": "AgIAAM8GAAAAAAAAAAAiwN4GAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-15T05:02:21.157Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Views\\Home\\Index.cshtml",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "Dial50_MVC_Core\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAP8HAAAAAAAAAAAAAOoHAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-15T05:00:59.367Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "NotificationRepository.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\NotificationRepository.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Repositories\\NotificationRepository.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\NotificationRepository.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Repositories\\NotificationRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAJIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:51:34.853Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "INotificationRepository.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\INotificationRepository.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Repositories\\INotificationRepository.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\INotificationRepository.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Repositories\\INotificationRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:51:29.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "TenantProvider.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\TenantProvider.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Services\\TenantProvider.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\TenantProvider.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Services\\TenantProvider.cs",
+              "ViewState": "AgIAAG4AAAAAAAAAAAAmwIwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:02:01.023Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "BedRepository.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\BedRepository.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Repositories\\BedRepository.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\BedRepository.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Repositories\\BedRepository.cs",
+              "ViewState": "AgIAAC4GAAAAAAAAAAAQwDEGAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T02:35:13.447Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Program.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Program.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Program.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Program.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Program.cs",
+              "ViewState": "AgIAABwAAAAAAAAAAAAjwDMAAABgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T02:35:14.829Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "PreLandingController.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\PreLandingController.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Controllers\\PreLandingController.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\PreLandingController.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Controllers\\PreLandingController.cs",
+              "ViewState": "AgIAAMUAAAAAAAAAAAAwwNQAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:01:47.253Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "PatientRepository.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\PatientRepository.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Repositories\\PatientRepository.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\PatientRepository.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Repositories\\PatientRepository.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAAKkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:53:11.229Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FoodRepository.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\FoodRepository.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Repositories\\FoodRepository.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Repositories\\FoodRepository.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Repositories\\FoodRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEICAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T03:53:36.802Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "login.css",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\css\\login.css",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\css\\login.css",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\css\\login.css",
+              "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\css\\login.css",
+              "ViewState": "AgIAAEIBAAAAAAAAAAAkwGMBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2026-11-15T03:21:32.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "LoginController.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\LoginController.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Controllers\\LoginController.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Controllers\\LoginController.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Controllers\\LoginController.cs",
+              "ViewState": "AgIAAI4AAAAAAAAAAAAAAJsAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T02:43:20.635Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\Login\\Index.cshtml",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Views\\Login\\Index.cshtml",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Views\\Login\\Index.cshtml",
+              "RelativeToolTip": "Dial50_MVC_Core\\Views\\Login\\Index.cshtml",
+              "ViewState": "AgIAAEYAAAAAAAAAAAAAAEcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2026-11-15T02:43:07.057Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "PushStore.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\PushStore.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Services\\PushStore.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\PushStore.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Services\\PushStore.cs",
+              "ViewState": "AgIAABQBAAAAAAAAAAAuwDMBAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T02:28:29.429Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "PushSender.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\PushSender.cs",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\Services\\PushSender.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\Services\\PushSender.cs",
+              "RelativeToolTip": "Dial50_MVC_Core\\Services\\PushSender.cs",
+              "ViewState": "AgIAAE4AAAAAAAAAAAAuwG0AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T02:28:23.376Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "manifest.json",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\manifest.json",
+              "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\manifest.json",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-QR\\Dial50_MVC_Core\\wwwroot\\manifest.json",
+              "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\manifest.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-11-15T02:24:36.062Z",
               "EditorCaption": ""
             }
           ]

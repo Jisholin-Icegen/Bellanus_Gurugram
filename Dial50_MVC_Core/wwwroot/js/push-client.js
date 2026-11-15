@@ -1,13 +1,15 @@
 ﻿(function (w, d) {
     'use strict';
 
+    w.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+    });
+
     var cfg = w.PUSH_CONFIG || {
         swUrl: '/sw.js',
         scope: '/',
         api: '/api/Push'
     };
-
-    var SYNC_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
 
     var state = {
         room: '',

@@ -26,14 +26,15 @@ namespace Dial50_MVC_Core.Services
         private const int MaxDevicesPerRoom = 30;
 
         private readonly IConfiguration _cfg;
+        private readonly TenantProvider _tenantProvider;
 
-        public PushStore(IConfiguration cfg)
+        public PushStore(IConfiguration cfg, TenantProvider tenantProvider)
         {
             _cfg = cfg;
+            _tenantProvider = tenantProvider;
         }
 
-        private string GetCs() => _cfg.GetConnectionString("Dial50")
-            ?? throw new Exception("Dial50 connection string not found in appsettings.json");
+        private string GetCs() => _tenantProvider.GetConnectionString();
 
         private static byte[] GetRoomHash(string roomNo)
         {

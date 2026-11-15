@@ -66,7 +66,7 @@ namespace Dial50_MVC_Core.Services
 
                     request.Headers.Remove("TTL");
                     request.Headers.TryAddWithoutValidation("TTL", "3600");
-                    request.Headers.TryAddWithoutValidation("Urgency", "high");
+                    request.Headers.TryAddWithoutValidation("Urgency", "normal");
 
                     if (topic.Length > 0)
                         request.Headers.TryAddWithoutValidation("Topic", topic);

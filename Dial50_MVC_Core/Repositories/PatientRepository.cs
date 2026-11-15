@@ -1,20 +1,28 @@
 ﻿using Dial50_MVC_Core.Models;
 using Dial50_MVC_Core.Models.HIS;
-using Microsoft.AspNetCore.Mvc;
+using Dial50_MVC_Core.Services;
 using Microsoft.Data.SqlClient;
-using System.Net.Http.Headers;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 public class PatientRepository : IPatientRepository
 {
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _config;
+    private readonly TenantProvider _tenantProvider;
+    private readonly ILogger<PatientRepository> _logger;
 
-    public PatientRepository(HttpClient httpClient, IConfiguration config)
+    public PatientRepository(HttpClient httpClient, IConfiguration config, TenantProvider tenantProvider, ILogger<PatientRepository> logger)
     {
         _httpClient = httpClient;
         _config = config;
+        _tenantProvider = tenantProvider;
+        _logger = logger;
     }
 
     public async Task<PatientResponse> GetPatientDetailsAsync(PatientRequest _patientRequest)
@@ -42,12 +50,21 @@ public class PatientRepository : IPatientRepository
 
     public async Task<PatientBedDetails?> GetPatientBedDetailsByBedIdAsync(string bedId)
     {
+        _logger.LogInformation("PatientRepository: GetPatientBedDetailsByBedIdAsync called for BedId={BedId}", bedId);
+
         if (string.IsNullOrWhiteSpace(bedId))
             return null;
 
-        var connectionString = _config.GetConnectionString("Dial50");
+        var connectionString = _tenantProvider.GetConnectionString();
+
         if (string.IsNullOrWhiteSpace(connectionString))
-            throw new InvalidOperationException("Connection string 'Dial50' not found.");
+        {
+            _logger.LogError("PatientRepository: Tenant Connection string not found.");
+            throw new InvalidOperationException("Tenant Connection string not found.");
+        }
+
+        var builder = new SqlConnectionStringBuilder(connectionString);
+        _logger.LogInformation("PatientRepository: Connecting to Database = {Database}", builder.InitialCatalog);
 
         using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync();
@@ -61,7 +78,12 @@ public class PatientRepository : IPatientRepository
         using var reader = await command.ExecuteReaderAsync();
 
         if (!await reader.ReadAsync())
+        {
+            _logger.LogWarning("PatientRepository: No records found for BedId={BedId}", bedId);
             return null;
+        }
+
+        _logger.LogInformation("PatientRepository: Successfully found patient for BedId={BedId}", bedId);
 
         return new PatientBedDetails
         {
@@ -82,8 +104,11 @@ public class PatientRepository : IPatientRepository
             TierLevel = reader["TierLevel"] is DBNull ? "" : reader["TierLevel"].ToString() ?? ""
         };
     }
+
     public async Task<PatientResponse> GetPatientDetailsStatic(PatientRequest request)
     {
+        _logger.LogInformation("PatientRepository: GetPatientDetailsStatic called for BedId={BedId}", request.BedID);
+
         if (string.IsNullOrWhiteSpace(request.BedID))
         {
             return new PatientResponse
@@ -94,16 +119,18 @@ public class PatientRepository : IPatientRepository
             };
         }
 
-        string connectionString = _config.GetConnectionString("Dial50");
+        string connectionString = _tenantProvider.GetConnectionString();
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
-            throw new InvalidOperationException(
-                "Connection string 'Dial50' was not found in configuration. " +
-                "Check ConnectionStrings section in appsettings.json.");
+            _logger.LogError("PatientRepository: Tenant Connection string not found.");
+            throw new InvalidOperationException("Tenant Connection string not found.");
         }
 
-        using var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString);
+        var builder = new SqlConnectionStringBuilder(connectionString);
+        _logger.LogInformation("PatientRepository: Connecting to Database = {Database}", builder.InitialCatalog);
+
+        using var connection = new SqlConnection(connectionString);
         await connection.OpenAsync();
 
         string query = @"
@@ -112,7 +139,7 @@ public class PatientRepository : IPatientRepository
             WHERE BedId = @UserID
             ORDER BY CreatedDateTime DESC";
 
-        using var command = new Microsoft.Data.SqlClient.SqlCommand(query, connection);
+        using var command = new SqlCommand(query, connection);
         command.Parameters.AddWithValue("@UserID", request.BedID);
 
         using var reader = await command.ExecuteReaderAsync();

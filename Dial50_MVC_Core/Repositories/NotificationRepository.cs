@@ -10,20 +10,28 @@ namespace Dial50_MVC_Core.Repositories
     public class NotificationRepository : INotificationRepository
     {
         private readonly IConfiguration _configuration;
+        private readonly TenantProvider _tenantProvider;
         private readonly ILogService _logService;
         private readonly ILogger<IFoodRepository> _logger;
 
-        public NotificationRepository(IConfiguration configuration, ILogService logService, ILogger<IFoodRepository> logger)
+        public NotificationRepository(
+            IConfiguration configuration,
+            TenantProvider tenantProvider,
+            ILogService logService,
+            ILogger<IFoodRepository> logger)
         {
             _configuration = configuration;
+            _tenantProvider = tenantProvider;
             _logService = logService;
             _logger = logger;
         }
 
+        private string GetCs() => _tenantProvider.GetConnectionString();
+
         public async Task<List<NotificationModel>> GetNotificationsByRoom(string roomNo, int maxCount)
         {
             var list = new List<NotificationModel>();
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Process", "GET");
@@ -56,7 +64,7 @@ namespace Dial50_MVC_Core.Repositories
 
         public async Task<bool> MarkAllAsReadByRoomAsync(string roomNo)
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Process", "MARK_ALL_READ");
@@ -75,7 +83,7 @@ namespace Dial50_MVC_Core.Repositories
             int count = 0;
             try
             {
-                using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+                using SqlConnection con = new SqlConnection(GetCs());
                 using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Process", "COUNT");
@@ -102,7 +110,7 @@ namespace Dial50_MVC_Core.Repositories
         public async Task<int> GetTotalCountByRoom(string roomNo)
         {
             int count = 0;
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Process", "TOTAL_COUNT");
@@ -123,7 +131,7 @@ namespace Dial50_MVC_Core.Repositories
 
         public async Task<bool> MarkNotificationAsRead(string notificationId)
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Process", "MARK_READ");
@@ -135,5 +143,5 @@ namespace Dial50_MVC_Core.Repositories
             await cmd.ExecuteNonQueryAsync();
             return true;
         }
-        }
     }
+}

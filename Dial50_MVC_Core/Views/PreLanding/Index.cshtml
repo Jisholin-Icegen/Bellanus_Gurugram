@@ -8,6 +8,7 @@
     var bedInfoEncrypt = (ViewBag.bedInfoEncrypt ?? "").ToString();
     var hospitalName = (ViewBag.HospitalName ?? "IHH Healthcare").ToString();
     var hospitalLogo = (ViewBag.HospitalLogo ?? "images/ihh-logo.png").ToString();
+    var tenantId = (ViewBag.TenantId ?? "").ToString();
 
     ViewData["Title"] = isInvalid
         ? "Invalid QR Code - " + hospitalName
@@ -573,7 +574,8 @@
          data-home-url="@Url.Action("Index", "Home")"
          data-is-invalid="@(isInvalid ? "true" : "false")"
          data-bed-info="@bedInfoEncrypt"
-         data-region="@(region ?? "")">
+         data-region="@(region ?? "")"
+         data-tenant-id="@tenantId">
     </div>
 
 
@@ -588,6 +590,7 @@
             var IS_INVALID = cfgEl.dataset.isInvalid === "true";
             var BED_INFO = cfgEl.dataset.bedInfo || "";
             var REGION = cfgEl.dataset.region || "";
+            var TENANT_ID = cfgEl.dataset.tenantId || "";
 
             try {
                 var q = new URLSearchParams(window.location.search);
@@ -618,6 +621,7 @@
 
                 try {
                     sessionStorage.setItem("bedInfo", BED_INFO);
+                    sessionStorage.setItem("XTenentID", TENANT_ID);
                 }
                 catch (e) {
                 }
@@ -643,6 +647,12 @@
                     url +=
                         "&region=" +
                         encodeURIComponent(regionLocal);
+                }
+
+                if (TENANT_ID) {
+                    url +=
+                        "&XTenentID=" +
+                        encodeURIComponent(TENANT_ID);
                 }
 
 

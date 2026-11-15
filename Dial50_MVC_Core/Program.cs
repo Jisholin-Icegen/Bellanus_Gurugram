@@ -18,14 +18,18 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
-builder.Services.AddSingleton<PushStore>();
-builder.Services.AddSingleton<PushSender>();
+
+builder.Services.AddScoped<PushStore>();
+builder.Services.AddScoped<PushSender>();
+
 builder.Services.AddHostedService<NotificationPushWorker>();
 builder.Services.Configure<HospitalSettings>(builder.Configuration.GetSection("HospitalSettings"));
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Dial50")));
-
+builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+{
+    var tenant = sp.GetRequiredService<TenantProvider>();
+    options.UseSqlServer(tenant.GetConnectionString());
+});
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
@@ -55,6 +59,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews(o => o.Filters.Add<BedContextFilter>());
 
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddScoped<TenantProvider>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(60);
@@ -79,7 +85,6 @@ var app = builder.Build();
 app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
-//app.UseStaticFiles();
 
 app.UseStaticFiles(new StaticFileOptions
 {

@@ -8,20 +8,70 @@
 <link rel="stylesheet" href="~/css/Food.css">
 
 <style>
-
     #servicesContainer {
         position: relative !important;
     }
 
+    #voiceLoadingOverlay {
+        position: absolute;
+        inset: 0;
+        background: #0f172a;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        color: #ffffff;
+        font-family: system-ui, -apple-system, sans-serif;
+        transition: opacity 0.3s ease;
+    }
+
+    .thara-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(16, 185, 129, 0.2);
+        border-left-color: #10b981;
+        border-radius: 50%;
+        animation: thara-spin 1s linear infinite;
+        margin-bottom: 20px;
+    }
+    @@keyframes thara-spin {
+        0%
+
+    {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+    }
+
+    .thara-loading-text {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #10b981;
+    }
+
+    .thara-loading-subtext {
+        font-size: 13px;
+        color: #94a3b8;
+    }
+
+    #voiceAgentModal, #voiceAgentIframe {
+        touch-action: manipulation;
+        -webkit-user-select: none;
+        user-select: none;
+    }
 </style>
 
 <div class="app-wrapper">
-
     <partial name="_header"></partial>
     <partial name="_nav"></partial>
 
     <div id="servicesContainer">
-
         <div class="food-sticky-header" style="position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
             <div>
                 <h1 style="margin: 0 0 4px 0;">Food &amp; Dining</h1>
@@ -29,7 +79,7 @@
             </div>
             <button type="button" onclick="openVoiceAgent()" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #ffffff; border: none; border-radius: 30px; padding: 10px 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
-                Order with Aria
+                Order with Thara
             </button>
         </div>
 
@@ -39,9 +89,7 @@
                 <div class="card-pill">NEW ORDER</div>
                 <h3>Food Ordering</h3>
                 <p>Browse meals approved for your diet and place an order.</p>
-                <div class="card-link-row">
-                    <span>Order Now &rarr;</span>
-                </div>
+                <div class="card-link-row"><span>Order Now &rarr;</span></div>
                 <i class="fa-solid fa-utensils bg-icon"></i>
             </div>
         }
@@ -50,9 +98,7 @@
             <div class="card-pill">TRACK &amp; HISTORY</div>
             <h3>My Orders</h3>
             <p>Track active deliveries and view your order history.</p>
-            <div class="card-link-row">
-                <span>View orders &rarr;</span>
-            </div>
+            <div class="card-link-row"><span>View orders &rarr;</span></div>
             <i class="fa-solid fa-clipboard-list bg-icon"></i>
         </div>
 
@@ -60,82 +106,50 @@
             <div class="card-pill">BEDSIDE SUPPORT</div>
             <h3>Other Services</h3>
             <p>Extra condiments, utensils, tray pickup, drinking water, and more.</p>
-            <div class="card-link-row">
-                <span>Browse services &rarr;</span>
-            </div>
+            <div class="card-link-row"><span>Browse services &rarr;</span></div>
             <i class="fa-solid fa-bell-concierge bg-icon"></i>
         </div>
-
     </div>
 
     <div id="voiceAgentModal"
          style="position:fixed;inset:0;width:100%;height:100%;height:100dvh;background:rgba(15,23,42,0.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:2147483647;display:none;align-items:stretch;justify-content:stretch;padding:0;box-sizing:border-box;overflow:hidden;">
-
         <div style="background:#ffffff;width:100%;height:100%;height:100dvh;max-width:none;max-height:none;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden;border:none;border-radius:0;box-shadow:none;">
 
             <div style="padding:clamp(12px,2.5vw,18px) clamp(14px,3vw,22px);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-shrink:0;background:linear-gradient(135deg,#ffffff,#f0fdfa);border-bottom:1px solid #e2e8f0;box-sizing:border-box;">
-
                 <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-
-                    <button type="button"
-                            id="assistantBackBtn"
-                            aria-label="Go back"
-                            onclick="closeVoiceAgent()"
-                            style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:none;border-radius:10px;background:#589a8b;color:#ffffff;font-size:18px;font-weight:600;cursor:pointer;flex:0 0 36px;transition:all 0.2s ease;box-shadow:0 2px 5px rgba(88,154,139,0.3);">
-
-                        <img src="/images/voice-agent/arrow.png"
-                             alt="Back"
-                             style="width:16px;height:16px;object-fit:contain;filter:brightness(0) invert(1);" />
-
+                    <button type="button" id="assistantBackBtn" aria-label="Go back" onclick="closeVoiceAgent()" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;padding:0;border:none;border-radius:10px;background:#589a8b;color:#ffffff;font-size:18px;font-weight:600;cursor:pointer;flex:0 0 36px;transition:all 0.2s ease;box-shadow:0 2px 5px rgba(88,154,139,0.3);">
+                        <img src="/images/voice-agent/arrow.png" alt="Back" style="width:16px;height:16px;object-fit:contain;filter:brightness(0) invert(1);" />
                     </button>
-@*                     <span style="width:36px;height:36px;flex:0 0 36px;display:flex;align-items:center;justify-content:center;background:#00b894;color:#ffffff;border-radius:12px;font-size:17px;box-shadow:0 2px 5px rgba(0,184,148,0.18);">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </span> *@
-
                     <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;">
-                        <h3 style="margin:0;font-size:clamp(16px,2.2vw,18px);font-weight:800;line-height:1.3;color:#172b4d;">
-                            Order with Aria
-                        </h3>
-
-                        <span style="display:block;font-size:clamp(10px,1.5vw,11px);font-weight:400;line-height:1.4;color:#8498b8;">
-                            AI-powered food ordering service
-                        </span>
+                        <h3 style="margin:0;font-size:clamp(16px,2.2vw,18px);font-weight:800;line-height:1.3;color:#172b4d;">Order with Thara</h3>
+                        <span style="display:block;font-size:clamp(10px,1.5vw,11px);font-weight:400;line-height:1.4;color:#8498b8;">AI-powered food ordering service</span>
                     </div>
-
                 </div>
-
             </div>
 
             <div style="position:relative;flex:1 1 0;min-height:0;min-width:0;width:100%;overflow:hidden;background:#0f172a;">
-
-                <iframe id="voiceAgentIframe"
-                        src="about:blank"
-                        title="Aria Voice Ordering Assistant"
-                        allow="microphone;camera;autoplay"
-                        allowfullscreen
-                        style="position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;border:none;background:#0f172a;">
-                </iframe>
-
+                <div id="voiceLoadingOverlay">
+                    <div class="thara-spinner"></div>
+                    <div class="thara-loading-text">Connecting to Thara...</div>
+                    <div class="thara-loading-subtext">Setting up your AI voice assistant</div>
+                </div>
+                <iframe id="voiceAgentIframe" src="about:blank" title="Thara Voice Ordering Assistant" allow="microphone;camera;autoplay" allowfullscreen style="position:absolute;inset:0;display:block;width:100%;height:100%;min-width:0;min-height:0;border:none;background:#0f172a;"></iframe>
+                <video id="iosWakeLockVideo" loop muted playsinline style="display:none; width:1px; height:1px; position:absolute;">
+                    <source src="data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr1tZGF0AAACrgYF//+q3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE2NCAtIHkgNC4yLjAgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MSByZWY9MyBkZWJsb2NrPTE6MDowIGFuYWx5c2U9MHgzOjB4MTEzIG1lPWhleCBzdWJtZT03IHBzeT0xIHBzeV9yZD0xLjAwOjAuMDAgbWl4ZWRfcmVmPTEgbWVfcmFuZ2U9MTYgY2hyb21hX21lPTEgdHJlbGxpcz0xIDh4OGRjdD0xIGNxbT0wIGRlYWR6b25lPTIxLDExIGZhc3RfcHNraXA9MSBjaHJvbWFfcXBfb2Zmc2V0PS0yIHRocmVhZHM9MSBsb29rYWhlYWRfdGhyZWFkcz0xIHNsaWNlZF90aHJlYWRzPTAgbnI9MCBkZWNpbWF0ZT0xIGludGVybGFjZWQ9MCBibHVyYXlfY29tcGF0PTAgY29uc3RyYWluZWRfaW50cmE9MCBiZnJhbWVzPTAgd2VpZ2h0cD0xIGtleWludD0yNTAga2V5aW50X21pbj0yNSBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA9liIQAV/4B7A0A3v4AAAAA" type="video/mp4">
+                </video>
             </div>
 
             <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px clamp(12px,3vw,20px);padding-bottom:max(10px,env(safe-area-inset-bottom));background:#ffffff;border-top:1px solid #e2e8f0;box-sizing:border-box;">
-
                 <div style="display:flex;align-items:center;gap:8px;color:#64748b;font-size:12px;font-weight:600;min-width:0;">
                     <span style="display:inline-block;width:8px;height:8px;flex:0 0 8px;border-radius:50%;background:#10b981;box-shadow:0 0 0 4px rgba(16,185,129,0.12);"></span>
-                    <span>Aria Voice Assistant</span>
+                    <span>Thara Voice Assistant</span>
                 </div>
-
-                <button type="button"
-                        onclick="closeVoiceAgent()"
-                        style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:11px 20px;background:linear-gradient(135deg,#e2e5e9,#cbd0d8);color:#374151;border:1px solid #b8c0ca;border-radius:30px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 4px 10px rgba(15,23,42,0.12);transition:all 0.2s ease;">
+                <button type="button" onclick="closeVoiceAgent()" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:11px 20px;background:linear-gradient(135deg,#e2e5e9,#cbd0d8);color:#374151;border:1px solid #b8c0ca;border-radius:30px;font-size:13px;font-weight:700;white-space:nowrap;cursor:pointer;box-shadow:0 4px 10px rgba(15,23,42,0.12);transition:all 0.2s ease;">
                     <i class="fa-solid fa-utensils" style="color:#4b5563;font-size:14px;"></i>
                     Browse Manually
                 </button>
-
             </div>
-
         </div>
-
     </div>
 
     <partial name="_footer"></partial>
@@ -147,32 +161,81 @@
 <script src="~/js/food-aria/food-script.js"></script>
 
 <script>
-
     window.goTo = function (basePath) {
         window.location.href = BedContext.url(basePath);
     };
 
-        document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function () {
         const voiceModal = document.getElementById('voiceAgentModal');
         const voiceIframe = document.getElementById('voiceAgentIframe');
+        const voiceLoadingOverlay = document.getElementById('voiceLoadingOverlay');
+        const iosVideo = document.getElementById('iosWakeLockVideo');
+        let wakeLock = null;
 
-        window.openVoiceAgent = function () {
+        voiceIframe.addEventListener('load', function () {
+            if (voiceIframe.src !== 'about:blank') {
+                voiceLoadingOverlay.style.opacity = '0';
+                setTimeout(function () {
+                    voiceLoadingOverlay.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        async function enableWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) { }
+
+            if (iosVideo) {
+                iosVideo.play().catch(function (e) { });
+            }
+        }
+
+        async function disableWakeLock() {
+            if (wakeLock !== null) {
+                try { await wakeLock.release(); } catch (e) { }
+                wakeLock = null;
+            }
+            if (iosVideo) {
+                try { iosVideo.pause(); } catch (e) { }
+            }
+        }
+
+        document.addEventListener('visibilitychange', function () {
+            if (voiceModal.style.display === 'flex' && document.visibilityState === 'visible') {
+                enableWakeLock();
+            }
+        });
+
+        window.openVoiceAgent = async function () {
             if (!voiceIframe.getAttribute('data-loaded')) {
-                var bedInfo = (window.BedContext && window.BedContext.get().bedId) || '';
+                voiceLoadingOverlay.style.display = 'flex';
+                voiceLoadingOverlay.style.opacity = '1';
 
+                var bedInfo = (window.BedContext && window.BedContext.get().bedId) || '';
                 var url = new URL(window.FOOD_AI_CONFIG.appUrl);
                 if (bedInfo) url.searchParams.set('BedInfo', bedInfo);
 
                 voiceIframe.src = url.toString();
                 voiceIframe.setAttribute('data-loaded', 'true');
+            } else {
+                voiceLoadingOverlay.style.display = 'none';
+                voiceLoadingOverlay.style.opacity = '0';
             }
 
             voiceModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+
+            await enableWakeLock();
         };
-        window.closeVoiceAgent = function () {
+
+        window.closeVoiceAgent = async function () {
             voiceModal.style.display = 'none';
             document.body.style.overflow = '';
+
+            await disableWakeLock();
         };
 
         voiceModal.addEventListener('click', function (e) {

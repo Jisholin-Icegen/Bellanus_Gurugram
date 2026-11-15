@@ -22,15 +22,19 @@ public class BedRepository : IBedRepository
     private readonly ApplicationDbContext _context;
     private readonly ILogger<BedRepository> _logger;
     private readonly IConfiguration _configuration;
+    private readonly TenantProvider _tenantProvider;
     private readonly ILogService _logService;
 
-    public BedRepository(IConfiguration configuration, ApplicationDbContext context, ILogger<BedRepository> logger, ILogService logService)
+    public BedRepository(IConfiguration configuration, TenantProvider tenantProvider, ApplicationDbContext context, ILogger<BedRepository> logger, ILogService logService)
     {
         _configuration = configuration;
+        _tenantProvider = tenantProvider;
         _context = context;
         _logger = logger;
         _logService = logService;
     }
+
+    private string GetCs() => _tenantProvider.GetConnectionString();
 
     public async Task<List<BedInfo>> GetBedInfo(string? _BedNo)
     {
@@ -61,7 +65,7 @@ public class BedRepository : IBedRepository
 
         try
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_GETTASKS_QR", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Bedid", BedID ?? "");
@@ -103,7 +107,7 @@ public class BedRepository : IBedRepository
 
     public async Task<int> InsertRoomComfortRequest(string bedNo, string category, string quantity, string remarks, string gender, string userId)
     {
-        var connectionString = _configuration.GetConnectionString("Dial50");
+        var connectionString = GetCs();
 
         using var conn = new SqlConnection(connectionString);
         await conn.OpenAsync();
@@ -258,7 +262,7 @@ public class BedRepository : IBedRepository
 
             _logger.LogInformation("Fetching tracking information for OrderIds: {OrderIds}", orderIds);
 
-            await using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            await using SqlConnection con = new SqlConnection(GetCs());
             await using SqlCommand cmd = new SqlCommand("SP_GET_TRACKING_REQUEST_BY_ORDERIDS", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add("@OrderIds", SqlDbType.VarChar, -1).Value = orderIds;
@@ -379,7 +383,7 @@ public class BedRepository : IBedRepository
         {
             roomNo = roomNo?.Trim() ?? string.Empty;
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_GET_TRACKING_REQUEST", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@RoomNo", roomNo);
@@ -509,7 +513,7 @@ public class BedRepository : IBedRepository
 
             string jsonData = JsonSerializer.Serialize(feedbackData);
 
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -555,7 +559,7 @@ public class BedRepository : IBedRepository
         try
         {
             using (SqlConnection conn = new SqlConnection(
-                _configuration.GetConnectionString("Dial50")))
+                GetCs()))
             {
                 await conn.OpenAsync();
 
@@ -650,7 +654,7 @@ public class BedRepository : IBedRepository
         try
         {
             using (SqlConnection conn = new SqlConnection(
-                _configuration.GetConnectionString("Dial50")))
+                GetCs()))
             {
                 await conn.OpenAsync();
 
@@ -693,7 +697,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeDepartmentInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
 
@@ -742,7 +746,7 @@ public class BedRepository : IBedRepository
         var result = new DischargeFeedbackInfo();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -787,7 +791,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeFeedbackInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -833,7 +837,7 @@ public class BedRepository : IBedRepository
         try
         {
             using (SqlConnection conn = new SqlConnection(
-                _configuration.GetConnectionString("Dial50")))
+                GetCs()))
             {
                 await conn.OpenAsync();
 
@@ -845,9 +849,9 @@ public class BedRepository : IBedRepository
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.Add(
-     "@PROCESS",
-     SqlDbType.VarChar,
-     20).Value = "CANCELLED";
+                         "@PROCESS",
+                         SqlDbType.VarChar,
+                         20).Value = "CANCELLED";
 
                     cmd.Parameters.Add(
                         "@FEEDBACKID",
@@ -875,7 +879,6 @@ public class BedRepository : IBedRepository
 
             result.Success = false;
 
-            // TEMPORARY: show the actual SQL error
             result.Message = ex.Message;
 
             return result;
@@ -886,7 +889,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeFeedbackSummaryInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -926,7 +929,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeDepartmentRatingInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -972,7 +975,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeDepartmentRatingInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -1019,7 +1022,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeDepartmentSummaryInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -1064,7 +1067,7 @@ public class BedRepository : IBedRepository
         var result = new SubmitRatingResult();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_SUBMIT_RATING", conn))
@@ -1110,7 +1113,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargePatientSummaryInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
@@ -1163,7 +1166,7 @@ public class BedRepository : IBedRepository
 
             _logger.LogInformation("Fetching latest video task for BedNo: {BedNo}, SinceDate: {SinceDate}", bedNo, sinceDate);
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("sp_GetLatestVideoTaskByBed", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@BedNo", bedNo);
@@ -1208,7 +1211,7 @@ public class BedRepository : IBedRepository
         DataTable dt = new DataTable();
         try
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_GETFRESHTASK_QR", con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -1259,7 +1262,7 @@ public class BedRepository : IBedRepository
             _logger.LogInformation("Inserting Guest Pass. BedNo={BedNo}, Guest={Guest}, Phone={Phone}",
                 bedNo, guestName, guestPhone);
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("sp_InsertGuestPass", con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -1314,7 +1317,7 @@ public class BedRepository : IBedRepository
         {
             _logger.LogInformation("Fetching Guest Pass. GuestPassId={Id}", guestPassId);
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SELECT * FROM GuestPassMaster WHERE GuestPassId = @Id", con);
             cmd.CommandType = CommandType.Text;
             cmd.Parameters.AddWithValue("@Id", guestPassId);
@@ -1355,7 +1358,7 @@ public class BedRepository : IBedRepository
         {
             _logger.LogInformation("Fetching Guest Pass by QR token hash.");
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SELECT * FROM GuestPassMaster WHERE QrTokenHash = @Hash", con);
             cmd.CommandType = CommandType.Text;
             cmd.Parameters.AddWithValue("@Hash", qrTokenHash);
@@ -1395,7 +1398,7 @@ public class BedRepository : IBedRepository
             _logger.LogInformation("Updating Guest Pass SMS status. GuestPassId={Id}, Sent={Sent}",
                 guestPassId, sent);
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand(
                 @"UPDATE GuestPassMaster
               SET SmsSent = @Sent,
@@ -1432,7 +1435,7 @@ public class BedRepository : IBedRepository
             _logger.LogInformation("Guest Pass decision. GuestPassId={Id}, Process={Process}",
                 guestPassId, process);
 
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("sp_GuestPassDecision", con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -1500,7 +1503,7 @@ public class BedRepository : IBedRepository
         LoginPatientResult result = null;
         try
         {
-            using SqlConnection con = new SqlConnection(_configuration.GetConnectionString("Dial50"));
+            using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_LOGINBYROOMNO", con);
             cmd.CommandType = CommandType.StoredProcedure;
 
@@ -1559,7 +1562,7 @@ public class BedRepository : IBedRepository
         var result = new List<DischargeCompleteFeedbackInfo>();
         try
         {
-            using (SqlConnection conn = new SqlConnection(_configuration.GetConnectionString("Dial50")))
+            using (SqlConnection conn = new SqlConnection(GetCs()))
             {
                 await conn.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand("SP_PATIENTFEEDBACK", conn))
