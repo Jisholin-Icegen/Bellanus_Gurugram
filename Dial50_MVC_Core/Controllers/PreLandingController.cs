@@ -39,7 +39,7 @@ namespace Dial50_MVC_Core.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(string? BedInfo, [FromQuery(Name = "XTenentID")] string? XTenentID)
+        public async Task<IActionResult> Index(string? BedInfo, [FromQuery(Name = "XTenantID")] string? XTenantID)
         {
             try
             {
@@ -48,15 +48,15 @@ namespace Dial50_MVC_Core.Controllers
 
                 bool isMultiTenant = IsMultiTenantApp();
 
-                if (isMultiTenant && string.IsNullOrWhiteSpace(XTenentID))
+                if (string.IsNullOrWhiteSpace(XTenantID))
                 {
-                    _logger.LogWarning("PreLanding: Blocked. Multi-tenant is ON but XTenentID is missing in URL.");
-                    return RenderInvalid();
+                    XTenantID = Request.Cookies["XTenantID"];
                 }
 
-                if (!string.IsNullOrWhiteSpace(XTenentID))
+                if (isMultiTenant && string.IsNullOrWhiteSpace(XTenantID))
                 {
-                    HttpContext.Session.SetString("XTenentID", XTenentID);
+                    _logger.LogWarning("PreLanding: Blocked. Multi-tenant is ON but XTenantID is missing in URL.");
+                    return RenderInvalid();
                 }
 
                 string bedInfoActual = BedInfo;
@@ -85,10 +85,33 @@ namespace Dial50_MVC_Core.Controllers
                     patient.BedId + "$$" + patient.BedId + "$$" + bedNumber + "$$"
                     + patient.PatientName + "$$" + _hospital.Name);
 
+                string encryptedTenantId = "";
+                if (!string.IsNullOrWhiteSpace(XTenantID))
+                {
+                    if (int.TryParse(XTenantID, out _))
+                    {
+                        string payload = $"{XTenantID}$${XTenantID}$$$$$$";
+                        encryptedTenantId = AesOperation.EncryptString(payload);
+                    }
+                    else
+                    {
+                        encryptedTenantId = XTenantID.Replace(" ", "+");
+                    }
+
+                    Response.Cookies.Append("XTenantID", encryptedTenantId, new CookieOptions
+                    {
+                        Path = "/",
+                        HttpOnly = false,
+                        IsEssential = true,
+                        SameSite = SameSiteMode.Lax,
+                        Expires = DateTimeOffset.UtcNow.AddDays(7)
+                    });
+                }
+
                 ViewBag.IsInvalid = false;
                 ViewBag.bedInfoEncrypt = Uri.EscapeDataString(bedInfoForHome);
                 ViewBag.BedId = patient.BedId;
-                ViewBag.TenantId = XTenentID ?? HttpContext.Session.GetString("XTenentID");
+                ViewBag.TenantId = encryptedTenantId;
                 ViewBag.Region = "IN";
                 ViewBag.HospitalName = _hospital.Name;
                 ViewBag.HospitalLogo = _hospital.LogoPath;
@@ -129,21 +152,38 @@ namespace Dial50_MVC_Core.Controllers
 
         public IActionResult Invalid() => RenderInvalid();
 
-        public IActionResult Logout(string? BedInfo)
+        public IActionResult Logout(string? BedInfo, [FromQuery(Name = "XTenantID")] string? XTenantID)
         {
+            string tenantId = !string.IsNullOrWhiteSpace(XTenantID)
+                ? XTenantID
+                : Request.Cookies["XTenantID"] ?? "";
+
+            if (!string.IsNullOrWhiteSpace(tenantId))
+            {
+                tenantId = int.TryParse(tenantId, out _)
+                    ? AesOperation.EncryptString($"{tenantId}$${tenantId}$$$$$$")
+                    : tenantId.Replace(" ", "+");
+            }
+
             ViewData["Title"] = "Session Ended - " + _hospital.Name;
+            ViewData["XTenantID"] = tenantId;
             ViewBag.HospitalName = _hospital.Name;
             ViewBag.HospitalLogo = _hospital.LogoPath;
             ViewBag.IsInvalid = false;
             ViewBag.BedId = "";
-            ViewBag.TenantId = "";
+            ViewBag.TenantId = tenantId;
             ViewBag.Region = "IN";
 
             var model = new List<BedInfo>();
 
             if (!string.IsNullOrWhiteSpace(BedInfo))
             {
-                var decrypted = _protector.DecryptAES(BedInfo);
+                string decrypted = "";
+                try
+                {
+                    decrypted = _protector.DecryptAES(BedInfo.Replace(" ", "+"));
+                }
+                catch { }
 
                 if (!string.IsNullOrWhiteSpace(decrypted))
                 {

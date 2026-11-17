@@ -40,54 +40,40 @@ namespace Dial50_MVC_Core.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(string? XTenentID)
+        public IActionResult Index(string? XTenantID)
         {
             bool isMultiTenant = IsMultiTenantApp();
-            _logger.LogInformation("Login GET: isMultiTenant={Multi}, XTenentID='{Tenant}'", isMultiTenant, XTenentID);
+            string encryptedTenantId = ResolveAndPersistTenantId(XTenantID);
 
-            if (!string.IsNullOrWhiteSpace(XTenentID))
+            if (string.IsNullOrWhiteSpace(XTenantID) && !string.IsNullOrWhiteSpace(encryptedTenantId))
             {
-                HttpContext.Session.SetString("XTenentID", XTenentID);
-                _logger.LogInformation("Login GET: Saved XTenentID '{Tenant}' to Session.", XTenentID);
-            }
-            else
-            {
-                var sessionTenant = HttpContext.Session.GetString("XTenentID");
-                if (!string.IsNullOrWhiteSpace(sessionTenant))
-                {
-                    _logger.LogInformation("Login GET: Using XTenentID '{Tenant}' from Session.", sessionTenant);
-                }
-                else if (isMultiTenant)
-                {
-                    _logger.LogWarning("Login GET: Multi-tenant is ON, but no XTenentID in URL or Session.");
-                }
+                return RedirectToAction("Index", new { XTenantID = encryptedTenantId });
             }
 
+            if (string.IsNullOrWhiteSpace(encryptedTenantId) && isMultiTenant)
+            {
+                _logger.LogWarning("Login GET: Multi-tenant is ON, but no XTenantID in URL or Cookie.");
+            }
+
+            ViewData["XTenantID"] = encryptedTenantId;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Index(string roomNumber, string? XTenentID)
+        public async Task<IActionResult> Index(string roomNumber, string? XTenantID)
         {
+            string encryptedTenantId = ResolveAndPersistTenantId(XTenantID);
+            ViewData["XTenantID"] = encryptedTenantId;
+
             roomNumber = roomNumber?.Trim();
             bool isMultiTenant = IsMultiTenantApp();
 
-            _logger.LogInformation("Login POST: isMultiTenant={Multi}, XTenentID='{Tenant}', Room='{Room}'", isMultiTenant, XTenentID, roomNumber);
+            _logger.LogInformation("Login POST: isMultiTenant={Multi}, XTenantID='{Tenant}', Room='{Room}'", isMultiTenant, encryptedTenantId, roomNumber);
 
-            if (!string.IsNullOrWhiteSpace(XTenentID))
+            if (isMultiTenant && string.IsNullOrWhiteSpace(encryptedTenantId))
             {
-                HttpContext.Session.SetString("XTenentID", XTenentID);
-                _logger.LogInformation("Login POST: Saved XTenentID '{Tenant}' to Session.", XTenentID);
-            }
-            else
-            {
-                XTenentID = HttpContext.Session.GetString("XTenentID");
-            }
-
-            if (isMultiTenant && string.IsNullOrWhiteSpace(XTenentID))
-            {
-                _logger.LogWarning("Login POST: Blocked. Multi-tenant is ON but XTenentID is missing.");
+                _logger.LogWarning("Login POST: Blocked. Multi-tenant is ON but XTenantID is missing.");
                 ViewData["Error"] = "Hospital identity is missing. Please use the proper link.";
                 return View();
             }
@@ -136,13 +122,10 @@ namespace Dial50_MVC_Core.Controllers
                 var newToken = Guid.NewGuid().ToString();
                 _cache.Set("ActiveSession_" + patientDetails.BedId.ToString(), newToken, TimeSpan.FromHours(12));
 
-                string tenant = HttpContext.Session.GetString("XTenentID") ?? "";
-
-                string redirectUrl = $"/?BedInfo={Uri.EscapeDataString(encryptedBedInfo)}";
-
-                if (!string.IsNullOrEmpty(tenant))
+                string redirectUrl = $"/PreLanding?BedInfo={Uri.EscapeDataString(encryptedBedInfo)}";
+                if (!string.IsNullOrEmpty(encryptedTenantId))
                 {
-                    redirectUrl += $"&XTenentID={tenant}";
+                    redirectUrl += $"&XTenantID={Uri.EscapeDataString(encryptedTenantId)}";
                 }
 
                 _logger.LogInformation("Login POST: Success for BedId={BedId}. Redirecting to '{Url}'", patient.BedId, redirectUrl);
@@ -152,7 +135,6 @@ namespace Dial50_MVC_Core.Controllers
             catch (SqlException ex)
             {
                 _logger.LogError(ex, "Login POST: Database error. Could not find SP or connection issue.");
-
                 ViewData["Error"] = "Hospital identity is missing. Please use the proper link.";
                 ViewData["RoomNumber"] = roomNumber;
                 return View();
@@ -164,6 +146,31 @@ namespace Dial50_MVC_Core.Controllers
                 ViewData["RoomNumber"] = roomNumber;
                 return View();
             }
+        }
+
+        private string ResolveAndPersistTenantId(string? tenantIdInput)
+        {
+            string tenantId = !string.IsNullOrWhiteSpace(tenantIdInput)
+                ? tenantIdInput.Trim()
+                : (Request.Cookies["XTenantID"] ?? "");
+
+            if (string.IsNullOrWhiteSpace(tenantId))
+                return "";
+
+            string encryptedTenantId = int.TryParse(tenantId, out _)
+                ? AesOperation.EncryptString($"{tenantId}$${tenantId}$$$$$$")
+                : tenantId.Replace(" ", "+");
+
+            Response.Cookies.Append("XTenantID", encryptedTenantId, new CookieOptions
+            {
+                Path = "/",
+                HttpOnly = false,
+                IsEssential = true,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            });
+
+            return encryptedTenantId;
         }
 
         private bool IsMultiTenantApp()

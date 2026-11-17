@@ -4,22 +4,178 @@
     ViewData["Title"] = ":: Food Services ::";
 }
 
-<link rel="stylesheet" href="~/css/Food.css">
 <link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
+<link rel="stylesheet" href="~/css/Food.css">
 
 <style>
+ 
+    #servicesContainer {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        box-sizing: border-box;
+    }
+
+        #servicesContainer .other-services-header,
+        #servicesContainer #mainContentArea {
+            grid-column: 1 / -1;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+    .other-services-header {
+        position: relative;
+        z-index: 1;
+        margin-bottom: 16px;
+        text-align: left;
+    }
+
+        .other-services-header .services-header {
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .other-services-header .orders-title-header {
+            margin: 0;
+        }
+
+
+    #otherServicesGrid.services-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #otherServicesGrid .service-card {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    @@media (min-width: 600px) {
+        #otherServicesGrid.services-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .other-services-header {
+            margin-bottom: 20px;
+        }
+    }
+
+    @@media (min-width: 1024px) {
+        #otherServicesGrid.services-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .other-services-header {
+            margin-bottom: 24px;
+        }
+    }
+
+
+    #modalOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+        z-index: 999999;
+    }
+
+        #modalOverlay .modal {
+            width: 94% !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+            border-radius: 24px !important;
+            overflow: hidden;
+            box-sizing: border-box;
+            animation: slideUpModal 0.25s ease-out;
+        }
+
+        #modalOverlay .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px 24px;
+            box-sizing: border-box;
+        }
+
+            #modalOverlay .modal-header .service-icon {
+                margin: 0;
+            }
+
+        #modalOverlay .modal-body {
+            padding: 24px 20px 22px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+            #modalOverlay .modal-body h2 {
+                margin: 0 0 8px;
+                font-size: 20px;
+                font-weight: 700;
+                line-height: 1.3;
+            }
+
+            #modalOverlay .modal-body p {
+                margin: 0 0 20px;
+                font-size: 14px;
+                line-height: 1.45;
+            }
+
+            #modalOverlay .modal-body .details-label {
+                text-align: left;
+                font-size: 14px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            #modalOverlay .modal-body textarea {
+                width: 100% !important;
+                min-height: 104px;
+                padding: 12px 14px;
+                border-radius: 14px;
+                box-sizing: border-box;
+                display: block;
+                margin-bottom: 20px;
+                font-size: 15px;
+            }
+
+            #modalOverlay .modal-body .confirm-btn {
+                width: 100% !important;
+                padding: 14px;
+                border-radius: 30px;
+                box-sizing: border-box;
+            }
+
+    @@media (min-width: 768px) {
+        #modalOverlay .modal {
+            max-width: 440px !important;
+        }
+
+        #modalOverlay .modal-body {
+            padding: 28px 28px 24px;
+        }
+    }
+
     #requestSuccessScreen.modal-overlay {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        inset: 0;
         background: rgba(0, 0, 0, 0.5);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 999999;
-        padding: 20px;
+        padding: 16px;
         box-sizing: border-box;
     }
 
@@ -29,8 +185,8 @@
 
     .request-modal {
         background: #ffffff;
-        width: 100%;
-        max-width: 360px;
+        width: 94%;
+        max-width: 380px;
         border-radius: 24px;
         padding: 24px 20px 0;
         box-sizing: border-box;
@@ -38,6 +194,13 @@
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         animation: slideUpModal 0.3s ease-out;
         overflow: hidden;
+    }
+
+    @@media (min-width: 768px) {
+        .request-modal {
+            max-width: 420px;
+            padding: 28px 24px 0;
+        }
     }
 
     @@keyframes slideUpModal {
@@ -70,8 +233,8 @@
     }
 
     .modal-avatar {
-        width: 90px;
-        height: 90px;
+        width: 84px;
+        height: 84px;
         margin: 0 auto 12px;
         border-radius: 50%;
         overflow: hidden;
@@ -89,7 +252,7 @@
         text-align: center;
         font-size: 15px;
         color: #1e293b;
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
 
         .modal-request-id strong {
@@ -101,7 +264,7 @@
         font-size: 14px;
         color: #475569;
         line-height: 1.5;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
 
         .modal-details p {
@@ -118,31 +281,35 @@
         justify-content: space-between;
         background: #f8fafc;
         border-radius: 16px;
-        padding: 16px 20px;
-        margin-bottom: 20px;
+        padding: 14px 16px;
+        margin-bottom: 18px;
+        gap: 8px;
     }
 
     .eta-item {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
+        min-width: 0;
     }
 
     .pill-icon {
         width: 28px;
         height: 28px;
+        flex-shrink: 0;
         border-radius: 50%;
         background: #e2e8f0;
         display: flex;
         align-items: center;
         justify-content: center;
         color: #1abc9c;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .pill-text {
         display: flex;
         flex-direction: column;
+        min-width: 0;
     }
 
         .pill-text small {
@@ -154,14 +321,18 @@
         }
 
         .pill-text strong {
-            font-size: 14px;
+            font-size: 13px;
             color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
     .pill-divider {
         width: 1px;
         height: 30px;
         background: #cbd5e1;
+        flex-shrink: 0;
     }
 
     .success-track-btn {
@@ -188,7 +359,7 @@
         gap: 8px;
         padding: 16px 0;
         border-top: 1px solid #f1f5f9;
-        margin-top: 20px;
+        margin-top: 18px;
     }
 
     .nav-link {
@@ -257,22 +428,21 @@
 
     <input type="hidden" id="hdnTaskTypeId">
 
-    <div class="other-services-header" style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 24px 32px 0 32px; box-sizing: border-box;">
-        <div class="page-back">
-            <button type="button" onclick="GoToBack()" class="back-button-link">
-                <i class="fa-solid fa-arrow-left"></i> Back to Food &amp; Dining
-            </button>
+    <div id="servicesContainer">
+        <div class="other-services-header">
+            <div class="page-back">
+                <button type="button" onclick="GoToBack()" class="back-button-link">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Food &amp; Dining
+                </button>
+            </div>
+            <div class="services-header">
+                <h1 class="orders-title-header">Other Services</h1>
+            </div>
         </div>
-        <div class="services-header" style="text-align: left; margin-top: 10px;">
-            <h1 class="orders-title-header" style="margin: 0;">Other Services</h1>
-        </div>
-    </div>
 
-    <div id="servicesContainer" class="content food-content" style="display: block !important; padding: 0 !important;">
-        <div id="mainContentArea" class="other-services-wrapper">
+        <div id="mainContentArea" class="other-services-wrapper" style="padding: 0 !important; margin: 0 !important; max-width: 100% !important;">
             <div class="services-grid" id="otherServicesGrid">
-
-                <div class="loading-placeholder" style="grid-column: span 2; text-align: center; padding: 40px;">
+                <div class="loading-placeholder" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
                     <i class="fa-solid fa-circle-notch fa-spin"></i> Loading services...
                 </div>
             </div>
@@ -356,14 +526,12 @@
 </div>
 
 <script>
-
     var allServices      = [];
     var allTasks         = [];
     var currentTaskIdx   = 0;
     var currentRequestId = 0;
 
     document.addEventListener("DOMContentLoaded", function () {
-
         fetchServices();
 
         currentRequestId = parseInt(sessionStorage.getItem('lastRequestId') || '0', 10);
@@ -390,9 +558,8 @@
     });
 
     function fetchServices() {
-
         $("#otherServicesGrid").html(`
-            <div style="grid-column: span 2; text-align: center; padding: 80px; width: 100%;">
+            <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; width: 100%;">
                 <i class="fa-solid fa-spinner fa-spin" style="font-size: 30px; color: #6366f1;"></i>
                 <p style="margin-top: 10px; color: #64748b; font-weight: 600;">Loading Services...</p>
             </div>
@@ -408,14 +575,14 @@
                     renderServiceGrid(data);
                 } else {
                     $("#otherServicesGrid").html(
-                        '<div style="grid-column: span 2; text-align: center; padding: 50px; color: #94a3b8;">No services available right now.</div>'
+                        '<div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: #94a3b8;">No services available right now.</div>'
                     );
                 }
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching services:", error);
                 $("#otherServicesGrid").html(
-                    '<div style="grid-column: span 2; text-align: center; padding: 50px; color: #ef4444;">Unable to load services.</div>'
+                    '<div style="grid-column: 1 / -1; text-align: center; padding: 50px 20px; color: #ef4444;">Unable to load services.</div>'
                 );
             }
         });
@@ -454,7 +621,6 @@
         $("#otherServicesGrid").html(html);
     }
 
-
     function openServiceModal(title, id, iconPath) {
         $("#modalTitle").text(title);
         $("#hdnTaskTypeId").val(id);
@@ -475,7 +641,7 @@
             .attr("src", finalSrc)
             .attr("alt", title || "service");
 
-        $("#modalOverlay").fadeIn(200);
+        $("#modalOverlay").css("display", "flex").hide().fadeIn(200);
     }
 
     function closeModal() {
@@ -494,9 +660,8 @@
             BedContext.go('Tracking');
         }
     }
-    
-    function submitTaskRequest() {
 
+    function submitTaskRequest() {
         const remarks    = $("#modalRemarks").val();
         const categoryId = $("#hdnTaskTypeId").val();
         const bc         = BedContext.get();
@@ -518,10 +683,9 @@
                 remarks:    remarks,
                 roomNo:     actualRoom,
                 userName:   userName
-            },            success: function (response) {
-
+            },
+            success: function (response) {
                 if (response.success) {
-
                     currentRequestId = response.requestId || 0;
                     sessionStorage.setItem('lastRequestId', currentRequestId);
 
@@ -530,8 +694,6 @@
 
                     loadSuccessTasks();
                     $("#modalSubmit").prop("disabled", false).text("Confirm Request");
-
-
                 } else {
                     alert("Failed to raise request.");
                     $("#modalSubmit").prop("disabled", false).text("Confirm Request");
@@ -545,11 +707,11 @@
     }
 
     function loadSuccessTasks() {
-
         var bc        = BedContext.get();
         var bedId     = encodeURIComponent(bc.bedId || '');
         var bedNumber = encodeURIComponent(bc.bedNumber || '');
         var token     = encodeURIComponent(bc.bedInfo || '');
+        var roomBed   = bc.roomBed || bc.roomNumber || '';
 
         var url = '/AI/GetFreshTask'
                 + '?bedId=' + bedId
@@ -561,7 +723,6 @@
         fetch(url)
             .then(function (res) { return res.json(); })
             .then(function (data) {
-
                 if (!Array.isArray(data)) data = [];
 
                 if (data.length > 0) {
@@ -572,7 +733,7 @@
                         taskName:   $('#modalTitle').text() || 'Request',
                         porterName: '',
                         status:     'PENDING',
-                        fromRoom:   serverRoomBed || '',
+                        fromRoom:   roomBed,
                         service:    'REQUEST'
                     }];
                 }
@@ -589,7 +750,7 @@
                     taskName:   $('#modalTitle').text() || 'Request',
                     porterName: '',
                     status:     'PENDING',
-                    fromRoom:   serverRoomBed || '',
+                    fromRoom:   roomBed,
                     service:    'REQUEST'
                 }];
 
@@ -608,7 +769,6 @@
     }
 
     function renderSuccessTask(index) {
-
         if (!allTasks || allTasks.length === 0) return;
 
         if (index < 0) index = 0;
@@ -633,7 +793,6 @@
     }
 
     function renderDots() {
-
         var dotsEl = document.getElementById('dotsContainer');
         if (!dotsEl) return;
 
@@ -642,14 +801,11 @@
         var html = '';
 
         if (total <= maxDots) {
-
             for (var i = 0; i < total; i++) {
                 html += '<span class="' + (i === currentTaskIdx ? 'active' : '') +
                         '" onclick="jumpToTask(' + i + ')"></span>';
             }
-
         } else {
-
             var half = Math.floor(maxDots / 2);
             var start = currentTaskIdx - half;
             var end = currentTaskIdx + half;
@@ -689,24 +845,16 @@
     }
 
     function prevRequest() {
-        console.log('[Prev] idx=', currentTaskIdx, '/ len=', allTasks.length);
-
         if (currentTaskIdx > 0) {
             currentTaskIdx--;
             renderSuccessTask(currentTaskIdx);
-        } else {
-            console.log('[Prev] already at first task — no-op');
         }
     }
 
     function nextRequest() {
-        console.log('[Next] idx=', currentTaskIdx, '/ len=', allTasks.length);
-
         if (currentTaskIdx < allTasks.length - 1) {
             currentTaskIdx++;
             renderSuccessTask(currentTaskIdx);
-        } else {
-            console.log('[Next] already at last task — no-op');
         }
     }
 
@@ -718,7 +866,6 @@
     function GoToBack() {
         BedContext.go('FoodDining');
     }
-
 </script>
 
 <script src="~/js/layout_DailyCare.js"></script>

@@ -935,23 +935,33 @@
         if (timerEl) timerEl.textContent = formatTime(Math.max(timeLeft, 0));
     }
 
-    // =========================================================
-    // PROFILE / LANGUAGE (starts at page load, awaited on click)
-    // =========================================================
     async function fetchProfileLanguage(id) {
         if (!id || !PROFILE_API_URL) return null;
         try {
+            var rawTenant = new URLSearchParams(window.location.search).get("XTenantID") || "";
+            var tenantId = decodeURIComponent(rawTenant);
+
+            var payload = {
+                userId: id,
+                Status: "GET",
+                "X-Tenant-ID": tenantId   
+            };
+
             var res = await fetch(PROFILE_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: id, Status: 'GET' })
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Tenant-ID": tenantId  
+                },
+                body: JSON.stringify(payload)
             });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
+
+            if (!res.ok) throw new Error("HTTP " + res.status);
             var result = await res.json();
             if (!result.status || !result.data || !result.data.Language) return null;
             return result.data.Language;
         } catch (err) {
-            console.warn('[VideoAI] profile fetch failed:', err.message);
+            console.warn("GetProfileOld failed — using region default language:", err.message);
             return null;
         }
     }
