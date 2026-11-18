@@ -150,7 +150,9 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Authenticat.cs" />
+    <Compile Include="Controllers\SkipTenantAttribute.cs" />
     <Compile Include="Controllers\SurveyController.cs" />
+    <Compile Include="Controllers\TenantInterceptor.cs" />
     <Compile Include="Controllers\TraczoController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

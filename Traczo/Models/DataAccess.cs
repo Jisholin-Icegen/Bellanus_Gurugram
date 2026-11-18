@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -13,16 +12,27 @@ namespace Traczo.Models
 {
     public class DataAccess
     {
-        public const string HosIdC = "van";
+        public static string HosIdC
+        {
+            get
+            {
+                var ctx = HttpContext.Current;
+                if (ctx == null) return "van";
+                var t = ctx.Items["XTenantConnStr"] as string;
+                if (string.IsNullOrEmpty(t))
+                    throw new InvalidOperationException("Tenant not resolved for this request.");
+                return t;
+            }
+        }
 
         public static DataTable GetProfileDA(GetProfileIP req, string process)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
-                SqlCommand cmd = new SqlCommand("SP_GetProfilePatientDetails", Con);                
-                cmd.Parameters.AddWithValue("@UserId", req.userId);//bedid
+                SqlCommand cmd = new SqlCommand("SP_GetProfilePatientDetails", Con);
+                cmd.Parameters.AddWithValue("@UserId", req.userId);
                 cmd.Parameters.AddWithValue("@PROCESS", process);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlDataAdapter adpt = new SqlDataAdapter(cmd);
@@ -54,7 +64,7 @@ namespace Traczo.Models
                 dt.Rows.Add(convId, userId, item.Department, item.Rating, item.Remarks);
             }
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(HosIdC)))
             using (SqlCommand cmd = new SqlCommand("SP_SAVE_FEEDBACK_BULK_INSERT", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -69,7 +79,7 @@ namespace Traczo.Models
         public static DataTable FeedbackJdDA(FeedbackIp req, string process)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
                 SqlCommand cmd = new SqlCommand("sp_UpdatePatientFeedback", Con);
@@ -95,7 +105,7 @@ namespace Traczo.Models
         public static DataTable ConversationUpdateJdDA(ConversationRequest req, string process)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
                 SqlCommand cmd = new SqlCommand("sp_ConversationInsert", Con);
@@ -116,10 +126,10 @@ namespace Traczo.Models
             }
             return dt;
         }
-        public static DataSet SaveQRcodeDA(string lid, string lname,string imgname, string process)
+        public static DataSet SaveQRcodeDA(string lid, string lname, string imgname, string process)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_SaveQRCode", Con);
@@ -141,15 +151,15 @@ namespace Traczo.Models
             return dt;
         }
 
-        public static DataTable SaveAudioFileDA(string conversationId,string filename, string process)
+        public static DataTable SaveAudioFileDA(string conversationId, string filename, string process)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_AudioTextAdd", Con);
                 cmd.Parameters.AddWithValue("@ConversationId", conversationId);
-                cmd.Parameters.AddWithValue("@Filename", filename);                 
+                cmd.Parameters.AddWithValue("@Filename", filename);
                 cmd.Parameters.AddWithValue("@PROCESS", process);
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlDataAdapter adpt = new SqlDataAdapter(cmd);
@@ -166,7 +176,7 @@ namespace Traczo.Models
         }
         public static void UpdateToken(string AccessToken, string IssuedToken, string expiresToken, string UserId, string conStr)
         {
-            SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_UpdateToken", con);
@@ -181,31 +191,40 @@ namespace Traczo.Models
                 cmd.ExecuteNonQuery();
                 con.Close();
             }
-            catch (Exception ex) { DataAccess.InsertError(ex.ToString(), "authenticate UpdateToken ", "van"); }
+            catch (Exception ex) { DataAccess.InsertError(ex.ToString(), "authenticate UpdateToken ", conStr); }
             finally
             {
                 if (con.State == ConnectionState.Open)
                     con.Close();
             }
         }
+
         public static void InsertError(string ErrMsg, string SpName, string conStr)
         {
-            SqlConnection TmpCon = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
-            SqlCommand cmd = new SqlCommand("SP_ERRORLOG", TmpCon);
-            cmd.Parameters.AddWithValue("@PROC", SpName);
-            cmd.Parameters.AddWithValue("@ERRORMSG", ErrMsg);
-            cmd.CommandType = CommandType.StoredProcedure;
-            SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-            if (TmpCon.State == ConnectionState.Closed)
-                TmpCon.Open();
-            cmd.ExecuteNonQuery();
-            TmpCon.Close();
+            try
+            {
+                string realConn = GetRealConnectionString(conStr);
+                if (string.IsNullOrWhiteSpace(realConn)) return;
+
+                using (SqlConnection TmpCon = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("SP_ERRORLOG", TmpCon))
+                {
+                    cmd.Parameters.AddWithValue("@PROC", SpName);
+                    cmd.Parameters.AddWithValue("@ERRORMSG", ErrMsg);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    TmpCon.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch
+            {
+            }
         }
 
         public static DataTable RegisterDevice(RegisterDevice reg, string process, string hosid, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("RegisterDevice", Con);
@@ -219,7 +238,7 @@ namespace Traczo.Models
                 cmd.Parameters.AddWithValue("@ROOMNO", reg.LocationName);
                 cmd.Parameters.AddWithValue("@FCMToken", reg.FCMToken);
 
-                cmd.Parameters.AddWithValue("@PROCESS",reg.Process );//process
+                cmd.Parameters.AddWithValue("@PROCESS", reg.Process);
 
 
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -243,7 +262,7 @@ namespace Traczo.Models
         public static DataTable SGetBranches(string HostingUrl, string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SGetBranches", Con);
@@ -296,10 +315,10 @@ namespace Traczo.Models
 
 
 
-        public static DataSet getPorterLocation(string porterid,string reqid,string conStr)
+        public static DataSet getPorterLocation(string porterid, string reqid, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             SqlCommand cmd = new SqlCommand("[GetPorterLocationByporterid]", Con);
             cmd.CommandTimeout = 1000;
             cmd.Parameters.AddWithValue("@porterid", porterid);
@@ -309,13 +328,13 @@ namespace Traczo.Models
             cmd.CommandType = CommandType.StoredProcedure;
             try
             {
-                
+
                 Con.Open();
                 adpt.Fill(dt);
             }
             catch (Exception ex)
             {
-                InsertError(ex.Message, "GetDepCategory", conStr); 
+                InsertError(ex.Message, "GetDepCategory", conStr);
                 dt = new DataSet();
 
             }
@@ -331,7 +350,7 @@ namespace Traczo.Models
         {
             DataSet ds = new DataSet();
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(HosIdC)))
             using (SqlCommand cmd = new SqlCommand("SP_SAVE_FEEDBACK_BULK_JD", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -373,7 +392,7 @@ namespace Traczo.Models
         {
             DataSet ds = new DataSet();
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(HosIdC)))
             using (SqlCommand cmd = new SqlCommand("SP_SAVE_FEEDBACK_BULK", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -415,7 +434,7 @@ namespace Traczo.Models
         {
             DataSet ds = new DataSet();
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(conStr)))
             {
                 using (SqlCommand cmd = new SqlCommand("sp_GetOverAllFeedback", con))
                 {
@@ -432,11 +451,11 @@ namespace Traczo.Models
 
             return ds;
         }
-        public static DataSet GetBedTasksStatus(string bedNo,string bedid, string conStr, string prs)
+        public static DataSet GetBedTasksStatus(string bedNo, string bedid, string conStr, string prs)
         {
             DataSet ds = new DataSet();
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(conStr)))
             {
                 using (SqlCommand cmd = new SqlCommand("sp_GetTasksByBedNo", con))
                 {
@@ -452,111 +471,13 @@ namespace Traczo.Models
 
             return ds;
         }
-        //    public static Dictionary<string, object> GetDynamicCategories(string loc, string imeNumber, string fcm, string conStr, string prs)
-        //    {
-
-        //        List<CategoryItem> rows = new List<CategoryItem>();
-
-        //        DataSet ds = new DataSet();
-
-
-        //        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
-        //        using (SqlCommand cmd = new SqlCommand("sp_GetCategoriesDep", con))
-        //        {
-        //            cmd.CommandType = CommandType.StoredProcedure;
-        //            cmd.Parameters.AddWithValue("@Locationname", loc);
-        //            cmd.Parameters.AddWithValue("@ImeNumber", imeNumber);
-        //            cmd.Parameters.AddWithValue("@Fcmtoken", fcm);
-        //            cmd.Parameters.AddWithValue("@Process", prs);
-
-        //            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-        //            {
-        //                da.Fill(ds);
-        //            }
-        //        }
-        //        if (ds.Tables.Count > 0)
-        //        {
-        //            DataTable dt = ds.Tables[0];
-
-        //            foreach (DataRow dr in dt.Rows)
-        //            {
-        //                rows.Add(new CategoryItem
-        //                {
-        //                    DepartmentId = dr["DepartmentId"].ToString(),
-        //                    DepartmentKey = dr["DepartmentKey"].ToString(),
-        //                    DepartmentName = dr["DepartmentName"].ToString(),
-
-        //                    CategoryId = dr["CategoryId"].ToString(),
-        //                    CategoryName = dr["CategoryName"].ToString(),
-        //                    CategoryImage = dr["CategoryImage"].ToString(),
-        //                    CategoryTitle = dr["CategoryTitle"].ToString(),
-        //                    CategoryDetails = dr["CategoryDetails"].ToString(),
-        //                    CategoryDescription = dr["CategoryDescription"].ToString(),
-        //                    DescriptionDetails = dr["DescriptionDetails"].ToString(),
-        //                    HisUrl = dr["HisUrl"].ToString(),
-        //                    Dial50url = dr["Dial50url"].ToString(),
-        //                    TaskTypeId = dr["TaskTypeId"].ToString(),
-
-        //                    SubLeveLDepId = dr["SubLeveLDepId"]?.ToString()
-
-        //                });
-        //            }
-        //        }
-        //        var dData = rows
-        //.GroupBy(x => x.DepartmentKey)
-        //.ToDictionary(
-        //    g => g.Key,
-        //    g => g.ToList()
-        //);
-        //        DataRow drp = null;
-        //        Dictionary<string, object> data = null;// new Dictionary<string, object>();
-
-        //        if (ds.Tables[2].Rows.Count > 0)
-        //        {
-        //            drp = ds.Tables[2].Rows[0];
-
-        //            data = new Dictionary<string, object>
-        //{
-        //    { "DeviceStatus", new DeviceStatus
-        //        {
-        //            isActiveDevice = ds.Tables[1].Rows[0][0].ToString() == "1" ? "TRUE" : "FALSE"
-        //        }
-        //    },
-
-        //    { "ProfileData", new GetProfileData
-        //        {
-        //            userName = drp["Patientname"].ToString(),
-        //            gender = drp["Gender"].ToString(),
-        //            userId = loc,
-        //            age = drp["age"].ToString(),
-        //            uhid = drp["uhid"].ToString()
-        //        }
-
-
-        //    },
-        //     { "DepFiltersName", ds.Tables[3].AsEnumerable().Select(x=>new { DepartmentId= x["DepartmentId"] ,
-        //     DepartmentName= x["DepartmentName"] , GroupName= x["GroupName"]
-        //     })
-
-
-        //    }
-        //};
-
-        //            foreach (var dept in dData)
-        //            {
-        //                data.Add(dept.Key, dept.Value);
-        //            }
-        //        }
-
-        //        return data;
-        //    }
 
         public static Dictionary<string, object> GetDynamicCategories(string loc, string imeNumber, string fcm, string conStr, string prs)
         {
             List<CategoryItem> rows = new List<CategoryItem>();
             DataSet ds = new DataSet();
 
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+            using (SqlConnection con = new SqlConnection(GetRealConnectionString(conStr)))
             using (SqlCommand cmd = new SqlCommand("sp_GetCategoriesDep", con))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
@@ -598,7 +519,6 @@ namespace Traczo.Models
                 }
             }
 
-            // Group Categories Department Wise
             var departmentTasks = rows
                 .GroupBy(x => x.DepartmentName)
                 .ToDictionary(
@@ -637,9 +557,6 @@ namespace Traczo.Models
                     userId = loc,
                     age = drp["age"].ToString(),
                     uhid = drp["uhid"].ToString()
-                   
-
-                   
                 });
 
                 data.Add("activeDepNames",
@@ -659,14 +576,14 @@ namespace Traczo.Models
 
             return data;
         }
-        public static DataTable GetDepCategory(  string process, string conStr)
+        public static DataTable GetDepCategory(string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GetDepCategory", Con);
-                 
+
                 cmd.Parameters.AddWithValue("@PROCESS", process);
 
 
@@ -690,7 +607,7 @@ namespace Traczo.Models
         public static DataTable GetBranches(string AppType, string HostingUrl, string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("GetBranches", Con);
@@ -720,7 +637,7 @@ namespace Traczo.Models
         public static DataTable OldCheckUser(UserLogin usl, string hospid, string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_CHECKUSER", Con);
@@ -743,7 +660,7 @@ namespace Traczo.Models
         public static DataTable CheckUser(string UserName, string Password, string AppType, string imeinumb, string conStr, string firstsec, string hospitalid, string FCMDevicetoken, string ClnZonId)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_CHECKUSER", Con);
@@ -773,7 +690,7 @@ namespace Traczo.Models
         public static DataTable TokenCheckUser(string AppType, string username, string password, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_CHECKUSER", Con);
@@ -797,7 +714,7 @@ namespace Traczo.Models
         public static DataTable DeleteDevicemaster(string imei, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("DeleteDevice", Con);
@@ -820,7 +737,7 @@ namespace Traczo.Models
         public static DataTable DaAutoAssign(string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_DYNASSIGN", Con);
@@ -843,7 +760,7 @@ namespace Traczo.Models
         public static DataTable DaLogout(GenHosPorter process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_Logout", Con);
@@ -866,7 +783,7 @@ namespace Traczo.Models
         public static DataTable DaAlarmOff(AlarmOffM process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("Sp_AlarmOff", Con);
@@ -889,7 +806,7 @@ namespace Traczo.Models
         public static DataTable LocationMaster(Locations loc, string Process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_LOCATIONMASTER", Con);
@@ -920,7 +837,7 @@ namespace Traczo.Models
         public static DataTable FloorMasterUpdate(Floors flr, string hosID, string Process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_FLOORMASTER", Con);
@@ -946,7 +863,7 @@ namespace Traczo.Models
         public static DataSet SelectedLocationMaster(Locations loc, string Process, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_LOCATIONMASTER", Con);
@@ -978,7 +895,7 @@ namespace Traczo.Models
         public static DataSet DaLocationList(Locations loc, string Process, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_LOCATIONMASTER", Con);
@@ -1009,7 +926,7 @@ namespace Traczo.Models
         public static DataTable SLocationMaster(Locations loc, string Process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_LOCATIONMASTER", Con);
@@ -1045,7 +962,7 @@ namespace Traczo.Models
         public static DataTable DAAdhocLoc(GetAdhocLocParam loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GetAdHocLocation", Con);
@@ -1069,7 +986,7 @@ namespace Traczo.Models
         public static DataTable DAPorterMsg(PorterMesssage loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_PORTERMESSAGE", Con);
@@ -1094,7 +1011,7 @@ namespace Traczo.Models
         public static DataTable DAPorterOnHold(BTaskOnHold loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_PORTERONHOLD", Con);
@@ -1120,7 +1037,7 @@ namespace Traczo.Models
         public static DataTable LocationUpdate(LocationUpdates loc, string Process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_LOCATIONUPDATE", Con);
@@ -1150,7 +1067,7 @@ namespace Traczo.Models
         {
 
             string retVal = string.Empty;
-            using (SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+            using (SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr)))
             {
                 try
                 {
@@ -1182,7 +1099,7 @@ namespace Traczo.Models
         public static DataTable GetPrivateCallStatus(string usrid, string process, string hosID, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("GetPrivateCallStatus", Con);
@@ -1206,7 +1123,7 @@ namespace Traczo.Models
         public static DataTable UpdateRequestInfo(ReqInfoReq riq, string prs, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("sp_InsertConversation", Con);
@@ -1230,7 +1147,7 @@ namespace Traczo.Models
         public static DataTable Updateinactiveuser(string pid, string uptime, string prs, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_UpdateSocketMsgUsr", Con);
@@ -1258,7 +1175,7 @@ namespace Traczo.Models
             string Rslt = string.Empty;
             try
             {
-                using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+                using (SqlConnection con = new SqlConnection(GetRealConnectionString(HosIdC)))
                 {
                     using (SqlCommand cmd = new SqlCommand("sp_InsertTaskRequest", con))
                     {
@@ -1273,7 +1190,7 @@ namespace Traczo.Models
                         cmd.Parameters.AddWithValue("@Remarks", item.Remarks);
                         cmd.Parameters.AddWithValue("@PorterId", string.IsNullOrEmpty(item.PorterId) ? "" : item.PorterId);
                         cmd.Parameters.AddWithValue("@UserId", userid);
-                       
+
 
                         SqlDataAdapter adpt = new SqlDataAdapter(cmd);
                         con.Open();
@@ -1304,17 +1221,19 @@ namespace Traczo.Models
 
             return result;
         }
-        
-    public static TaskResult ReqCreationNew(TaskItem item,string from, string to,string convid,string gender,string userid,string Language)
+
+        public static TaskResult ReqCreationNew(TaskItem item, string from, string to, string convid, string gender, string userid, string Language, string conStr)
         {
             var result = new TaskResult();
             DataSet ds = new DataSet();
             string Rslt = string.Empty;
+            string realConn = conStr;
 
             try
             {
-                using (SqlConnection con = new SqlConnection(
-                    ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+                realConn = GetRealConnectionString(conStr);
+
+                using (SqlConnection con = new SqlConnection(realConn))
                 {
                     using (SqlCommand cmd = new SqlCommand("sp_InsertRoomRequest", con))
                     {
@@ -1332,44 +1251,31 @@ namespace Traczo.Models
                         cmd.Parameters.AddWithValue("@Language", Language);
 
                         SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-
                         con.Open();
                         adpt.Fill(ds);
 
-                        
-                        if (ds.Tables.Count == 0 ||
-                            ds.Tables[0].Rows.Count == 0)
+                        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
                         {
                             result.Status = "false";
                             result.Result = "No response received from database";
                             result.RequestNo = "";
                             result.CategoryName = "";
-
                             return result;
                         }
 
-                        
                         Rslt = ds.Tables[0].Rows[0]["Result"].ToString();
+                        result.RequestNo = ds.Tables[0].Rows[0]["RequestNo"].ToString();
 
-                        result.RequestNo =
-                            ds.Tables[0].Rows[0]["RequestNo"].ToString();
-
-                       
-                        if (ds.Tables.Count > 1 &&
-                            ds.Tables[1].Rows.Count > 0 &&
-                            ds.Tables[1].Columns.Contains("Category"))
+                        if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0 && ds.Tables[1].Columns.Contains("Category"))
                         {
-                            result.CategoryName =
-                                ds.Tables[1].Rows[0]["Category"].ToString();
+                            result.CategoryName = ds.Tables[1].Rows[0]["Category"].ToString();
                         }
                         else
                         {
                             result.CategoryName = "";
                         }
 
-                        
-                        if (Rslt.Equals("TRUE",
-                            StringComparison.OrdinalIgnoreCase))
+                        if (Rslt.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
                         {
                             result.Status = "true";
                             result.Result = "Request created successfully";
@@ -1384,18 +1290,10 @@ namespace Traczo.Models
             }
             catch (Exception ex)
             {
-                InsertError(
-                    ex.ToString(),
-                    "da requrstcr",
-                    HosIdC);
+                try { InsertError(ex.ToString(), "da requrstcr", realConn); } catch { }
 
                 result.Status = "false";
-
-               
-                result.Result = string.IsNullOrEmpty(Rslt)
-                    ? "An error occurred while creating request"
-                    : Rslt;
-
+                result.Result = string.IsNullOrEmpty(Rslt) ? "An error occurred while creating request" : Rslt;
                 result.RequestNo = "";
                 result.CategoryName = "";
             }
@@ -1403,219 +1301,161 @@ namespace Traczo.Models
             return result;
         }
 
+        public static string GetRealConnectionString(string keyOrConnStr)
+        {
+            if (string.IsNullOrWhiteSpace(keyOrConnStr))
+                throw new InvalidOperationException("Connection key is empty.");
+
+            if (keyOrConnStr.IndexOf("Data Source=", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                keyOrConnStr.IndexOf("Initial Catalog=", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                keyOrConnStr.IndexOf("Server=", StringComparison.OrdinalIgnoreCase) >= 0)
+                return keyOrConnStr;
+
+            var entry = ConfigurationManager.ConnectionStrings[keyOrConnStr];
+            if (entry != null && !string.IsNullOrEmpty(entry.ConnectionString))
+                return entry.ConnectionString;
+
+            throw new InvalidOperationException("Connection '" + keyOrConnStr + "' not found.");
+        }
+
         public static DataTable SubmitAIFoodOrders(List<FoodOrderAISlimRow> rows, string conStr)
         {
             DataTable result = new DataTable();
-
-            using (SqlConnection con = new SqlConnection(
-                ConfigurationManager.ConnectionStrings[conStr].ConnectionString))
-            {
-                con.Open();
-
-                var grouped = rows.GroupBy(r => new
-                {
-                    ROOMNO = (r.ROOMNO ?? "").Trim(),
-                    MEALTYPE = (r.MEALTYPE ?? "").Trim(),
-                    ORDERTYPE = (r.ORDERTYPE ?? "").Trim()
-                });
-
-                foreach (var grp in grouped)
-                {
-                    var grpRows = grp.ToList();
-                    var firstRow = grpRows[0];
-
-                    using (SqlCommand cmd = new SqlCommand("dbo.SP_SUBMIT_AI_FOOD_ORDER", con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.CommandTimeout = 300;
-
-                        cmd.Parameters.Add("@ROOMNO", SqlDbType.NVarChar, 20).Value = grp.Key.ROOMNO;
-                        cmd.Parameters.Add("@ORDERTYPE", SqlDbType.NVarChar, 50).Value = grp.Key.ORDERTYPE;
-                        cmd.Parameters.Add("@MEALTYPE", SqlDbType.NVarChar, 50).Value = grp.Key.MEALTYPE;
-                        cmd.Parameters.Add("@ISPREORDER", SqlDbType.Bit).Value = (firstRow.ISPREORDER == "1");
-                        cmd.Parameters.Add("@SPECIALINSTRUCTION", SqlDbType.NVarChar, 500).Value = (object)firstRow.SPECIALINSTRUCTION ?? DBNull.Value;
-                        cmd.Parameters.Add("@ORDERBY", SqlDbType.NVarChar, 200).Value = (object)firstRow.ORDERBY ?? DBNull.Value;
-                        cmd.Parameters.Add("@CALORIES", SqlDbType.Int).Value = (object)firstRow.CALORIES ?? DBNull.Value;
-
-                        var tvp = new DataTable();
-                        tvp.Columns.Add("ITEMID", typeof(string));
-                        tvp.Columns.Add("ITEMNAME", typeof(string));
-                        tvp.Columns.Add("ITEMDESC", typeof(string));
-                        tvp.Columns.Add("QUANTITY", typeof(int));
-
-                        foreach (var r in grpRows)
-                            tvp.Rows.Add(r.ITEMID, r.ITEMNAME, r.ITEMDESC, r.QUANTITY);
-
-                        var tvpParam = cmd.Parameters.AddWithValue("@ITEMS", tvp);
-                        tvpParam.SqlDbType = SqlDbType.Structured;
-                        tvpParam.TypeName = "dbo.FoodOrderItemType";
-
-                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                            da.Fill(result);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public static TaskResult VideoCreation(TaskItem item, string from, string to, string convid, string gender, string userid, string Language)
-        {
-            var result = new TaskResult();
-            DataSet ds = new DataSet();
-            string Rslt = string.Empty;
+            string realConn = GetRealConnectionString(conStr);
 
             try
             {
-                using (SqlConnection con = new SqlConnection(
-                    ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
+                using (SqlConnection con = new SqlConnection(realConn))
                 {
-                    using (SqlCommand cmd = new SqlCommand("sp_InsertVideoRequest", con))
+                    con.Open();
+
+                    var grouped = rows.GroupBy(r => new
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
+                        ROOMNO = (r.ROOMNO ?? "").Trim(),
+                        MEALTYPE = (r.MEALTYPE ?? "").Trim(),
+                        ORDERTYPE = (r.ORDERTYPE ?? "").Trim()
+                    });
 
-                        cmd.Parameters.AddWithValue("@FromLocation", from);
-                        cmd.Parameters.AddWithValue("@ToLocation", to);
-                        cmd.Parameters.AddWithValue("@ConversationId", convid);
-                        cmd.Parameters.AddWithValue("@Gender", gender);
-                        cmd.Parameters.AddWithValue("@Category", item.Category);
-                        cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
-                        cmd.Parameters.AddWithValue("@Remarks", item.Remarks);
-                        cmd.Parameters.AddWithValue("@PorterId", string.IsNullOrEmpty(item.PorterId) ? "" : item.PorterId);
-                        cmd.Parameters.AddWithValue("@UserId", userid);
-                        cmd.Parameters.AddWithValue("@Language", Language);
+                    foreach (var grp in grouped)
+                    {
+                        var grpRows = grp.ToList();
+                        var firstRow = grpRows[0];
 
-                        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-
-                        con.Open();
-                        adpt.Fill(ds);
-
-                        if (ds.Tables.Count == 0 ||
-                            ds.Tables[0].Rows.Count == 0)
+                        using (SqlCommand cmd = new SqlCommand("dbo.SP_SUBMIT_AI_FOOD_ORDER", con))
                         {
-                            result.Status = "false";
-                            result.Result = "No response received from database";
-                            result.RequestNo = "";
-                            result.CategoryName = "";
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.CommandTimeout = 300;
 
-                            return result;
-                        }
+                            cmd.Parameters.Add("@ROOMNO", SqlDbType.NVarChar, 20).Value = grp.Key.ROOMNO;
+                            cmd.Parameters.Add("@ORDERTYPE", SqlDbType.NVarChar, 50).Value = grp.Key.ORDERTYPE;
+                            cmd.Parameters.Add("@MEALTYPE", SqlDbType.NVarChar, 50).Value = grp.Key.MEALTYPE;
+                            cmd.Parameters.Add("@ISPREORDER", SqlDbType.Bit).Value = (firstRow.ISPREORDER == "1");
+                            cmd.Parameters.Add("@SPECIALINSTRUCTION", SqlDbType.NVarChar, 500).Value = (object)firstRow.SPECIALINSTRUCTION ?? DBNull.Value;
+                            cmd.Parameters.Add("@ORDERBY", SqlDbType.NVarChar, 200).Value = (object)firstRow.ORDERBY ?? DBNull.Value;
+                            cmd.Parameters.Add("@CALORIES", SqlDbType.Int).Value = (object)firstRow.CALORIES ?? DBNull.Value;
 
-                        Rslt = ds.Tables[0].Rows[0]["Result"].ToString();
+                            var tvp = new DataTable();
+                            tvp.Columns.Add("ITEMID", typeof(string));
+                            tvp.Columns.Add("ITEMNAME", typeof(string));
+                            tvp.Columns.Add("ITEMDESC", typeof(string));
+                            tvp.Columns.Add("QUANTITY", typeof(int));
 
-                        result.RequestNo =
-                            ds.Tables[0].Rows[0]["RequestNo"].ToString();
+                            foreach (var r in grpRows)
+                                tvp.Rows.Add(r.ITEMID, r.ITEMNAME, r.ITEMDESC, r.QUANTITY);
 
-                        if (ds.Tables.Count > 1 &&
-                            ds.Tables[1].Rows.Count > 0 &&
-                            ds.Tables[1].Columns.Contains("Category"))
-                        {
-                            result.CategoryName =
-                                ds.Tables[1].Rows[0]["Category"].ToString();
-                        }
-                        else
-                        {
-                            result.CategoryName = "";
-                        }
+                            var tvpParam = cmd.Parameters.AddWithValue("@ITEMS", tvp);
+                            tvpParam.SqlDbType = SqlDbType.Structured;
+                            tvpParam.TypeName = "dbo.FoodOrderItemType";
 
-                        if (Rslt.Equals("TRUE",
-                            StringComparison.OrdinalIgnoreCase))
-                        {
-                            result.Status = "true";
-                            result.Result = "Video request created successfully";
-                        }
-                        else
-                        {
-                            result.Status = "false";
-                            result.Result = Rslt;
+                            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                da.Fill(result);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                InsertError(
-                    ex.ToString(),
-                    "da videocr",
-                    HosIdC);
-
-                result.Status = "false";
-
-                result.Result = string.IsNullOrEmpty(Rslt)
-                    ? "An error occurred while creating video request"
-                    : Rslt;
-
-                result.RequestNo = "";
-                result.CategoryName = "";
+                InsertError(ex.ToString(), "SubmitAIFoodOrders", realConn);
+                throw;
             }
 
             return result;
         }
 
+        public static TaskResult VideoCreation(TaskItem item, string from, string to, string convid, string gender, string userid, string Language, string conStr)
+        {
+            var result = new TaskResult();
+            DataSet ds = new DataSet();
+            string Rslt = string.Empty;
+            string realConn = conStr;
 
-        //public static TaskResult ReqCreationNew(TaskItem item,string from,string to,string convid,string gender,string userid, string Language)
-        //{
-        //    var result = new TaskResult();
-        //    DataSet ds = new DataSet();
-        //    string Rslt = string.Empty;
-        //    try
-        //    {
-        //        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString()))
-        //        {
-        //            using (SqlCommand cmd = new SqlCommand("sp_InsertTaskRequest", con))
-        //            {
-        //                cmd.CommandType = CommandType.StoredProcedure;
+            try
+            {
+                realConn = GetRealConnectionString(conStr);
 
-        //                cmd.Parameters.AddWithValue("@FromLocation", from);
-        //                cmd.Parameters.AddWithValue("@ToLocation", to);
-        //                cmd.Parameters.AddWithValue("@ConversationId", convid);
-        //                cmd.Parameters.AddWithValue("@Gender", gender);
-        //                cmd.Parameters.AddWithValue("@Category", item.Category);
-        //                cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
-        //                cmd.Parameters.AddWithValue("@Remarks", item.Remarks);
-        //                cmd.Parameters.AddWithValue("@PorterId", string.IsNullOrEmpty( item.PorterId)?"": item.PorterId);
-        //                cmd.Parameters.AddWithValue("@UserId", userid);
-        //                cmd.Parameters.AddWithValue("@Language", Language);
+                using (SqlConnection con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("sp_InsertVideoRequest", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@FromLocation", from);
+                    cmd.Parameters.AddWithValue("@ToLocation", to);
+                    cmd.Parameters.AddWithValue("@ConversationId", convid);
+                    cmd.Parameters.AddWithValue("@Gender", gender);
+                    cmd.Parameters.AddWithValue("@Category", item.Category);
+                    cmd.Parameters.AddWithValue("@Quantity", item.Quantity);
+                    cmd.Parameters.AddWithValue("@Remarks", item.Remarks);
+                    cmd.Parameters.AddWithValue("@PorterId", string.IsNullOrEmpty(item.PorterId) ? "" : item.PorterId);
+                    cmd.Parameters.AddWithValue("@UserId", userid);
+                    cmd.Parameters.AddWithValue("@Language", Language);
 
-        //                SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-        //                con.Open();
-        //                adpt.Fill(ds);
-        //                Rslt = ds.Tables[0].Rows[0]["result"].ToString();
-        //                if (Rslt.ToUpper() == "TRUE")
-        //                {
-        //                    result.CategoryName = ds.Tables[1].Rows[0]["Category"].ToString();
-        //                    result.Status = "true";
-        //                    result.Result = "Request created successfully";
-        //                    result.RequestNo = ds.Tables[0].Rows[0]["RequestNo"].ToString();
+                    SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+                    con.Open();
+                    adpt.Fill(ds);
 
-        //                }
-        //                else
-        //                {
-        //                    result.CategoryName = ds.Tables[1].Rows[0]["Category"].ToString();
-        //                    result.Status = "false";
-        //                    result.Result = Rslt;
-        //                    result.RequestNo = "";
+                    if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+                    {
+                        result.Status = "false";
+                        result.Result = "No response received from database";
+                        result.RequestNo = "";
+                        result.CategoryName = "";
+                        return result;
+                    }
 
+                    Rslt = ds.Tables[0].Rows[0]["Result"].ToString();
+                    result.RequestNo = ds.Tables[0].Rows[0]["RequestNo"].ToString();
 
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        InsertError(ex.Message, "da requrstcr", HosIdC);
-        //        result.Status = "false";
-        //        result.Result = Rslt;
-        //        result.RequestNo = "";
-        //        result.CategoryName = ds.Tables[1].Rows[0]["Category"].ToString();
-        //    }
+                    if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0 && ds.Tables[1].Columns.Contains("Category"))
+                        result.CategoryName = ds.Tables[1].Rows[0]["Category"].ToString();
+                    else
+                        result.CategoryName = "";
 
-        //    return result;
-        //}
+                    if (Rslt.Equals("TRUE", StringComparison.OrdinalIgnoreCase))
+                    {
+                        result.Status = "true";
+                        result.Result = "Video request created successfully";
+                    }
+                    else
+                    {
+                        result.Status = "false";
+                        result.Result = Rslt;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                try { InsertError(ex.ToString(), "da videocr", realConn); } catch { }
+                result.Status = "false";
+                result.Result = string.IsNullOrEmpty(Rslt) ? "An error occurred while creating video request" : Rslt;
+                result.RequestNo = "";
+                result.CategoryName = "";
+            }
+            return result;
+        }
+
         public static DataTable RequestInsert(RequestCreate loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_REQUESTINSERT", Con);
@@ -1653,13 +1493,10 @@ namespace Traczo.Models
             return dt;
         }
 
-
-      
-
         public static DataSet AdhocRequestInsert(AdhocRequestCreate loc, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_ADHOCREQUESTINSERT", Con);
@@ -1696,7 +1533,7 @@ namespace Traczo.Models
         public static DataTable AdhocOfflineInsert(AdhocRequestCreate loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_ADHOCREQUESTINSERT", Con);
@@ -1732,7 +1569,7 @@ namespace Traczo.Models
         public static DataTable DeleteUserAccount(UserAccount loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_DeleteUserAccount", Con);
@@ -1759,7 +1596,7 @@ namespace Traczo.Models
         public static DataTable PTTLogDa(PTTLog loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_AddPttLog", Con);
@@ -1767,7 +1604,7 @@ namespace Traczo.Models
 
                 cmd.Parameters.AddWithValue("@UserID", loc.PorterId);
                 cmd.Parameters.AddWithValue("@IMEINo", loc.IMEINo);
-                cmd.Parameters.AddWithValue("@Log", loc.Log); 
+                cmd.Parameters.AddWithValue("@Log", loc.Log);
 
                 cmd.CommandType = CommandType.StoredProcedure;
                 SqlDataAdapter adpt = new SqlDataAdapter(cmd);
@@ -1786,7 +1623,7 @@ namespace Traczo.Models
         public static DataTable Updatevoicefeed(VoiceFbkMdl loc)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[HosIdC].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(HosIdC));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_updatevoicefeedback", Con);
@@ -1812,7 +1649,7 @@ namespace Traczo.Models
         public static DataTable ProfileDetails(ProfileDetails loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GetProfileDetails", Con);
@@ -1839,7 +1676,7 @@ namespace Traczo.Models
         public static DataSet AddCleaningRequest(string userid, string requestid, string checklistid, string val, string before, string after, string photo, string InputType, string alldata, string sts, string rmks, string starttim, string endtim, string process, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("[SP_AddCleaningRequest]", Con);
@@ -1882,7 +1719,7 @@ namespace Traczo.Models
         public static DataTable GetBuzzerList(string ptype, string alertid, string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_ALERTRAISEDLIST", Con);
@@ -1907,7 +1744,7 @@ namespace Traczo.Models
         public static DataSet DaCateringRemarks(string process, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_CATERINGREMARKS", Con);
@@ -1931,7 +1768,7 @@ namespace Traczo.Models
         public static DataTable PorterRemarks(string process, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_PORTERREMARKS", Con);
@@ -1954,7 +1791,7 @@ namespace Traczo.Models
         public static DataTable StartEndCleanTask(StartCompleteClnTask loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_StartCompleteCleanTask", Con);
@@ -1994,10 +1831,10 @@ namespace Traczo.Models
             }
             return dt;
         }
-         public static DataTable StartEndTask(StartCompleteTask loc, string conStr)
+        public static DataTable StartEndTask(StartCompleteTask loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_StartCompleteTask", Con);
@@ -2007,7 +1844,6 @@ namespace Traczo.Models
                 cmd.Parameters.AddWithValue("@PorterRemarks", loc.PorterRemarks);
                 cmd.Parameters.AddWithValue("@StartTime", loc.StartTime);
                 cmd.Parameters.AddWithValue("@EndTime", loc.EndTime);
-                //   cmd.Parameters.AddWithValue("@RemarksId", Convert.ToInt32(loc.RemarksId));
                 cmd.Parameters.AddWithValue("@Name", (loc.Name));
                 cmd.Parameters.AddWithValue("@PhoneNo", (loc.PhoneNo));
                 cmd.Parameters.AddWithValue("@CatSignFName", (loc.CateringSign));
@@ -2020,7 +1856,7 @@ namespace Traczo.Models
                 Con.Open();
                 adpt.Fill(dt);
             }
-            catch (Exception ex) { InsertError(ex.Message, "SP_StartCompleteTask "+loc.Process+":" + loc.RequestId, conStr); }
+            catch (Exception ex) { InsertError(ex.Message, "SP_StartCompleteTask " + loc.Process + ":" + loc.RequestId, conStr); }
             finally
             {
                 if (Con.State == ConnectionState.Open)
@@ -2032,7 +1868,7 @@ namespace Traczo.Models
         public static DataTable CleaningTaskHistory(GetCatCleanTaskHistory loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GETCLEANINGTASKHIS", Con);
@@ -2056,7 +1892,7 @@ namespace Traczo.Models
         public static DataTable PorterTaskHistory(GetPorterTaskHistory loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GETPORTERTASKHIS", Con);
@@ -2079,7 +1915,7 @@ namespace Traczo.Models
         public static DataSet DACateringGroup(string prs, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GETCATERINGGROUP", Con);
@@ -2101,7 +1937,7 @@ namespace Traczo.Models
         public static DataSet DACateringTasks(GetPorterTasks loc, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GETCATERINGTASK", Con);
@@ -2123,7 +1959,7 @@ namespace Traczo.Models
         public static DataSet DAPorterTasks(GetPorterTasks loc, string conStr)
         {
             DataSet dt = new DataSet();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_GETPORTERTASK", Con);
@@ -2142,42 +1978,11 @@ namespace Traczo.Models
             }
             return dt;
         }
-        /*  public static DataSet getRecords(string SpName)
-          {
-              DataSet ds = new DataSet();
-              SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings["cineConn"].ToString());
-              SqlCommand cmd = new SqlCommand(SpName, Con);
-              cmd.CommandType = CommandType.StoredProcedure;
-              try
-              {
-                  SqlDataAdapter adpt = new SqlDataAdapter(cmd); Con.Open();
-                  adpt.Fill(ds);
-              }
-              catch (Exception ex)
-              {
-                  InsertError(ex.Message, SpName,);
-              }
-              finally
-              {
-                  while (ds.Tables.Count == 0)
-                  {
-                      SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-                      if (Con.State == ConnectionState.Closed)
-                          Con.Open();
-                      adpt.Fill(ds);
-                  }
-                  if (Con.State == ConnectionState.Open)
-                      Con.Close();
-              }
-              return ds;
-          }
-
-      */
 
         public static DataTable DaMessage(ProMessages loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_MessageDetails", Con);
@@ -2206,164 +2011,122 @@ namespace Traczo.Models
         public static DataTable GetRequestedDepByPatientID(string patId, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            string realConn = GetRealConnectionString(conStr);
             try
             {
-                SqlCommand cmd = new SqlCommand("SP_GETREQUESTEDDEPBYPATIENTID", Con);
-                cmd.Parameters.AddWithValue("@PATIENT_ID", patId);
-                cmd.CommandType = CommandType.StoredProcedure;
-                SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-                Con.Open();
-                adpt.Fill(dt);
+                using (SqlConnection Con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("SP_GETREQUESTEDDEPBYPATIENTID", Con))
+                {
+                    cmd.Parameters.AddWithValue("@PATIENT_ID", patId);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+                    Con.Open();
+                    adpt.Fill(dt);
+                }
             }
-            catch (Exception ex) { InsertError(ex.Message, "SP_GETREQUESTEDDEPBYPATIENTID", conStr); }
-            finally
-            {
-                if (Con.State == ConnectionState.Open)
-                    Con.Close();
-            }
+            catch (Exception ex) { InsertError(ex.Message, "SP_GETREQUESTEDDEPBYPATIENTID", realConn); }
             return dt;
         }
 
         public static DataTable GetVideoCategories(string conStr)
         {
             DataTable dt = new DataTable();
+            string realConn = GetRealConnectionString(conStr);
             try
             {
-                using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+                using (SqlConnection con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("sp_GetEducationCategories", con))
                 {
-                    using (SqlCommand cmd = new SqlCommand("sp_GetEducationCategories", con))
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                        {
-                            da.Fill(dt);
-                        }
+                        da.Fill(dt);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                InsertError(ex.ToString(), "GetVideoCategories", conStr);
-            }
+            catch (Exception ex) { InsertError(ex.ToString(), "GetVideoCategories", realConn); }
             return dt;
         }
 
         public static DataTable ProcessAdtEvent(int patientId, string eventType, string newRoom, string newBed, string newBedID, string reason, string conStr)
         {
             DataTable dt = new DataTable();
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
+            string realConn = GetRealConnectionString(conStr);
+            try
             {
-                try
+                using (SqlConnection con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("SP_PROCESS_ADT_FEED", con))
                 {
-                    using (SqlCommand cmd = new SqlCommand("SP_PROCESS_ADT_FEED", con))
-                    {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@PatientId", patientId);
-                        cmd.Parameters.AddWithValue("@EventType", eventType);
-                        cmd.Parameters.AddWithValue("@NewRoom", string.IsNullOrEmpty(newRoom) ? (object)DBNull.Value : newRoom);
-                        cmd.Parameters.AddWithValue("@NewBed", string.IsNullOrEmpty(newBed) ? (object)DBNull.Value : newBed);
-                        cmd.Parameters.AddWithValue("@NewBedID", string.IsNullOrEmpty(newBedID) ? (object)DBNull.Value : newBedID);
-                        cmd.Parameters.AddWithValue("@Reason", string.IsNullOrEmpty(reason) ? (object)DBNull.Value : reason);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PatientId", patientId);
+                    cmd.Parameters.AddWithValue("@EventType", eventType);
+                    cmd.Parameters.AddWithValue("@NewRoom", string.IsNullOrEmpty(newRoom) ? (object)DBNull.Value : newRoom);
+                    cmd.Parameters.AddWithValue("@NewBed", string.IsNullOrEmpty(newBed) ? (object)DBNull.Value : newBed);
+                    cmd.Parameters.AddWithValue("@NewBedID", string.IsNullOrEmpty(newBedID) ? (object)DBNull.Value : newBedID);
+                    cmd.Parameters.AddWithValue("@Reason", string.IsNullOrEmpty(reason) ? (object)DBNull.Value : reason);
 
-                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
-                        {
-                            da.Fill(dt);
-                        }
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        da.Fill(dt);
                     }
                 }
-                catch (Exception ex)
-                {
-                    InsertError(ex.ToString(), "SP_PROCESS_ADT_FEED", conStr);
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                InsertError(ex.ToString(), "SP_PROCESS_ADT_FEED", realConn);
+                throw;
             }
             return dt;
         }
 
-        //public static DataTable GetFeedbackDepartmentByPatientID(string patId, string conStr)
-        //{   DataTable dt = new DataTable();
-        //    SqlConnection Con = new SqlConnection(
-        //    ConfigurationManager.ConnectionStrings[conStr].ToString());
-        //    try
-        //    {
-        //        SqlCommand cmd = new SqlCommand("SP_GETFEEDBACKDEPARTMENTBYPATIENTID", Con);
-        //        cmd.Parameters.AddWithValue("@PATIENT_ID", patId);
-        //        cmd.CommandType = CommandType.StoredProcedure;
-        //        SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-        //        Con.Open();
-        //        adpt.Fill(dt);
-        //    }
-        //    catch (Exception ex)
-        //    {  
-        //        InsertError(
-        //            ex.Message, "SP_GETFEEDBACKDEPARTMENTBYPATIENTID", conStr);
-        //    }
-        //    finally
-        //    {
-        //        if (Con.State == ConnectionState.Open)
-        //            Con.Close();
-        //    }
-        //    return dt;
-        //}
-
         public static DataTable GetAllFeedbackDepartments(string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            string realConn = GetRealConnectionString(conStr);
             try
             {
-                SqlCommand cmd = new SqlCommand("SP_GETALLFEEDBACKDEPARTMENTS", Con);
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                SqlDataAdapter adpt = new SqlDataAdapter(cmd);
-                Con.Open();
-                adpt.Fill(dt);
+                using (SqlConnection Con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("SP_GETALLFEEDBACKDEPARTMENTS", Con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    SqlDataAdapter adpt = new SqlDataAdapter(cmd);
+                    Con.Open();
+                    adpt.Fill(dt);
+                }
             }
-            catch (Exception ex)
-            {
-                InsertError(ex.Message, "SP_GETALLFEEDBACKDEPARTMENTS", conStr);
-            }
-            finally
-            {
-                if (Con.State == ConnectionState.Open)
-                    Con.Close();
-            }
+            catch (Exception ex) { InsertError(ex.Message, "SP_GETALLFEEDBACKDEPARTMENTS", realConn); }
             return dt;
         }
 
         public static DataTable SendFeedback(string patientId, string sessionId, string feedbackJson, string conStr)
         {
             DataTable dt = new DataTable();
-
-            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString()))
-            using (SqlCommand cmd = new SqlCommand("SP_SENDFEEDBACK", con))
-            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            string realConn = GetRealConnectionString(conStr);
+            try
             {
-                cmd.CommandType = CommandType.StoredProcedure;
-
-                cmd.Parameters.AddWithValue("@PATIENT_ID", (object)patientId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@SESSION_ID", (object)sessionId ?? DBNull.Value);
-                cmd.Parameters.AddWithValue("@FEEDBACKDATA", (object)feedbackJson ?? DBNull.Value);
-
-                try
+                using (SqlConnection con = new SqlConnection(realConn))
+                using (SqlCommand cmd = new SqlCommand("SP_SENDFEEDBACK", con))
+                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@PATIENT_ID", (object)patientId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@SESSION_ID", (object)sessionId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FEEDBACKDATA", (object)feedbackJson ?? DBNull.Value);
                     da.Fill(dt);
                 }
-                catch (Exception ex)
-                {
-                    InsertError(ex.ToString(), "SP_SENDFEEDBACK", conStr);
-                    throw;  
-                }
             }
-
+            catch (Exception ex)
+            {
+                InsertError(ex.ToString(), "SP_SENDFEEDBACK", realConn);
+                throw;
+            }
             return dt;
         }
 
         public static DataTable AdhocEndTask(AdHocCompleteTask loc, string conStr)
         {
             DataTable dt = new DataTable();
-            SqlConnection Con = new SqlConnection(ConfigurationManager.ConnectionStrings[conStr].ToString());
+            SqlConnection Con = new SqlConnection(GetRealConnectionString(conStr));
             try
             {
                 SqlCommand cmd = new SqlCommand("SP_AdhocComplete", Con);

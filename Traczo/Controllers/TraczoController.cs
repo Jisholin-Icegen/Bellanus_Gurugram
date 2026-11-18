@@ -34,9 +34,24 @@ namespace Traczo.Controllers
     [RoutePrefix("Traczo")]
 
     [EnableCors(origins: "*", headers: "*", methods: "*")]
+    [TenantInterceptor]
     public class TraczoController : ApiController
     {
-        string conStr = string.Empty, hosID = string.Empty, rslt = string.Empty; bool rtnBool = false;
+        string hosID = string.Empty, rslt = string.Empty;
+        bool rtnBool = false;
+
+        public string conStr
+        {
+            get
+            {
+                object v;
+                if (Request != null && Request.Properties.TryGetValue("XTenantConnStr", out v))
+                    return v.ToString();
+                return DataAccess.HosIdC;
+            }
+            set { }
+        }
+
         public TraczoController()
         {
             //<add name="traczomain" connectionString="Data Source=DESKTOP-6SCV78N;Initial Catalog=Trac;Timeout=1000;User ID=sa;Password=icegen;Connection Timeout=300;" />
@@ -93,7 +108,7 @@ namespace Traczo.Controllers
 
                         var result = JsonConvert.DeserializeObject<PatientHisRes>(rst);
 
-                        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[DataAccess.HosIdC].ToString()))
+                        using (SqlConnection con = new SqlConnection(DataAccess.GetRealConnectionString(DataAccess.HosIdC)))
                         {
                             using (SqlCommand cmd = new SqlCommand("sp_insertHISProfile", con))
                             {
@@ -170,7 +185,7 @@ namespace Traczo.Controllers
                         try
                         {
                             // Save to DB
-                            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings[DataAccess.HosIdC].ToString()))
+                            using (SqlConnection con = new SqlConnection(DataAccess.GetRealConnectionString(DataAccess.HosIdC)))
                             {
                                 using (SqlCommand cmd = new SqlCommand("sp_insertHISProfile", con))
                                 {
@@ -432,6 +447,7 @@ namespace Traczo.Controllers
                new { status = false, message = ex.Message });
             }
         }
+
         [HttpPost]
         [Route("GetDepartmentDetails")]
         public HttpResponseMessage GetDepartmentDetails([FromBody] DepCategoryI dpI)
@@ -445,24 +461,20 @@ namespace Traczo.Controllers
                         new { status = false, message = "Invalid request" });
                 }
 
-                Dictionary<string, object> dynamicCategories = DataAccess.GetDynamicCategories(dpI.LocationName, dpI.ImeiNumber, dpI.FcmToken, DataAccess.HosIdC, "get");
-
+                Dictionary<string, object> dynamicCategories = DataAccess.GetDynamicCategories(dpI.LocationName, dpI.ImeiNumber, dpI.FcmToken, conStr, "get");
 
                 var response = new
                 {
                     status = true,
                     message = dynamicCategories.Count(x => x.Value is List<CategoryItem>) + " Records found",
-                    data =
-                        dynamicCategories
-
+                    data = dynamicCategories
                 };
-
 
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
             {
-                DataAccess.InsertError(ex.Message, "getdepcategory", DataAccess.HosIdC);
+                DataAccess.InsertError(ex.Message, "getdepcategory", conStr);
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,
                new { status = false, message = ex.Message });
             }
@@ -1831,7 +1843,7 @@ namespace Traczo.Controllers
 
                 foreach (var item in request.Tasks)
                 {
-                    TaskResult res = DataAccess.ReqCreationNew(item, request.From, request.To, request.ConversationId, request.Gender, request.user, request.Language);
+                    TaskResult res = DataAccess.ReqCreationNew(item, request.From, request.To, request.ConversationId, request.Gender, request.user, request.Language, conStr);
 
                     results.Add(res);
                 }
@@ -1869,7 +1881,6 @@ namespace Traczo.Controllers
         [Route("FoodOrdering")]
         public HttpResponseMessage SubmitAIFoodOrders([FromBody] FoodOrderAISlimRequest request)
         {
-            conStr = DataAccess.HosIdC;
             try
             {
                 if (request == null || request.Orders == null || request.Orders.Count == 0)
@@ -1891,13 +1902,6 @@ namespace Traczo.Controllers
                     if (r.QUANTITY <= 0)
                         return Request.CreateResponse(HttpStatusCode.BadRequest,
                             new { status = false, message = $"Row {i + 1}: QUANTITY must be > 0", data = new List<object>() });
-                }
-
-                if (!string.IsNullOrWhiteSpace(request.HospitalId))
-                {
-                    var dec = AesOperation.DecryptString(request.HospitalId);
-                    var parts = dec.Split('_');
-                    if (parts.Length > 1) conStr = parts[1];
                 }
 
                 foreach (var r in request.Orders)
@@ -1990,7 +1994,8 @@ namespace Traczo.Controllers
                         request.ConversationId,
                         request.Gender,
                         request.user,
-                        request.Language);
+                        request.Language,
+                        conStr);
 
                     results.Add(res);
                 }
@@ -2147,75 +2152,64 @@ namespace Traczo.Controllers
 
         [HttpGet]
         [Route("GetRequestedDepByPatientID")]
-        public HttpResponseMessage GetRequestedDepByPatientID(string PatID, string HosID)
+        public HttpResponseMessage GetRequestedDepByPatientID(
+            string PatID,
+            string HosID = null,
+            [FromUri(Name = "X-Tenant-ID")] string tenantId = null)
         {
-            rslt = "FALSE"; DataTable dt = new DataTable();
+
+            string tenantConn = conStr;
+
+            if (string.IsNullOrWhiteSpace(PatID))
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new
+                {
+                    status = false,
+                    message = "PatID is required",
+                    data = new { }
+                });
+            }
+
             try
             {
-                if (!string.IsNullOrWhiteSpace(PatID))
+                DataTable dt = DataAccess.GetRequestedDepByPatientID(PatID.Trim(), tenantConn);
+
+                var departments = (dt == null)
+                    ? new List<string>()
+                    : dt.AsEnumerable()
+                        .Select(r => Convert.ToString(r["DEPARTMENTNAME"]))
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Distinct()
+                        .ToList();
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
                 {
-                    if (!string.IsNullOrWhiteSpace(HosID))
-                    {
-                        var dec = AesOperation.DecryptString(HosID);
-                        hosID = dec.Split('_')[0];
-                        conStr = dec.Split('_')[1];
-                    }
-                    else
-                    {
-                        conStr = DataAccess.HosIdC;
-                    }
-
-                    dt = DataAccess.GetRequestedDepByPatientID(PatID, conStr);
-
-                    if (dt != null && dt.Rows.Count > 0)
-                    {
-                        var departments = dt.AsEnumerable()
-                                            .Select(r => Convert.ToString(r["DEPARTMENTNAME"]))
-                                            .Where(x => !string.IsNullOrEmpty(x))
-                                            .ToList();
-
-                        rslt = " {\"status\": true,\"message\": \"" + departments.Count + " Departments found\",\"data\": {\"Departments\":[\"" + string.Join("\",\"", departments) + "\"]}}";
-                    }
-                    else
-                    {
-                        rslt = " {\"status\": true,\"message\": \"No departments found\",\"data\": {\"Departments\":[]}}";
-                    }
-                    rtnBool = true;
-                }
-                else
-                {
-                    rtnBool = false;
-                }
+                    status = true,
+                    message = departments.Count > 0
+                        ? departments.Count + " Departments found"
+                        : "No departments found",
+                    data = new { Departments = departments }
+                });
             }
             catch (Exception ex)
             {
-                DataAccess.InsertError(ex.ToString(), "GetRequestedDepByPatientID", conStr);
-                rtnBool = false;
+                DataAccess.InsertError(ex.ToString(), "GetRequestedDepByPatientID", tenantConn);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, new
+                {
+                    status = false,
+                    message = "An error occurred while processing request",
+                    data = new { }
+                });
             }
-
-            rslt = rtnBool ? rslt : " {\"status\": false,\"message\": \"Please check the data.\",\"data\": { } }";
-
-            return Request.CreateResponse(HttpStatusCode.OK, JsonConvert.DeserializeObject(rslt));
         }
 
         [HttpGet]
         [Route("GetVideoCategories")]
-        public HttpResponseMessage GetVideoCategories(string HospitalID)
+        public HttpResponseMessage GetVideoCategories()
         {
             rslt = "FALSE"; DataTable dt = new DataTable();
             try
             {
-                if (!string.IsNullOrWhiteSpace(HospitalID))
-                {
-                    var dec = AesOperation.DecryptString(HospitalID);
-                    hosID = dec.Split('_')[0];
-                    conStr = dec.Split('_')[1];
-                }
-                else
-                {
-                    conStr = DataAccess.HosIdC;
-                }
-
                 dt = DataAccess.GetVideoCategories(conStr);
 
                 if (dt != null && dt.Rows.Count > 0)
@@ -2242,14 +2236,13 @@ namespace Traczo.Controllers
                 }
                 rtnBool = true;
             }
-            catch (Exception ex)    
+            catch (Exception ex)
             {
                 DataAccess.InsertError(ex.ToString(), "GetVideoCategories", conStr);
                 rtnBool = false;
             }
 
             rslt = rtnBool ? rslt : " {\"status\": false,\"message\": \"Please check the data.\",\"data\": { } }";
-
             return Request.CreateResponse(HttpStatusCode.OK, JsonConvert.DeserializeObject(rslt));
         }
 
@@ -2257,8 +2250,6 @@ namespace Traczo.Controllers
         [Route("ProcessAdtEvent")]
         public HttpResponseMessage ProcessAdtEvent([FromBody] AdtEventRequest request)
         {
-            conStr = DataAccess.HosIdC;
-
             try
             {
                 if (request == null || request.PatientId <= 0 || string.IsNullOrWhiteSpace(request.EventType))
@@ -2310,27 +2301,11 @@ namespace Traczo.Controllers
 
         [HttpGet]
         [Route("GetFeedbackDepartments")]
-        public HttpResponseMessage GetFeedbackDepartments(string HosID)
+        public HttpResponseMessage GetFeedbackDepartments()
         {
             try
             {
-                string conStrName = "";
-
-                if (!string.IsNullOrWhiteSpace(HosID))
-                {
-                    var dec = AesOperation.DecryptString(HosID);
-                    var parts = dec.Split('_');
-                    if (parts.Length > 1)
-                    {
-                        conStrName = parts[1];
-                    }
-                }
-                else
-                {
-                    conStrName = DataAccess.HosIdC;
-                }
-
-                DataTable dt = DataAccess.GetAllFeedbackDepartments(conStrName);
+                DataTable dt = DataAccess.GetAllFeedbackDepartments(conStr);
 
                 var departments = dt.AsEnumerable()
                     .Where(r => !string.IsNullOrWhiteSpace(Convert.ToString(r["DEPARTMENTKEY"])))
@@ -2358,8 +2333,7 @@ namespace Traczo.Controllers
             }
             catch (Exception ex)
             {
-                DataAccess.InsertError(ex.ToString(), "GetFeedbackDepartments", HosID);
-
+                DataAccess.InsertError(ex.ToString(), "GetFeedbackDepartments", conStr);
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
                     status = false,
@@ -2404,19 +2378,8 @@ namespace Traczo.Controllers
             if (invalidRatings.Count > 0)
                 return Fail($"Invalid ratings for: {string.Join(", ", invalidRatings)}. Allowed: satisfied, neutral, unsatisfied");
 
-            string conStr = null;
-
             try
             {
-                var dec = AesOperation.DecryptString(request.hospital_id);
-
-                var parts = dec.Split('_');
-                if (parts.Length < 2)
-                    return Fail("Invalid hospital_id format");
-
-                hosID = parts[0];
-                conStr = parts[1];
-
                 var normalized = source.ToDictionary(
                     kv => kv.Key,
                     kv => new
@@ -2429,9 +2392,7 @@ namespace Traczo.Controllers
                     });
 
                 string payload = JsonConvert.SerializeObject(normalized);
-
-                DataTable dt = DataAccess.SendFeedback(
-                    request.patient_id, request.session_id, payload, conStr);
+                DataTable dt = DataAccess.SendFeedback(request.patient_id, request.session_id, payload, conStr);
 
                 var saved = new List<object>();
 
@@ -2455,8 +2416,7 @@ namespace Traczo.Controllers
             }
             catch (Exception ex)
             {
-                if (!string.IsNullOrWhiteSpace(conStr))
-                    DataAccess.InsertError(ex.ToString(), "sendFeedback", conStr);
+                DataAccess.InsertError(ex.ToString(), "sendFeedback", conStr);
 
                 return Request.CreateResponse(HttpStatusCode.InternalServerError,
                     new
@@ -2806,7 +2766,6 @@ namespace Traczo.Controllers
         {
             bool Rslt = false;
             string sts = "GET";
-            conStr = DataAccess.HosIdC;
             try
             {
                 if (request == null)
@@ -5680,7 +5639,6 @@ namespace Traczo.Controllers
         }
 
 
-
         //supervisortask app end
 
         //cleaning start
@@ -5934,7 +5892,27 @@ namespace Traczo.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, rtnRst);
         }
 
+        protected string TenantDb
+        {
+            get
+            {
+                object v;
+                if (Request != null && Request.Properties.TryGetValue("XTenantConnStr", out v))
+                    return v.ToString();
+                return DataAccess.HosIdC;
+            }
+        }
 
+        protected string TenantHospitalId
+        {
+            get
+            {
+                object v;
+                if (Request != null && Request.Properties.TryGetValue("XTenantHospitalId", out v))
+                    return v.ToString();
+                return "";
+            }
+        }
         //end
     }
 }

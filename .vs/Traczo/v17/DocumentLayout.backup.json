@@ -1,32 +1,37 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\",
+  "WorkspaceRootPath": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\traczo\\controllers\\traczocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\controllers\\traczocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\traczo\\controllers\\tenantinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\controllers\\tenantinterceptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\traczo\\models\\traczomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-api_v2\\traczo\\models\\traczomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\models\\traczomodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|d:\\project\\bmc\\web qr api applictaion\\api\\bmc_traczo_api\\traczo\\models\\dataaccess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\models\\dataaccess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\traczo\\controllers\\traczocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\controllers\\traczocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Temp\\.vsdbgsrc\\8215ba68b5def1d7c089bb45c721de05f71f6505ec69547e780264fcd517655a\\ReflectedHttpActionDescriptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-api_v2\\traczo\\textfile1.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\textfile1.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Icege\\AppData\\Local\\SourceServer\\686d4d4d2f98378d9e22f563c4f119d31797e2668ede7a8ed7324758f8b28cc6\\src\\Microsoft.Owin.Host.SystemWeb\\IntegratedPipeline\\IntegratedPipelineContextStage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\traczo\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\traczo\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
       "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\web.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\traczo\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\traczo\\models\\dataaccess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\models\\dataaccess.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|d:\\project\\bellanus \u0026 gurugram\\git codes\\multitenant-api_v2\\traczo\\controllers\\skiptenantattribute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{96EB9BE7-9BAA-4CD3-82C8-BEC7288C526E}|Traczo\\Traczo.csproj|solutionrelative:traczo\\controllers\\skiptenantattribute.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Temp\\.vsdbgsrc\\8215ba68b5def1d7c089bb45c721de05f71f6505ec69547e780264fcd517655a\\ReflectedHttpActionDescriptor.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -36,7 +41,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -49,6 +54,45 @@
             {
               "$type": "Document",
               "DocumentIndex": 3,
+              "Title": "TextFile1.txt",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\TextFile1.txt",
+              "RelativeDocumentMoniker": "Traczo\\TextFile1.txt",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\TextFile1.txt",
+              "RelativeToolTip": "Traczo\\TextFile1.txt",
+              "ViewState": "AgIAAH8AAAAAAAAAAADgv/0AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
+              "WhenOpened": "2026-11-18T04:36:55.47Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "SkipTenantAttribute.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\SkipTenantAttribute.cs",
+              "RelativeDocumentMoniker": "Traczo\\Controllers\\SkipTenantAttribute.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\SkipTenantAttribute.cs",
+              "RelativeToolTip": "Traczo\\Controllers\\SkipTenantAttribute.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-18T04:24:26.346Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "TenantInterceptor.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\TenantInterceptor.cs",
+              "RelativeDocumentMoniker": "Traczo\\Controllers\\TenantInterceptor.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\TenantInterceptor.cs",
+              "RelativeToolTip": "Traczo\\Controllers\\TenantInterceptor.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-11-15T07:55:30.256Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "ReflectedHttpActionDescriptor.cs",
               "DocumentMoniker": "C:\\Temp\\.vsdbgsrc\\8215ba68b5def1d7c089bb45c721de05f71f6505ec69547e780264fcd517655a\\ReflectedHttpActionDescriptor.cs",
               "ToolTip": "C:\\Temp\\.vsdbgsrc\\8215ba68b5def1d7c089bb45c721de05f71f6505ec69547e780264fcd517655a\\ReflectedHttpActionDescriptor.cs [Read Only]",
@@ -60,22 +104,12 @@
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "IntegratedPipelineContextStage.cs",
-              "DocumentMoniker": "C:\\Users\\Icege\\AppData\\Local\\SourceServer\\686d4d4d2f98378d9e22f563c4f119d31797e2668ede7a8ed7324758f8b28cc6\\src\\Microsoft.Owin.Host.SystemWeb\\IntegratedPipeline\\IntegratedPipelineContextStage.cs",
-              "ToolTip": "C:\\Users\\Icege\\AppData\\Local\\SourceServer\\686d4d4d2f98378d9e22f563c4f119d31797e2668ede7a8ed7324758f8b28cc6\\src\\Microsoft.Owin.Host.SystemWeb\\IntegratedPipeline\\IntegratedPipelineContextStage.cs",
-              "ViewState": "AgIAAEIAAAAAAAAAAAD4v1MAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-10-29T10:06:26.394Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
               "Title": "Web.config",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Web.config",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Web.config",
               "RelativeDocumentMoniker": "Traczo\\Web.config",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Web.config",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Web.config",
               "RelativeToolTip": "Traczo\\Web.config",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
               "WhenOpened": "2026-09-12T05:21:52.667Z",
               "EditorCaption": ""
@@ -84,52 +118,40 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "TraczoModel.cs",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Models\\TraczoModel.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Models\\TraczoModel.cs",
               "RelativeDocumentMoniker": "Traczo\\Models\\TraczoModel.cs",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Models\\TraczoModel.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Models\\TraczoModel.cs",
               "RelativeToolTip": "Traczo\\Models\\TraczoModel.cs",
-              "ViewState": "AgIAACMBAAAAAAAAAAAswDUBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAHUEAAAAAAAAAAAAAJEEAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-12T04:46:23.916Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 5,
               "Title": "DataAccess.cs",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Models\\DataAccess.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Models\\DataAccess.cs",
               "RelativeDocumentMoniker": "Traczo\\Models\\DataAccess.cs",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Models\\DataAccess.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Models\\DataAccess.cs",
               "RelativeToolTip": "Traczo\\Models\\DataAccess.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAiwCcAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAN8GAAAAAAAAAAAAAFYIAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-12T04:46:19.443Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "TraczoController.cs",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Controllers\\TraczoController.cs",
+              "DocumentMoniker": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\TraczoController.cs",
               "RelativeDocumentMoniker": "Traczo\\Controllers\\TraczoController.cs",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Controllers\\TraczoController.cs",
+              "ToolTip": "D:\\PROJECT\\BELLANUS \u0026 GURUGRAM\\GIT CODES\\MULTITENANT-API_V2\\Traczo\\Controllers\\TraczoController.cs",
               "RelativeToolTip": "Traczo\\Controllers\\TraczoController.cs",
-              "ViewState": "AgIAABsLAAAAAAAAAAAUwCoLAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAMXAAAAAAAAAAAqwBoXAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-09-12T04:34:59.449Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Startup.cs",
-              "DocumentMoniker": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Startup.cs",
-              "RelativeDocumentMoniker": "Traczo\\Startup.cs",
-              "ToolTip": "D:\\PROJECT\\BMC\\WEB QR API Applictaion\\API\\BMC_Traczo_API\\Traczo\\Startup.cs",
-              "RelativeToolTip": "Traczo\\Startup.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAiwBMAAAApAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-31T08:28:48.547Z"
             }
           ]
         }

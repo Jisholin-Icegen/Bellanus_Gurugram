@@ -1,4 +1,6 @@
-﻿
+﻿using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,7 +15,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Traczo.Models
 {
-    public class PatientRequest
+    public class PatientRequest : TenantBase
     {
         public string userId { get; set; }
         public string LocationId { get; set; }
@@ -61,9 +63,9 @@ namespace Traczo.Models
 
     //dial 50 start
 
-    public class AIRequest
+    public class AIRequest : TenantBase
     {
-        public string Prompt { get; set; }
+        //public string Prompt { get; set; }
     }
 
     public class FeedbackSaveResponse
@@ -79,7 +81,7 @@ namespace Traczo.Models
     }
 
 
-    public class FeedbackRequestJd
+    public class FeedbackRequestJd : TenantBase
     {
         public string convId { get; set; }
         public string user { get; set; }   // Room 402-A (display value)
@@ -94,7 +96,7 @@ namespace Traczo.Models
     }
 
 
-    public class FeedbackRequest
+    public class FeedbackRequest : TenantBase
     {
         public string Uhid { get; set; }
         public string BedNo { get; set; }
@@ -124,14 +126,14 @@ namespace Traczo.Models
         public string message { get; set; }
         public T data { get; set; }
     }
-    public class FeedbackResponse
+    public class FeedbackResponse : TenantBase
     {
         public List<FeedbackItem> Feedback { get; set; }
     }
 
 
 
-    public class BedTaskRequest
+    public class BedTaskRequest : TenantBase
     {
         public string BedNo { get; set; }
         public string BedId { get; set; }
@@ -183,10 +185,10 @@ namespace Traczo.Models
     {
         public string Result { get; set; }
         public string StoragePath { get; set; }
-        
+
     }
 
-    public class DepCategoryI
+    public class DepCategoryI : TenantBase
     {
 
 
@@ -224,33 +226,33 @@ namespace Traczo.Models
         public string DepartmentKey { get; set; }
         public string DepartmentName { get; set; }
         public string CategoryId { get; set; }
-        public string CategoryName { get; set; }        
+        public string CategoryName { get; set; }
         public string CategoryImage { get; set; }
         public string CategoryTitle { get; set; }
         public string CategoryDetails { get; set; }
         public string CategoryDescription { get; set; }
         public string DescriptionDetails { get; set; }
-        
+
         public string HisUrl { get; set; }
         public string Dial50url { get; set; }
 
         public string TaskTypeId { get; set; }
         public string SubLeveLDepId { get; set; }
 
-        
+
     }
 
 
-    public class FeedbackIp
+    public class FeedbackIp : TenantBase
     {
-        public string requestId { get; set; }       
+        public string requestId { get; set; }
         public string convId { get; set; }
         public string rating { get; set; }
         public string remarks { get; set; }
         public string status { get; set; }
     }
 
-    public class ConversationRequest
+    public class ConversationRequest : TenantBase
     {
         public string type { get; set; }
         public string status { get; set; }
@@ -275,14 +277,14 @@ namespace Traczo.Models
         public bool status { get; set; }
         public string message { get; set; }
         public GetProfileData data { get; set; }
-        
+
     }
     public class GetDepartmentData
     {
 
         public string DepartmentId { get; set; }
         public string DepartmentName { get; set; }
-         
+
 
     }
     public class GetProfileDataDep
@@ -293,7 +295,7 @@ namespace Traczo.Models
         public string gender { get; set; }
         public string age { get; set; }
         public string uhid { get; set; }
-      
+
     }
     public class GetProfileData
     {
@@ -312,11 +314,11 @@ namespace Traczo.Models
         public int tierLevel { get; set; }
     }
 
-    public class GetProfileIP
+    public class GetProfileIP : TenantBase
     {
         public string userId { get; set; }
         public string Status { get; set; }
-       
+
     }
 
     public class TaskResponse
@@ -334,15 +336,15 @@ namespace Traczo.Models
     public class TaskResult
     {
         public string CategoryName { get; set; }
-        public string Status { get; set; }  // "true" / "false" string as requested
+        public string Status { get; set; }
         public string Result { get; set; }
         public string RequestNo { get; set; }
-        
+
 
     }
     public class TaskResultnew
     {
-        public string Status { get; set; }  // "true" / "false" string as requested
+        public string Status { get; set; }
         public string Result { get; set; }
         public string RequestNo { get; set; }
         public string CategoryName { get; set; }
@@ -352,6 +354,7 @@ namespace Traczo.Models
     public class TaskRequest
     {
         public string HosId { get; set; }
+
         public string user { get; set; }
         public string From { get; set; }
         public string To { get; set; }
@@ -361,6 +364,7 @@ namespace Traczo.Models
 
         public List<TaskItem> Tasks { get; set; }
     }
+
     public class TaskItem
     {
         public string Category { get; set; }
@@ -406,7 +410,7 @@ namespace Traczo.Models
 
     }
 
-    public class MultiImageFiles
+    public class MultiImageFiles : TenantBase
     {
 
         [Required]
@@ -428,7 +432,7 @@ namespace Traczo.Models
         public PorterTaskDetails data { get; set; }
     }
 
-   
+
 
     public class RtnLogin
     {
@@ -456,7 +460,7 @@ namespace Traczo.Models
         public string CleaningZoneId { get; set; }
         public string CleaningZoneName { get; set; }
     }
-    public class ReturnPorterTaskList ///new
+    public class ReturnPorterTaskList
     {
         public bool status { get; set; }
         public string message { get; set; }
@@ -482,7 +486,7 @@ namespace Traczo.Models
     }
 
 
-    public class GetCatCleanTaskHistory
+    public class GetCatCleanTaskHistory : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -492,7 +496,7 @@ namespace Traczo.Models
         public string ServiceId { get; set; }
         public string Process { get; set; }
     }
-    public class GetPorterTaskHistory
+    public class GetPorterTaskHistory : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -733,7 +737,7 @@ namespace Traczo.Models
         public string MessageId { get; set; }
     }
 
-    public class Credentials
+    public class Credentials : TenantBase
     {
         [JsonProperty("username")]
         public string Username { get; set; }
@@ -762,7 +766,7 @@ namespace Traczo.Models
         public string Result { get; set; }
 
     }
-    public class BranchesIP
+    public class BranchesIP : TenantBase
     {
 
         public string ServerIp { get; set; }
@@ -793,28 +797,28 @@ namespace Traczo.Models
         public string data { get; set; }
     }
 
-    public class GetAdhocLocParam
+    public class GetAdhocLocParam : TenantBase
     {
         public string HospitalId { get; set; }
         public string PorterId { get; set; }
         public string Process { get; set; }
     }
 
-    public class ReqInfoReq
+    public class ReqInfoReq : TenantBase
     {
         public string Department { get; set; }
         public string Category { get; set; }
         public string ConversationId { get; set; }
     }
 
-    public class PorterTracReq
+    public class PorterTracReq : TenantBase
     {
         public string PorterId { get; set; }
         public string RequestId { get; set; }
         public string RequestStatusId { get; set; }
     }
 
-    public class PTTCall
+    public class PTTCall : TenantBase
     {
 
         public string PrivateCallId { get; set; }
@@ -826,7 +830,7 @@ namespace Traczo.Models
 
 
 
-    public class PorterMesssage
+    public class PorterMesssage : TenantBase
     {
         public string HospitalId { get; set; }
         public string PorterId { get; set; }
@@ -834,7 +838,7 @@ namespace Traczo.Models
         public string Process { get; set; }
     }
 
-    public class BTaskOnHold
+    public class BTaskOnHold : TenantBase
     {
         public string HospitalId { get; set; }
         public string PorterId { get; set; }
@@ -858,7 +862,7 @@ namespace Traczo.Models
     }
     public class CateringCleaningRemarks
     {
-        
+
         public List<CateringRem> CateringRemarks { get; set; }
         public List<CleaningRem> CleaningRemarks { get; set; }
 
@@ -920,7 +924,7 @@ namespace Traczo.Models
     public class LocationMacListQR
     {
         public List<LocationDetailsQR> qrLocations { get; set; }
-         
+
     }
     public class LocationDetailsQR
     {
@@ -1047,7 +1051,7 @@ namespace Traczo.Models
 
     }
 
-    public class DeleteDevice
+    public class DeleteDevice : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1056,7 +1060,7 @@ namespace Traczo.Models
 
     }
 
-    public class AlarmOffM
+    public class AlarmOffM : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1066,14 +1070,14 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class AutoAssginRequest
+    public class AutoAssginRequest : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
         public string Process { get; set; }
 
     }
-    public class RegisterDevice
+    public class RegisterDevice : TenantBase
     {
         public string DeviceId { get; set; }
         public string HospitalId { get; set; }
@@ -1088,7 +1092,84 @@ namespace Traczo.Models
 
     }
 
-    public class UserLogin
+    public class TenantBase
+    {
+        [JsonProperty(PropertyName = "X-Tenant-ID", NullValueHandling = NullValueHandling.Ignore)]
+        public string XTenentID { get; set; }
+    }
+
+    public static class TenantModeConfig
+    {
+        private static Tuple<bool, string> _cached;
+        private static DateTime _cachedAt = DateTime.MinValue;
+        private static readonly object _lock = new object();
+
+        public static bool IsMultiTenant
+        {
+            get { return Load().Item1; }
+        }
+
+        public static string SingleTenantId
+        {
+            get { return Load().Item2; }
+        }
+
+        public static void Reload()
+        {
+            lock (_lock)
+            {
+                _cached = null;
+                _cachedAt = DateTime.MinValue;
+            }
+        }
+
+        private static Tuple<bool, string> Load()
+        {
+            lock (_lock)
+            {
+                if (_cached != null && (DateTime.Now - _cachedAt).TotalSeconds < 5)
+                    return _cached;
+            }
+
+            bool multi = false;
+            string singleId = "van";
+            var entry = ConfigurationManager.ConnectionStrings["CentralDB"];
+            if (entry != null)
+            {
+                try
+                {
+                    using (var conn = new SqlConnection(entry.ConnectionString))
+                    using (var cmd = new SqlCommand("dbo.SP_GET_APP_CONFIG", conn))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@APPNAME", "api");
+                        conn.Open();
+                        object v = cmd.ExecuteScalar();
+                        if (v != null && v != DBNull.Value)
+                        {
+                            if (v is bool b) multi = b;
+                            else if (v is int i) multi = i == 1;
+                            else multi = Convert.ToString(v).Trim() == "1" || Convert.ToString(v).Trim().ToLower() == "true";
+                        }
+                    }
+                }
+                catch
+                {
+                    multi = false;
+                }
+            }
+
+            var result = Tuple.Create(multi, singleId);
+            lock (_lock)
+            {
+                _cached = result;
+                _cachedAt = DateTime.Now;
+            }
+            return result;
+        }
+    }
+
+    public class UserLogin : TenantBase
     {
         public string HospitalId { get; set; }
         public string UserId { get; set; }
@@ -1105,7 +1186,7 @@ namespace Traczo.Models
 
     }
 
-    public class Floors
+    public class Floors : TenantBase
     {
         public string HospitalId { get; set; }
         public int FloorId { get; set; }
@@ -1117,7 +1198,7 @@ namespace Traczo.Models
 
     }
 
-    public class GetPorterTasks
+    public class GetPorterTasks : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1126,7 +1207,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class GetBuzzerList
+    public class GetBuzzerList : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1135,7 +1216,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class ModelHospital
+    public class ModelHospital : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1144,7 +1225,7 @@ namespace Traczo.Models
 
     }
 
-    public class UserAccount
+    public class UserAccount : TenantBase
     {
         public string HospitalId { get; set; }
         [Required]
@@ -1153,7 +1234,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class ProfileDetails
+    public class ProfileDetails : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1164,18 +1245,18 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class VoiceFbkMdl
+    public class VoiceFbkMdl : TenantBase
     {
-        
+
         public string HospitalId { get; set; }
-        
+
         public string RequestId { get; set; }
         public string ConversationId { get; set; }
         public string Remarks { get; set; }
         public string Process { get; set; }
 
     }
-    public class PTTLog
+    public class PTTLog : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1189,7 +1270,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class StartCompleteTask
+    public class StartCompleteTask : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1202,7 +1283,6 @@ namespace Traczo.Models
         public string EndTime { get; set; }
         public string RequestStatus { get; set; }
         public string PorterRemarks { get; set; }
-        //  public string RemarksId { get; set; }
         public string Name { get; set; }
         public string PhoneNo { get; set; }
         public string CateringSign { get; set; }
@@ -1215,7 +1295,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class ErMsg
+    public class ErMsg : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1224,7 +1304,7 @@ namespace Traczo.Models
         public string Process { get; set; }
 
     }
-    public class StartCompleteClnTask
+    public class StartCompleteClnTask : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1237,7 +1317,6 @@ namespace Traczo.Models
         public string EndTime { get; set; }
         public string RequestStatus { get; set; }
         public string PorterRemarks { get; set; }
-        //  public string RemarksId { get; set; }
         public string Name { get; set; }
         public string PhoneNo { get; set; }
         public string CleaningSign { get; set; }
@@ -1258,7 +1337,7 @@ namespace Traczo.Models
 
     }
 
-    public class RequestCreate
+    public class RequestCreate : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1266,11 +1345,11 @@ namespace Traczo.Models
         public string RequestDate { get; set; }
         public string PorterId { get; set; }
         public string SubPorterId { get; set; }
-        public string RequestStatusId { get; set; }         
-        public string From { get; set; }        
-        public string To { get; set; }        
+        public string RequestStatusId { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
         public string Category { get; set; }
-        public string Remarks { get; set; }         
+        public string Remarks { get; set; }
         public string UserId { get; set; }
         public string PatientName { get; set; }
         public string MultiTaskFlag { get; set; }
@@ -1283,7 +1362,7 @@ namespace Traczo.Models
 
     }
 
-    public class LocationUpdates
+    public class LocationUpdates : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1300,7 +1379,7 @@ namespace Traczo.Models
 
     }
 
-    public class SelectedZone
+    public class SelectedZone : TenantBase
     {
         public int Id { get; set; }
         public string ZoneName { get; set; }
@@ -1308,7 +1387,7 @@ namespace Traczo.Models
 
 
     }
-    public class SelectedLocation
+    public class SelectedLocation : TenantBase
     {
 
         public int Id { get; set; }
@@ -1326,14 +1405,14 @@ namespace Traczo.Models
 
     }
 
-    public class Device
+    public class Device : TenantBase
     {
         public string HospitalId { get; set; }
         public string IMEINumber { get; set; }
 
 
     }
-    public class Locations
+    public class Locations : TenantBase
     {
         public string HospitalId { get; set; }
         public int Id { get; set; }
@@ -1360,10 +1439,10 @@ namespace Traczo.Models
 
     }
 
-    public class QRLocations
+    public class QRLocations : TenantBase
     {
         public string HospitalId { get; set; }
-         public string Process { get; set; }
+        public string Process { get; set; }
         public string Result { get; set; }
 
     }
@@ -1451,7 +1530,7 @@ namespace Traczo.Models
         public List<NrZones> NrZoness { get; set; }
     }
 
-    public class AdhocRequestCreate
+    public class AdhocRequestCreate : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1480,7 +1559,7 @@ namespace Traczo.Models
 
     }
 
-    public class AdHocCompleteTask
+    public class AdHocCompleteTask : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1500,7 +1579,7 @@ namespace Traczo.Models
 
     }
 
-    public class GenHosPorter
+    public class GenHosPorter : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1508,7 +1587,7 @@ namespace Traczo.Models
         public string UserId { get; set; }
         public string Process { get; set; }
     }
-    public class ProMessages
+    public class ProMessages : TenantBase
     {
         [Required]
         public string HospitalId { get; set; }
@@ -1558,10 +1637,6 @@ namespace Traczo.Models
         public string CheckListName { get; set; }
         public string InputType { get; set; }
         public string Mandatory { get; set; }
-        /*   public string InputValue { get; set; }
-           public string BeforeName { get; set; }
-           public string AfterName { get; set; }
-           public string Photo { get; set; } */
 
     }
 
@@ -1622,7 +1697,6 @@ namespace Traczo.Models
         public string patient_id { get; set; }
         public string hospital_id { get; set; }
         public string session_id { get; set; }
-
         public Dictionary<string, FeedbackDetailM> feedback_list { get; set; }
         public Dictionary<string, FeedbackDetailM> feedback { get; set; }
     }
@@ -1635,15 +1709,15 @@ namespace Traczo.Models
     }
 
     public class FeedbackDepartmentModel
-        {
-            public string key { get; set; }
-            public string description { get; set; }
-        }
+    {
+        public string key { get; set; }
+        public string description { get; set; }
+    }
 
-        public class FeedbackDepartmentData
-        {
-            public List<FeedbackDepartmentModel> Departments { get; set; }
-        }
+    public class FeedbackDepartmentData
+    {
+        public List<FeedbackDepartmentModel> Departments { get; set; }
+    }
 
     public class AdtEventRequest
     {
@@ -1673,13 +1747,14 @@ namespace Traczo.Models
     public class FoodOrderAISlimRequest
     {
         public string HospitalId { get; set; }
+
         public List<FoodOrderAISlimRow> Orders { get; set; }
     }
     public class FeedbackDepartmentResponse
-        {
-            public bool status { get; set; }
-            public string message { get; set; }
-            public FeedbackDepartmentData data { get; set; }
-        }
+    {
+        public bool status { get; set; }
+        public string message { get; set; }
+        public FeedbackDepartmentData data { get; set; }
+    }
 
 }
