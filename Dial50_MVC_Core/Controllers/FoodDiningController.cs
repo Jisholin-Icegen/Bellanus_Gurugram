@@ -77,10 +77,10 @@ namespace Dial50_MVC_Core.Controllers
         [HttpGet]
         public IActionResult ReviewOrder()
         {
-            ViewBag.OrderType = TempData["OrderType"];
-            ViewBag.Mode = TempData["Mode"];
-            ViewBag.Meal = TempData["Meal"];
-            ViewBag.OrderDate = TempData["OrderDate"];
+            ViewBag.OrderType = TempData.Peek("OrderType");
+            ViewBag.Mode = TempData.Peek("Mode");
+            ViewBag.Meal = TempData.Peek("Meal");
+            ViewBag.OrderDate = TempData.Peek("OrderDate");
             return View();
         }
 

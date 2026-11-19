@@ -30,17 +30,27 @@
                 <button class="back-link-sm" onclick="goBackToFlow()">
                     <i class="fa-solid fa-arrow-left"></i> Back
                 </button>
-
-                <div id="headerPatientInfo" class="header-info-pills">
-                </div>
+                <div id="headerPatientInfo" class="header-info-pills"></div>
             </div>
+            <div class="header-row-bottom lang-filter-row">
+                <div class="diet-filter-bar" id="dietFilterBar">
+                    <span class="diet-filter-icon"><i class="fa-solid fa-leaf"></i></span>
+                    <select id="dietFilter" class="diet-filter-select" onchange="applyDietFilter()">
+                        <option value="all">All Items</option>
+                        <option value="veg">Veg</option>
+                        <option value="nonveg">Non-Veg</option>
+                        <option value="vegan">Vegan</option>
+                    </select>
+                    <i class="fa-solid fa-chevron-down diet-filter-arrow"></i>
+                </div>
 
-            <div class="header-row-bottom" style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; width: 100%;">
-                <label for="languageSelector" style="font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin: 0; white-space: nowrap;">
-                    <i class="fa-solid fa-globe" style="font-size: 14px;"></i> Choose Your Language
-                </label>
-                <div class="lang-dropdown-wrap">
-                    <select id="languageSelector" class="lang-select" onchange="changeMenuLanguage(this.value)"></select>
+                <div class="lang-group">
+                    <label for="languageSelector" style="font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin: 0; white-space: nowrap;">
+                        <i class="fa-solid fa-globe" style="font-size: 14px;"></i> Choose Your Language
+                    </label>
+                    <div class="lang-dropdown-wrap">
+                        <select id="languageSelector" class="lang-select" onchange="changeMenuLanguage(this.value)"></select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,19 +68,15 @@
                 </div>
                 <div class="mt-3">
                     <span class="date-pill-blue" id="preorderLabelDisplay">
-                        <i class="fa-regular fa-calendar-check"></i>
-                        Pre-order for ...
+                        <i class="fa-regular fa-calendar-check"></i> Pre-order for ...
                     </span>
                 </div>
-
                 <div class="preorder-title-section">
                     <h1 id="preorderMainTitle">Plan Tomorrow's Meals</h1>
                     <p>Switch between meal tabs to plan each course. All meals submit together.</p>
                 </div>
-                <div class="preorder-meal-tabs" id="dynamicMealTabs">
-                </div>
+                <div class="preorder-meal-tabs" id="dynamicMealTabs"></div>
             </div>
-
             <input type="hidden" id="hdnPreorderDate" value="" />
         }
         else
@@ -133,17 +139,29 @@
         </button>
     </div>
 
+    <div class="nutrition-modal-overlay" id="nutritionModal">
+        <div class="nutrition-modal-content">
+            <button class="modal-close" onclick="closeNutritionModal()">✕</button>
+            <div id="modalContent"></div>
+            <div class="auto-close-bar">
+                <span>⏱️ Auto-dismisses in <strong id="countdownText">20</strong>s</span>
+                <button class="btn-done-blue" onclick="closeNutritionModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
     <partial name="_footer"></partial>
 
     <script>
         let servingData = [];
         let isOrderingDisabled = false;
+        let nutritionTimer = null;
+        let countdownInterval = null;
 
         function isTimeBetween(startStr, endStr) {
             if (!startStr || !endStr) return true;
             const now = new Date();
             const currentTime = now.getHours() * 60 + now.getMinutes();
-
             const getMinutes = (timeStr) => {
                 const [time, modifier] = timeStr.split(' ');
                 let [hours, minutes] = time.split(':');
@@ -152,10 +170,8 @@
                 if (modifier === 'PM') totalMinutes += 720;
                 return totalMinutes;
             };
-
             const start = getMinutes(startStr);
             const end = getMinutes(endStr);
-
             if (start < end) return currentTime >= start && currentTime < end;
             else return currentTime >= start || currentTime < end;
         }
@@ -164,7 +180,6 @@
             if (!endTimeStr) return false;
             const now = new Date();
             const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
-
             const getMinutes = (timeStr) => {
                 const [time, modifier] = timeStr.split(' ');
                 let [hours, minutes] = time.split(':');
@@ -173,7 +188,6 @@
                 if (modifier === 'PM') totalMinutes += 720;
                 return totalMinutes;
             };
-
             const end = getMinutes(endTimeStr);
             return currentTimeMinutes >= end;
         }
@@ -185,12 +199,8 @@
                 success: function (res) {
                     servingData = res;
                     const mode = $("#hdnMealOrderType").val();
-                    if (mode === "preorder") {
-                        renderPreorderTabs();
-                    } else {
-                        renderInstantPills();
-                        determineCurrentInstantMeal();
-                    }
+                    if (mode === "preorder") renderPreorderTabs();
+                    else { renderInstantPills(); determineCurrentInstantMeal(); }
                 }
             });
         }
@@ -200,7 +210,6 @@
             const mealType = $("#hdnMealType").val();
             const servingTime = $("#hdnServingTime").val();
             const isPatient = (orderType === "patient");
-
             const pRoom = BedContext.get().roomBed || BedContext.get().roomNumber || '';
 
             if (!pRoom) {
@@ -216,52 +225,29 @@
                 data: { orderType: orderType, mealType: mealType, pRoom: pRoom, servingTime: servingTime },
                 success: function (response) {
                     allMenuItems = [];
-                    if (response.menuItems) { allMenuItems = allMenuItems.concat(response.menuItems); }
+                    if (response.menuItems) allMenuItems = allMenuItems.concat(response.menuItems);
                     if (response.recommendations) {
                         response.recommendations.forEach(rec => {
-                            if (!allMenuItems.find(m => m.id === rec.id)) { allMenuItems.push(rec); }
+                            if (!allMenuItems.find(m => m.id === rec.id)) allMenuItems.push(rec);
                         });
                     }
-
+                        try {
+                            const meta = JSON.parse(localStorage.getItem('MenuMeta') || '{}');
+                            allMenuItems.forEach(m => {
+                                meta[String(m.id)] = { imagePath: m.imagePath };
+                            });
+                            localStorage.setItem('MenuMeta', JSON.stringify(meta));
+                        } catch (e) { }
                     let defaultItems = response.menuItems ? response.menuItems.filter(m => m.isDefaultOrder === 1 && isPatient) : [];
                     let regularItems = response.menuItems ? response.menuItems.filter(m => m.isDefaultOrder !== 1 || !isPatient) : [];
 
                     let defaultSectionHtml = "";
                     if (defaultItems.length > 0) {
-                        defaultSectionHtml = `
-                        <div class="todays-food-container">
-                            <div class="todays-food-header">
-                                <div class="header-left">
-                                    <div class="icon-circle-orange"><i class="fa-solid fa-utensils"></i></div>
-                                    <span class="label-text">TODAY'S SELECTION</span>
-                                    <span class="badge-selected">SELECTED</span>
-                                </div>
-                            </div>
-                            <div class="default-items-list">`;
-
+                        defaultSectionHtml = `<div class="todays-food-container"><div class="todays-food-header"><div class="header-left"><div class="icon-circle-orange"><i class="fa-solid fa-utensils"></i></div><span class="label-text">TODAY'S SELECTION</span><span class="badge-selected">SELECTED</span></div></div><div class="default-items-list">`;
                         $.each(defaultItems, function(i, item) {
                             let img = item.imagePath || "/images/defaultfood.png";
                             const uniqueId = (item.id + "_" + mealType).replace(/\s+/g, '_');
-
-                            defaultSectionHtml += `
-                                <div class="default-horizontal-card">
-                                    <div class="card-left-content">
-                                        <div class="badge-today-default">TODAY'S MENU</div>
-                                        <h4 class="default-food-name">${i18n.t(item.foodName, item.foodName)}</h4>
-                                        <p class="default-food-subtext">${item.description || 'Recommended for you'}</p>
-                                        <div class="card-controls-row">
-                                            <button class="btn-remove-default" onclick="RemoveDefaultPreference('${item.id}')">
-                                                <i class="fa-solid fa-trash-can"></i> Remove
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="card-right-visual">
-                                        <div class="circle-img-wrap">
-                                            <img src="${img}" onerror="this.src='/images/defaultfood.png'" />
-                                        </div>
-                                        <span class="meal-tag-yellow">${i18n.t(mealType, mealType).toUpperCase()}</span>
-                                    </div>
-                                </div>`;
+                            defaultSectionHtml += `<div class="default-horizontal-card"><div class="card-left-content"><div class="badge-today-default">TODAY'S MENU</div><h4 class="default-food-name">${i18n.t(item.foodName, item.foodName)}</h4><p class="default-food-subtext">${item.description || 'Recommended for you'}</p><div class="card-controls-row"><button class="btn-remove-default" onclick="RemoveDefaultPreference('${item.id}')"><i class="fa-solid fa-trash-can"></i> Remove</button></div></div><div class="card-right-visual"><div class="circle-img-wrap"><img src="${img}" onerror="this.src='/images/defaultfood.png'" /></div><span class="meal-tag-yellow">${i18n.t(mealType, mealType).toUpperCase()}</span></div></div>`;
                         });
                         defaultSectionHtml += `</div></div>`;
                     }
@@ -269,25 +255,10 @@
                     let recHtml = "";
                     const recCount = (response.recommendations) ? response.recommendations.length : 0;
                     $(".recommended-header .count").text(`(${recCount})`);
-
                     if (recCount > 0) {
                         $.each(response.recommendations, function (i, item) {
                             let lovedPercent = Math.round((parseFloat(item.avgRating || 0) / 2) * 100);
-                            recHtml += `
-                            <div class="rec-card" onclick="addToOrder('${item.id}', '${mealType}')">
-                                <div class="rec-header-row">
-                                    <span class="rec-title">${i18n.t(item.foodName, item.foodName)}</span>
-                                    <i class="fa-solid fa-arrow-trend-up rec-trend-icon"></i>
-                                </div>
-                                <div class="rec-loved-badge">
-                                    <i class="fa-regular fa-face-smile"></i>
-                                    <span>${lovedPercent}% loved this</span>
-                                </div>
-                                <div class="rec-footer-row">
-                                    <span class="rec-response-count">${item.totalRatings} responses</span>
-                                    <span class="rec-add-btn">+ Add</span>
-                                </div>
-                            </div>`;
+                            recHtml += `<div class="rec-card" onclick="addToOrder('${item.id}', '${mealType}')"><div class="rec-header-row"><span class="rec-title">${i18n.t(item.foodName, item.foodName)}</span><i class="fa-solid fa-arrow-trend-up rec-trend-icon"></i></div><div class="rec-loved-badge"><i class="fa-regular fa-face-smile"></i><span>${lovedPercent}% loved this</span></div><div class="rec-footer-row"><span class="rec-response-count">${item.totalRatings} responses</span><span class="rec-add-btn">+ Add</span></div></div>`;
                         });
                         $("#recommendedSection").html(recHtml);
                         $(".recommended-header").show();
@@ -295,42 +266,58 @@
                         $(".recommended-header").hide();
                     }
 
-                    let menuHtml = "";
-                    if (regularItems.length > 0) {
-                        $.each(regularItems, function (i, item) {
-                            let img = item.imagePath || "/images/defaultfood.png";
-                            const uniqueId = (item.id + "_" + mealType).replace(/\s+/g, '_');
-                            menuHtml += `
-                            <div class="menu-card-v2">
-                                <div class="image-area-creamy">
-                                    <div class="card-top-badges">
-                                        ${item.calories ? `<div class="calories-badge-top-right"> ${item.calories} cal</div>` : ''}
-                                    </div>
+        let menuHtml = "";
+        if (regularItems.length > 0) {
+            $.each(regularItems, function (i, item) {
+                const uniqueId = (item.id + "_" + mealType).replace(/\s+/g, '_');
 
-                                    <img src="${img}" alt="${item.foodName}" onerror="this.src='/images/defaultfood.png'" />
-                                </div>
-                                <div class="card-info">
-                                    <h4 class="food-title">${i18n.t(item.foodName, item.foodName)}</h4>
-                                    <p class="food-description">${item.description}</p>
-                                    <div class="food-meta-row">
-                                        <div class="tag-area">
-                                            ${item.allergens ? `<span class="allergens-tag">${item.allergens}</span>` : ''}
-                                        </div>
-                                        <div class="action-area">
-                                            <button class="add-btn-v2" id="add-btn-${uniqueId}" onclick="addToOrder('${item.id}', '${mealType}')">+ Add</button>
-                                            <div class="qty-selector-v2" id="qty-selector-${uniqueId}" style="display:none;">
-                                                <button class="qty-btn-v2 minus" onclick="changeQty('${item.id}', -1, '${mealType}')">−</button>
-                                                <span class="qty-count-v2" id="qty-count-${uniqueId}">1</span>
-                                                <button class="qty-btn-v2 plus" onclick="changeQty('${item.id}', 1, '${mealType}')">+</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>`;
-                        });
-                    }
+                const hasPhoto = item.imagePath && !/defaultfood/i.test(item.imagePath);
+                const img = hasPhoto ? item.imagePath : "/images/defaultfood.png";
+                const photoClass = hasPhoto ? "has-photo" : "no-photo";
 
+                const d = (item.dietaryType || '').toLowerCase();
+                let dietClass = 'veg', dietLabel = 'VEG';
+                if (d.includes('non')) { dietClass = 'nonveg'; dietLabel = 'NON-VEG'; }
+                else if (d.includes('vegan')) { dietClass = 'vegan'; dietLabel = 'VEGAN'; }
+
+                const priceTag = (orderType === "visitor" && item.price)
+                    ? `<div class="price-chip">$${parseFloat(item.price).toFixed(2)}</div>` : "";
+
+                const allergenTag = item.allergens
+                    ? `<span class="allergens-tag danger">Contains: ${item.allergens}</span>` : '';
+
+                menuHtml += `
+                <div class="menu-card-v2" data-diet="${dietClass}">
+                    <div class="image-area-creamy ${photoClass}">
+                        <img src="${img}" alt="${item.foodName}"
+                             onerror="this.src='/images/defaultfood.png'; this.closest('.image-area-creamy').classList.remove('has-photo'); this.closest('.image-area-creamy').classList.add('no-photo');" />
+                        ${priceTag}
+                        <div class="img-badges">
+                            <span class="kcal-chip">${item.calories || '0'} kcal</span>
+                            <span class="diet-chip ${dietClass}">${dietLabel}</span>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <h4 class="food-title">${i18n.t(item.foodName, item.foodName)}</h4>
+                        <p class="food-description">${item.description || ''}</p>
+                        <div class="tag-area">${allergenTag}</div>
+                        <div class="card-footer-v3">
+                            <button class="btn-nutrition" onclick="openNutritionModal('${item.id}', '${mealType}')">Nutrition</button>
+                            <div class="add-wrap">
+                                <button class="add-btn-v2" id="add-btn-${uniqueId}" onclick="addToOrder('${item.id}', '${mealType}')">+ Add</button>
+                                <div class="qty-selector-v2" id="qty-selector-${uniqueId}" style="display:none;">
+                                    <button class="qty-btn-v2 minus" onclick="changeQty('${item.id}', -1, '${mealType}')">−</button>
+                                    <span class="qty-count-v2" id="qty-count-${uniqueId}">1</span>
+                                    <button class="qty-btn-v2 plus" onclick="changeQty('${item.id}', 1, '${mealType}')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        }
                     $("#menuGrid").html(defaultSectionHtml + menuHtml);
+                    applyDietFilter();
                     LoadCartFromDatabase();
                 },
                 error: function (xhr, status, err) {
@@ -340,37 +327,100 @@
             });
         }
 
+          function applyDietFilter() {
+            const f = $("#dietFilter").val();
+            let shown = 0;
+
+            $("#menuGrid .menu-card-v2").each(function () {
+                const d = $(this).data("diet");
+                const match = f === "all" || (f === "veg" && (d === "veg" || d === "vegan")) || f === d;
+                $(this).toggle(match);
+                if (match) shown++;
+            });
+
+            $("#menuGrid .no-diet-match").remove();
+            if (shown === 0 && $("#menuGrid .menu-card-v2").length > 0) {
+                $("#menuGrid").append('<div class="no-diet-match">No items match this filter.</div>');
+            }
+        }
+
+        function openNutritionModal(itemId, mealType) {
+            const item = allMenuItems.find(m => m.id == itemId);
+            if (!item) return;
+            clearTimeout(nutritionTimer);
+            clearInterval(countdownInterval);
+
+            const mealLabel = (mealType || '').toUpperCase();
+        const content = `
+            <span class="modal-meal-pill">${i18n.t(mealType, mealType).toUpperCase()}</span>
+            <h2 class="modal-title">${i18n.t(item.foodName, item.foodName)}</h2>
+            <div class="modal-subtitle">${mealType.toUpperCase()}</div>
+
+            <div class="nutri-grid">
+                <div class="nutri-box cal"><div class="nutri-label">Calories</div><div class="nutri-value">${item.calories || '-'} kcal</div></div>
+                <div class="nutri-box pro"><div class="nutri-label">Protein</div><div class="nutri-value">${item.protein || '-'}g</div></div>
+                <div class="nutri-box carb"><div class="nutri-label">Carbs</div><div class="nutri-value">${item.carbs || '-'}g</div></div>
+                <div class="nutri-box fat"><div class="nutri-label">Total Fat</div><div class="nutri-value">${item.totalFat || '-'}g</div></div>
+                <div class="nutri-box sod"><div class="nutri-label">Sodium</div><div class="nutri-value">${item.sodium || '-'}mg</div></div>
+                <div class="nutri-box sug"><div class="nutri-label">Sugar</div><div class="nutri-value">${item.sugar || '-'}g</div></div>
+            </div>
+
+            <div class="info-section">
+                <div class="section-title">🌿 INGREDIENTS</div>
+                <div class="section-text">${item.ingredients || 'No ingredients listed.'}</div>
+            </div>
+            <div class="info-section">
+                <div class="section-title">🛡️ ALLERGENS &amp; DIETARY FLAGS</div>
+                <div class="section-text">
+                    ${item.allergens
+                        ? '<span class="allergen-warn">⚠ Contains: ' + item.allergens + '</span>'
+                        : '<span class="allergen-safe">✓ No known major allergens</span>'}
+                </div>
+            </div>`;
+
+            $("#modalContent").html(content);
+            $("#nutritionModal").css("display", "flex");
+            $("#progressFill").css("width", "100%");
+            $("#countdownText").text("20");
+
+            let secondsLeft = 20;
+            countdownInterval = setInterval(() => {
+                secondsLeft--;
+                $("#countdownText").text(secondsLeft);
+                $("#progressFill").css("width", (secondsLeft / 20 * 100) + "%");
+                if (secondsLeft <= 0) closeNutritionModal();
+            }, 1000);
+            nutritionTimer = setTimeout(closeNutritionModal, 20500);
+        }
+
+        function closeNutritionModal() {
+            $("#nutritionModal").hide();
+            clearTimeout(nutritionTimer);
+            clearInterval(countdownInterval);
+        }
+
+        $("#nutritionModal").on("click", function(e) {
+            if (e.target === this) closeNutritionModal();
+        });
+
         function renderPreorderTabs() {
             const isToday = $("#date-btn-today").hasClass("active");
             const $container = $("#dynamicMealTabs");
             $container.empty();
             let firstValidFound = false;
-
             $.each(servingData, function (i, item) {
                 const isFinished = isToday ? isMealFinished(item.endTime) : false;
                 const sanitizedName = item.categoryName.replace(/\s+/g, '_');
-
                 let activeClass = "";
                 if (!isFinished && !firstValidFound) {
                     activeClass = "active";
                     firstValidFound = true;
                     loadMeal(item.categoryName);
                 }
-
-                const btnHtml = `
-                    <button type="button"
-                            class="meal-tab-box ${activeClass} ${isFinished ? 'not-available' : ''}"
-                            id="tab-${sanitizedName}"
-                            ${isFinished ? '' : `onclick="loadMeal('${item.categoryName}')"`}>
-                        <span class="tab-name" style="font-weight:700;">${item.categoryName}</span>
-                        ${isFinished ? '<span class="not-now-text">NOT NOW</span>' : ''}
-                    </button>`;
-
+                const btnHtml = `<button type="button" class="meal-tab-box ${activeClass} ${isFinished ? 'not-available' : ''}" id="tab-${sanitizedName}" ${isFinished ? '' : `onclick="loadMeal('${item.categoryName}')"`}><span class="tab-name" style="font-weight:700;">${item.categoryName}</span>${isFinished ? '<span class="not-now-text">NOT NOW</span>' : ''}</button>`;
                 $container.append(btnHtml);
             });
-            if (!firstValidFound && isToday) {
-                setPreorderDate(1);
-            }
+            if (!firstValidFound && isToday) setPreorderDate(1);
         }
 
         function renderInstantPills() {
@@ -379,14 +429,7 @@
             $.each(servingData, function (i, item) {
                 const isOpen = isTimeBetween(item.startTime, item.endTime);
                 const sanitizedName = item.categoryName.replace(/\s+/g, '_');
-
-                $container.append(`
-                    <div class="meal-select-pill ${!isOpen ? 'not-available' : ''}"
-                         id="pill-${sanitizedName}" data-mealname="${item.categoryName}" onclick="loadMeal('${item.categoryName}')">
-                        <i class="fa-solid ${getIcon(item.categoryName)}"></i>
-                        <span class="meal-label-name">${item.categoryName}</span>
-                        ${!isOpen ? '<span class="not-now-label">NOT NOW</span>' : ''}
-                    </div>`);
+                $container.append(`<div class="meal-select-pill ${!isOpen ? 'not-available' : ''}" id="pill-${sanitizedName}" data-mealname="${item.categoryName}" onclick="loadMeal('${item.categoryName}')"><i class="fa-solid ${getIcon(item.categoryName)}"></i><span class="meal-label-name">${item.categoryName}</span>${!isOpen ? '<span class="not-now-label">NOT NOW</span>' : ''}</div>`);
             });
         }
 
@@ -406,24 +449,18 @@
             const mode = $("#hdnMealOrderType").val();
             const isOpen = isTimeBetween(meal?.startTime, meal?.endTime);
             const sanitizedMeal = mealType.replace(/\s+/g, '_');
-
             $("#hdnMealType").val(mealType);
             updateDynamicHeader();
             $(".meal-select-pill, .meal-tab-box").removeClass("active");
             $(`#tab-${sanitizedMeal}, #pill-${sanitizedMeal}`).addClass("active");
             $("#currentMealLabel").text(`Showing ${i18n.t(mealType, mealType).toLowerCase()} menu`);
-            if (mode !== "preorder" && !isOpen) {
-                showClosedUI(mealType, meal.startTime, meal.endTime);
-            } else {
-                hideClosedUI();
-                LoadMenuDetails();
-            }
+            if (mode !== "preorder" && !isOpen) showClosedUI(mealType, meal.startTime, meal.endTime);
+            else { hideClosedUI(); LoadMenuDetails(); }
         }
 
         function setPreorderDate(offset) {
             const date = new Date();
             date.setDate(date.getDate() + offset);
-
             $(".date-pill-selector").removeClass("active");
             if (offset === 0) {
                 $("#date-btn-today").addClass("active");
@@ -432,23 +469,17 @@
                 $("#date-btn-tomorrow").addClass("active");
                 $("#preorderMainTitle").text("Plan Tomorrow's Meals");
             }
-
-            const localeMap = {
-                en:'en-US', zh:'zh-CN', hi:'hi-IN', es:'es-ES', fr:'fr-FR',
-                ar:'ar-EG', bn:'bn-BD', pt:'pt-PT', ru:'ru-RU', ur:'ur-PK'
-            };
+            const localeMap = { en:'en-US', zh:'zh-CN', hi:'hi-IN', es:'es-ES', fr:'fr-FR', ar:'ar-EG', bn:'bn-BD', pt:'pt-PT', ru:'ru-RU', ur:'ur-PK' };
             const options = { weekday: 'long', month: 'long', day: 'numeric' };
             const formattedDate = date.toLocaleDateString(localeMap[i18n.current] || 'en-US', options);
-
             $("#preorderLabelDisplay").html(`<i class="fa-regular fa-calendar-check"></i> Pre-order for ${formattedDate}`);
-
             $("#hdnPreorderDate").val(date.toISOString().split('T')[0]);
             updateDynamicHeader();
             loadDynamicMealTabs();
         }
 
         function showClosedUI(mealName, start, end) {
-            $("#menuGrid, .recommended-header, #recommendedSection, .special-instructions-card, #reviewOrderBar").hide();
+            $("#menuGrid, .recommended-header, #recommendedSection, .special-instructions-card, #reviewOrderBar, #dietFilterBar").hide();
             $("#bannerTitle").text(`${i18n.t(mealName, mealName)} is closed`);
             $("#bannerSubtext").text(`Available between ${start} and ${end}.`);
             $("#mealClosedBanner, #mealClosedEmptyState").show();
@@ -456,7 +487,7 @@
 
         function hideClosedUI() {
             $("#mealClosedBanner, #mealClosedEmptyState").hide();
-            $("#menuGrid, .recommended-header, .special-instructions-card").show();
+            $("#menuGrid, .recommended-header, .special-instructions-card, #dietFilterBar").show();
         }
 
         function getIcon(name) {
@@ -471,14 +502,11 @@
             const mode = $("#hdnMealOrderType").val();
             if (mode === "preorder") setPreorderDate(0);
             else loadDynamicMealTabs();
-
             LoadCartFromDatabase();
-
             $(document).on("input", "#menuInstructions", function () {
                 var val = $(this).val();
                 setSpecialInstruction(val);
             });
-
             if ($("#hdnOrderType").val() === "patient") {
                 const diet = BedContext.get().dietType;
                 const allergies = BedContext.get().allergies;

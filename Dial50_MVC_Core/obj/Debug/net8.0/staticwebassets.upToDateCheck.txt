@@ -458,4 +458,5 @@ wwwroot\locales\ru.json
 wwwroot\locales\ur.json
 wwwroot\locales\zh.json
 wwwroot\manifest.json
+wwwroot\models\silero-vad.onnx
 wwwroot\sw.js

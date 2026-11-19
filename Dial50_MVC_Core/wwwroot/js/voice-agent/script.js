@@ -135,22 +135,33 @@ function renderTimer() {
 }
 
 async function fetchProfileLanguage(id) {
-    if (!id || !PROFILE_API_URL) return null;
+    if (!id || typeof PROFILE_API_URL === 'undefined') return null;
     try {
+        var tenantId = window.BedContext.getTenantId();
+        if (!tenantId) {
+            console.warn("GetProfileOld failed: No TenantId in BedContext");
+            return null;
+        }
+
         var res = await fetch(PROFILE_API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: id, Status: "GET" })
+            headers: {
+                "Content-Type": "application/json",
+                "X-Tenant-ID": tenantId
+            },
+            body: JSON.stringify({ userId: String(id) })
         });
+
         if (!res.ok) throw new Error("HTTP " + res.status);
         var result = await res.json();
         if (!result.status || !result.data || !result.data.Language) return null;
         return result.data.Language;
     } catch (err) {
-        console.warn("GetProfileOld failed — using region default language:", err.message);
+        console.warn("GetProfileOld failed:", err.message);
         return null;
     }
 }
+
 
 var REGION_LANGUAGE_URL = "/data/region-language.json";
 var FALLBACK_COUNTRY_CODE = "IN";
@@ -263,93 +274,273 @@ var activeSources = [];
 var drainTimer = null;
 
 // =========================================================
-// LOCAL VAD — kept in script.js (no inline VAD code in Index.cshtml)
+// SILERO NEURAL VAD — browser-side ONNX Runtime Web
+// Original 24 kHz PCM16 audio continues to the backend unchanged.
+// A separate copy is resampled to 16 kHz only for Silero inference.
 // =========================================================
 var vadCfg = (CFG && CFG.VAD) || {};
 
-class LocalVoiceActivityDetector {
+function loadExternalScriptOnce(src) {
+    if (window.ort) return Promise.resolve(window.ort);
+    if (window.__dial50OrtLoading) return window.__dial50OrtLoading;
+    window.__dial50OrtLoading = new Promise(function (resolve, reject) {
+        var existing = document.querySelector('script[data-dial50-ort="true"]');
+        if (existing) {
+            existing.addEventListener("load", function () {
+                window.ort ? resolve(window.ort) : reject(new Error("ONNX Runtime loaded but window.ort is unavailable."));
+            }, { once: true });
+            existing.addEventListener("error", function () { reject(new Error("Could not load ONNX Runtime Web.")); }, { once: true });
+            return;
+        }
+        var script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.dataset.dial50Ort = "true";
+        script.onload = function () {
+            window.ort ? resolve(window.ort) : reject(new Error("ONNX Runtime script loaded but window.ort is unavailable."));
+        };
+        script.onerror = function () { reject(new Error("Failed to load ONNX Runtime Web from " + src)); };
+        document.head.appendChild(script);
+    });
+    return window.__dial50OrtLoading;
+}
+
+class SileroVoiceActivityDetector {
     constructor(options) {
         options = options || {};
-        this.sampleRate = options.sampleRate || 24000;
-        this.energyThreshold = typeof options.threshold === "number" ? options.threshold : 0.01;
-        this.endThreshold = typeof options.speechEndThreshold === "number" ? options.speechEndThreshold : 0.0072;
-        this.duckingThreshold = typeof options.duckingThreshold === "number" ? options.duckingThreshold : 0.065;
-        this.duckingEndThreshold = this.duckingThreshold * 0.72;
-        this.silenceDurationMs = typeof options.silenceDurationMs === "number" ? options.silenceDurationMs : 600;
-        this.speechStartDurationMs = typeof options.speechStartDurationMs === "number" ? options.speechStartDurationMs : 180;
+        this.sampleRate = 16000;
+        this.frameSize = 512;
+        this.contextSize = 64;
+        this.threshold = typeof options.threshold === "number" ? options.threshold : 0.50;
+        this.negativeThreshold = typeof options.negativeThreshold === "number" ? options.negativeThreshold : 0.35;
+        this.bargeInThreshold = typeof options.bargeInThreshold === "number" ? options.bargeInThreshold : 0.65;
+        this.silenceDurationMs = typeof options.silenceDurationMs === "number" ? options.silenceDurationMs : 420;
+        this.speechStartDurationMs = typeof options.speechStartDurationMs === "number" ? options.speechStartDurationMs : 96;
         this.bargeInStartDurationMs = typeof options.bargeInStartDurationMs === "number" ? options.bargeInStartDurationMs : 220;
+        this.modelPath = options.modelPath || "/models/silero-vad.onnx";
+        this.ortScriptUrl = options.ortScriptUrl || "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/ort.min.js";
+        this.wasmPaths = options.wasmPaths || "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.20.1/dist/";
+        this.session = null;
+        this.isReady = false;
+        this.isLoading = false;
+        this.loadPromise = null;
+        this.state = new Float32Array(2 * 128);
+        this.context = new Float32Array(this.contextSize);
+        this.audioFrame = new Float32Array(this.frameSize);
+        this.audioFrameCount = 0;
+        this.inferenceQueue = [];
+        this.inferenceRunning = false;
         this.isSpeaking = false;
-        this.silenceTimeMs = 0;
         this.speechTimeMs = 0;
-        this.lastRms = 0;
+        this.silenceTimeMs = 0;
+        this.lastProbability = 0;
+        this.lastError = null;
+        this.generation = 0;
     }
 
-    calculateRMS(samples) {
-        if (!samples || !samples.length) return 0;
-        var sumSquares = 0;
-        var count = 0;
-        // Sample every other value to keep the per-frame CPU cost low.
-        for (var i = 0; i < samples.length; i += 2) {
-            var sample = samples[i];
-            sumSquares += sample * sample;
-            count++;
+    async load() {
+        if (this.isReady) return true;
+        if (this.loadPromise) return this.loadPromise;
+        this.isLoading = true;
+        this.loadPromise = (async () => {
+            try {
+                var ort = await loadExternalScriptOnce(this.ortScriptUrl);
+                if (ort.env && ort.env.wasm) {
+                    ort.env.wasm.wasmPaths = this.wasmPaths;
+                    ort.env.wasm.numThreads = 1;
+                    ort.env.wasm.proxy = false;
+                }
+                this.session = await ort.InferenceSession.create(this.modelPath, {
+                    executionProviders: ["wasm"],
+                    graphOptimizationLevel: "all"
+                });
+                ["input", "state", "sr"].forEach((name) => {
+                    if (this.session.inputNames.indexOf(name) === -1) {
+                        throw new Error("Silero ONNX model is missing required input: " + name);
+                    }
+                });
+                ["output", "stateN"].forEach((name) => {
+                    if (this.session.outputNames.indexOf(name) === -1) {
+                        throw new Error("Silero ONNX model is missing required output: " + name);
+                    }
+                });
+                this.isReady = true;
+                this.lastError = null;
+                console.info("Dial50: Silero Neural VAD loaded successfully", {
+                    model: this.modelPath, runtime: "ONNX Runtime Web / WASM",
+                    sampleRate: this.sampleRate, frameSize: this.frameSize
+                });
+                return true;
+            } catch (err) {
+                this.lastError = err;
+                this.isReady = false;
+                this.session = null;
+                console.error("Dial50: Silero VAD failed to load or initialize. Check the ONNX model URL and model compatibility.", err);
+                return false;
+            } finally {
+                this.isLoading = false;
+            }
+        })();
+        return this.loadPromise;
+    }
+
+    resample24kTo16k(samples) {
+        var input = samples instanceof Int16Array ? samples : new Int16Array(samples);
+        var outputLength = Math.floor(input.length * 2 / 3);
+        var output = new Float32Array(outputLength);
+        for (var i = 0; i < outputLength; i++) {
+            var sourcePosition = i * 1.5;
+            var left = Math.floor(sourcePosition);
+            var right = Math.min(left + 1, input.length - 1);
+            var fraction = sourcePosition - left;
+            var a = input[left] / 32768;
+            var b = input[right] / 32768;
+            output[i] = a + (b - a) * fraction;
         }
-        if (!count) return 0;
-        var rms = Math.sqrt(sumSquares / count);
-        return samples instanceof Int16Array ? rms / 32768 : rms;
+        return output;
     }
 
-    process(samples, sampleRate, onSpeechStart, onSpeechEnd, playbackActive) {
-        if (!samples || !samples.length) return;
-        var rms = this.calculateRMS(samples);
-        this.lastRms = rms;
-        var durationMs = samples.length / (sampleRate || this.sampleRate) * 1000;
-        var onset = playbackActive ? this.duckingThreshold : this.energyThreshold;
-        var sustain = playbackActive ? this.duckingEndThreshold : this.endThreshold;
-        var debounce = playbackActive ? this.bargeInStartDurationMs : this.speechStartDurationMs;
-        var voiceEnergy = rms > (this.isSpeaking ? sustain : onset);
+    enqueueAudio(samples16k, playbackActive) {
+        if (!this.isReady || !samples16k || !samples16k.length) return;
+        for (var i = 0; i < samples16k.length; i++) {
+            this.audioFrame[this.audioFrameCount++] = samples16k[i];
+            if (this.audioFrameCount === this.frameSize) {
+                this.inferenceQueue.push({
+                    frame: this.audioFrame.slice(),
+                    playbackActive: !!playbackActive,
+                    generation: this.generation
+                });
+                this.audioFrameCount = 0;
+            }
+        }
+        if (this.inferenceQueue.length > 12) {
+            this.inferenceQueue.splice(0, this.inferenceQueue.length - 12);
+        }
+        this.runInferenceQueue();
+    }
 
-        if (voiceEnergy) {
-            this.silenceTimeMs = 0;
-            if (!this.isSpeaking) {
-                this.speechTimeMs += durationMs;
-                if (this.speechTimeMs >= debounce) {
-                    this.isSpeaking = true;
-                    this.speechTimeMs = 0;
-                    if (typeof onSpeechStart === "function") onSpeechStart(rms);
+    async runInferenceQueue() {
+        if (this.inferenceRunning || !this.isReady || !this.session) return;
+        this.inferenceRunning = true;
+        try {
+            while (this.inferenceQueue.length && this.isReady) {
+                var item = this.inferenceQueue.shift();
+                if (item.generation === this.generation) {
+                    await this.inferFrame(item.frame, item.playbackActive, item.generation);
                 }
             }
-        } else if (!this.isSpeaking) {
-            this.speechTimeMs = Math.max(0, this.speechTimeMs - durationMs);
+        } catch (err) {
+            this.lastError = err;
+            console.error("Dial50: Silero inference error:", err);
+        } finally {
+            this.inferenceRunning = false;
+            if (this.inferenceQueue.length && this.isReady) this.runInferenceQueue();
+        }
+    }
+
+    async inferFrame(frame, playbackActive, generation) {
+        var ort = window.ort;
+        var inputData = new Float32Array(this.contextSize + this.frameSize);
+        inputData.set(this.context, 0);
+        inputData.set(frame, this.contextSize);
+        var inputTensor = new ort.Tensor("float32", inputData, [1, inputData.length]);
+        var stateTensor = new ort.Tensor("float32", this.state, [2, 1, 128]);
+        var sampleRateTensor = new ort.Tensor("int64", BigInt64Array.from([16000n]), []);
+        var outputs;
+        try {
+            outputs = await this.session.run({ input: inputTensor, state: stateTensor, sr: sampleRateTensor });
+            if (generation !== this.generation) return;
+            var probability = Number(outputs.output.data[0]) || 0;
+            this.state.set(outputs.stateN.data);
+            this.context.set(inputData.subarray(inputData.length - this.contextSize));
+            this.lastProbability = probability;
+            this.updateSpeechState(probability, playbackActive);
+        } finally {
+            [inputTensor, stateTensor, sampleRateTensor,
+                outputs && outputs.output, outputs && outputs.stateN].forEach(function (tensor) {
+                if (tensor && typeof tensor.dispose === "function") tensor.dispose();
+            });
+        }
+    }
+
+    updateSpeechState(probability, playbackActive) {
+        var frameDurationMs = this.frameSize / this.sampleRate * 1000;
+        var startThreshold = playbackActive ? this.bargeInThreshold : this.threshold;
+        var startDuration = playbackActive ? this.bargeInStartDurationMs : this.speechStartDurationMs;
+        if (!this.isSpeaking) {
+            if (probability >= startThreshold) {
+                this.speechTimeMs += frameDurationMs;
+                if (this.speechTimeMs >= startDuration) {
+                    this.isSpeaking = true;
+                    this.speechTimeMs = 0;
+                    this.silenceTimeMs = 0;
+                    onLocalSpeechStart(probability);
+                }
+            } else {
+                this.speechTimeMs = 0;
+            }
+            return;
+        }
+        if (probability >= this.negativeThreshold) {
+            this.silenceTimeMs = 0;
         } else {
-            this.silenceTimeMs += durationMs;
+            this.silenceTimeMs += frameDurationMs;
             if (this.silenceTimeMs >= this.silenceDurationMs) {
                 this.isSpeaking = false;
-                this.silenceTimeMs = 0;
                 this.speechTimeMs = 0;
-                if (typeof onSpeechEnd === "function") onSpeechEnd(rms);
+                this.silenceTimeMs = 0;
+                onLocalSpeechEnd(probability);
             }
         }
+    }
+
+    process(samples, sampleRate, playbackActive) {
+        if (!this.isReady || !samples || !samples.length) return;
+        if (sampleRate !== 24000) {
+            console.warn("Dial50 Silero VAD expects 24 kHz input before resampling; received", sampleRate);
+            return;
+        }
+        this.enqueueAudio(this.resample24kTo16k(samples), playbackActive);
     }
 
     reset() {
+        this.generation++;
+        this.state.fill(0);
+        this.context.fill(0);
+        this.audioFrame.fill(0);
+        this.audioFrameCount = 0;
+        this.inferenceQueue.length = 0;
         this.isSpeaking = false;
-        this.silenceTimeMs = 0;
         this.speechTimeMs = 0;
-        this.lastRms = 0;
+        this.silenceTimeMs = 0;
+        this.lastProbability = 0;
+    }
+
+    getState() {
+        return {
+            engine: "silero-neural-vad", modelReady: this.isReady,
+            isLoading: this.isLoading, isSpeaking: this.isSpeaking,
+            speechProbability: this.lastProbability, threshold: this.threshold,
+            negativeThreshold: this.negativeThreshold,
+            silenceDurationMs: this.silenceDurationMs,
+            queuedFrames: this.inferenceQueue.length,
+            error: this.lastError ? this.lastError.message : null
+        };
     }
 }
 
-var localVad = new LocalVoiceActivityDetector({
-    sampleRate: SAMPLE_RATE,
-    threshold: typeof vadCfg.threshold === "number" ? vadCfg.threshold : 0.01,
-    speechEndThreshold: typeof vadCfg.speechEndThreshold === "number" ? vadCfg.speechEndThreshold : 0.0072,
-    duckingThreshold: typeof vadCfg.duckingThreshold === "number" ? vadCfg.duckingThreshold : 0.065,
-    silenceDurationMs: typeof vadCfg.silenceDurationMs === "number" ? vadCfg.silenceDurationMs : 600,
-    speechStartDurationMs: typeof vadCfg.speechStartDurationMs === "number" ? vadCfg.speechStartDurationMs : 180,
-    bargeInStartDurationMs: typeof vadCfg.bargeInStartDurationMs === "number" ? vadCfg.bargeInStartDurationMs : 220
+var localVad = new SileroVoiceActivityDetector({
+    threshold: typeof vadCfg.threshold === "number" ? vadCfg.threshold : 0.50,
+    negativeThreshold: typeof vadCfg.negativeThreshold === "number" ? vadCfg.negativeThreshold : 0.35,
+    bargeInThreshold: typeof vadCfg.bargeInThreshold === "number" ? vadCfg.bargeInThreshold : 0.65,
+    silenceDurationMs: typeof vadCfg.silenceDurationMs === "number" ? vadCfg.silenceDurationMs : 420,
+    speechStartDurationMs: typeof vadCfg.speechStartDurationMs === "number" ? vadCfg.speechStartDurationMs : 96,
+    bargeInStartDurationMs: typeof vadCfg.bargeInStartDurationMs === "number" ? vadCfg.bargeInStartDurationMs : 220,
+    modelPath: vadCfg.modelPath,
+    ortScriptUrl: vadCfg.ortScriptUrl,
+    wasmPaths: vadCfg.wasmPaths
 });
-var localBargeIn = vadCfg.localBargeIn === true;
+var localBargeIn = vadCfg.localBargeIn !== false;
 
 function processLocalVADFrame(buffer) {
     if (!localVad || micMuted || !buffer) return;
@@ -358,26 +549,27 @@ function processLocalVADFrame(buffer) {
     else if (buffer instanceof ArrayBuffer && buffer.byteLength >= 2) {
         samples = new Int16Array(buffer, 0, Math.floor(buffer.byteLength / 2));
     } else return;
-
     var playbackActive = !!(audioContext && activeSources.length > 0 && audioContext.currentTime < nextPlayTime);
-    localVad.process(samples, SAMPLE_RATE, onLocalSpeechStart, onLocalSpeechEnd, playbackActive);
+    localVad.process(samples, SAMPLE_RATE, playbackActive);
 }
 
-function onLocalSpeechStart(rms) {
-    // Off by default: server/Azure VAD remains responsible for actual barge-in.
-    if (localBargeIn) flushPlayback();
-    var layer = document.getElementById("callLayer");
-    if (layer) {
-        var status = layer.getAttribute("data-status");
-        if (status === "speaking" || status === "thinking") setCallStatus("listening");
+function onLocalSpeechStart(probability) {
+    if (localBargeIn) {
+        flushPlayback();
+        var layer = document.getElementById("callLayer");
+        if (layer) {
+            var status = layer.getAttribute("data-status");
+            if (status === "speaking" || status === "thinking") setCallStatus("listening");
+        }
     }
+    console.info("Dial50 Silero: speech started; probability=" + Number(probability).toFixed(3));
 }
 
-function onLocalSpeechEnd() {
+function onLocalSpeechEnd(probability) {
+    console.info("Dial50 Silero: speech ended; probability=" + Number(probability).toFixed(3));
     var layer = document.getElementById("callLayer");
     if (layer && layer.getAttribute("data-status") === "listening") setCallStatus("thinking");
 }
-
 
 var MIC_WORKLET_SOURCE = `
 class MicProcessor extends AudioWorkletProcessor {
@@ -557,6 +749,7 @@ async function connectToAvatarBackend() {
     serverEnding = false;
     try {
         await languageReady;
+        await localVad.load();
         await startMicrophone();
         setCallStatus("ringing");
 
@@ -822,14 +1015,14 @@ function initializeAvatarEvents() {
         });
     }
 
-//    console.log("Dial50: All avatar events initialized", {
-//        idleBtn: !!idleBtn,
-//        micBtn: !!micBtn,
-//        speakerBtn: !!speakerBtn,
-//        endChatBtn: !!endChatBtn,
-//        endedMicBtn: !!endedMicBtn,
-//        body: !!body
-//    });
+   console.log("Dial50: All avatar events initialized", {
+       idleBtn: !!idleBtn,
+       micBtn: !!micBtn,
+       speakerBtn: !!speakerBtn,
+       endChatBtn: !!endChatBtn,
+       endedMicBtn: !!endedMicBtn,
+       body: !!body
+   });
 }
 
 
@@ -851,9 +1044,10 @@ window.setCallStatus = setCallStatus;
 window.connectToAvatarBackend = connectToAvatarBackend;
 window.endChat = endChat;
 window.Dial50VAD = {
-    Detector: LocalVoiceActivityDetector,
+    Detector: SileroVoiceActivityDetector,
     instance: localVad,
+    load: function () { return localVad.load(); },
     processFrame: processLocalVADFrame,
     reset: function () { localVad.reset(); },
-    getState: function () { return { isSpeaking: localVad.isSpeaking, lastRms: localVad.lastRms, threshold: localVad.energyThreshold }; }
+    getState: function () { return localVad.getState(); }
 };

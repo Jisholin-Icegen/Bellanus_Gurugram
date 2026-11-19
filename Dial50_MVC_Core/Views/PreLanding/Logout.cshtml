@@ -1,5 +1,6 @@
 ﻿@using Microsoft.Extensions.Options
 @using Dial50_MVC_Core.Models
+@using Dial50_MVC_Core.Services
 @inject IOptions<HospitalSettings> HospitalConfig
 
 @{
@@ -8,7 +9,25 @@
 
     var hospitalName = HospitalConfig.Value?.Name ?? "Hospital";
     var hospitalLogo = HospitalConfig.Value?.LogoPath ?? "images/ihh-logo.png";
+
+    var currentTenant = ViewData["XTenantID"]?.ToString();
+    if (string.IsNullOrWhiteSpace(currentTenant))
+        currentTenant = Context.Request.Query["XTenantID"].ToString();
+    if (string.IsNullOrWhiteSpace(currentTenant))
+        currentTenant = Context.Request.Cookies["XTenantID"] ?? "";
+
+    if (!string.IsNullOrWhiteSpace(currentTenant))
+    {
+        currentTenant = int.TryParse(currentTenant, out _)
+            ? AesOperation.EncryptString($"{currentTenant}$${currentTenant}$$$$$$")
+            : currentTenant.Replace(" ", "+");
+    }
+
+    var loginUrl = string.IsNullOrWhiteSpace(currentTenant)
+        ? Url.Content("~/Login")
+        : $"{Url.Content("~/Login")}?XTenantID={Uri.EscapeDataString(currentTenant)}";
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,7 +229,7 @@
                 You have been safely logged out of your account. Thank you for using our services.
             </p>
 
-            <a href="@Url.Content("~/Login")" class="login-btn">Log In Again</a>
+            <a href="@loginUrl" class="login-btn">Log In Again</a>
 
         </div>
 

@@ -210,11 +210,20 @@ namespace Dial50_MVC_Core.Repositories
                                 {
                                     Id = Convert.ToInt32(reader["ID"]),
                                     FoodName = reader["FOODNAME"].ToString(),
-                                    Description = reader["DESCRIPTION"].ToString(),
+                                    Description = reader["DESCRIPTION"]?.ToString() ?? "",
                                     ImagePath = reader["IMAGEPATH"]?.ToString() ?? "/images/defaultfood.png",
                                     Allergens = reader["ALLERGENS"]?.ToString() ?? "",
                                     IsDefaultOrder = Convert.ToInt32(reader["ISDEFAULTORDER"]),
-                                    Calories = reader["CALORIES"] != DBNull.Value ? Convert.ToInt32(reader["CALORIES"]) : (int?)null
+                                    Calories = reader["CALORIES"] != DBNull.Value ? Convert.ToInt32(reader["CALORIES"]) : (int?)null,
+                                    Protein = reader["PROTEIN"]?.ToString() ?? "-",
+                                    Carbs = reader["CARBS"]?.ToString() ?? "-",
+                                    TotalFat = reader["TOTALFAT"]?.ToString() ?? "-",
+                                    Sodium = reader["SODIUM"]?.ToString() ?? "-",
+                                    Sugar = reader["SUGAR"]?.ToString() ?? "-",
+                                    Ingredients = reader["INGREDIENTS"]?.ToString() ?? "No ingredients listed.",
+                                    AllergensDietaryFlags = reader["ALLERGENSDIETARYFLAGS"]?.ToString() ?? "",
+                                    DietaryType = reader["DIETARY_TYPE"]?.ToString() ?? "",
+                                    Price = reader["PRICE"] != DBNull.Value ? Convert.ToDecimal(reader["PRICE"]) : (decimal?)null
                                 });
                             }
 
@@ -226,7 +235,18 @@ namespace Dial50_MVC_Core.Repositories
                                     {
                                         Id = Convert.ToInt32(reader["ID"]),
                                         FoodName = reader["FOODNAME"].ToString(),
+                                        Description = reader["DESCRIPTION"]?.ToString() ?? "",
                                         ImagePath = reader["IMAGEPATH"]?.ToString() ?? "/images/defaultfood.png",
+                                        Calories = reader["CALORIES"] != DBNull.Value ? Convert.ToInt32(reader["CALORIES"]) : (int?)null,
+                                        Protein = reader["PROTEIN"]?.ToString() ?? "-",
+                                        Carbs = reader["CARBS"]?.ToString() ?? "-",
+                                        TotalFat = reader["TOTALFAT"]?.ToString() ?? "-",
+                                        Sodium = reader["SODIUM"]?.ToString() ?? "-",
+                                        Sugar = reader["SUGAR"]?.ToString() ?? "-",
+                                        Ingredients = reader["INGREDIENTS"]?.ToString() ?? "No ingredients listed.",
+                                        AllergensDietaryFlags = reader["ALLERGENSDIETARYFLAGS"]?.ToString() ?? "",
+                                        DietaryType = reader["DIETARY_TYPE"]?.ToString() ?? "",
+                                        Price = reader["PRICE"] != DBNull.Value ? Convert.ToDecimal(reader["PRICE"]) : (decimal?)null,
                                         AvgRating = reader["AVGRATING"] != DBNull.Value ? Convert.ToDecimal(reader["AVGRATING"]) : 0,
                                         TotalRatings = reader["TOTALRATINGS"] != DBNull.Value ? Convert.ToInt32(reader["TOTALRATINGS"]) : 0
                                     });
@@ -257,6 +277,8 @@ namespace Dial50_MVC_Core.Repositories
                 cmd.Parameters.AddWithValue("@ORDERTYPE", cart.OrderType);
                 cmd.Parameters.AddWithValue("@MEALTYPE", cart.MealType);
                 cmd.Parameters.AddWithValue("@CALORIES", cart.Calories);
+                cmd.Parameters.AddWithValue("@PRICE", (object)cart.Price ?? DBNull.Value);                    
+                cmd.Parameters.AddWithValue("@DIETARYTYPE", (object)cart.DietaryType ?? DBNull.Value);        
                 await con.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
                 return true;
@@ -266,33 +288,31 @@ namespace Dial50_MVC_Core.Repositories
 
         public async Task<List<FoodCartModel>> GetCartItemsAsync(string roomNo)
         {
-            List<FoodCartModel> items = new();
-            try
+            var list = new List<FoodCartModel>();
+            using SqlConnection con = new SqlConnection(GetCs());
+            using SqlCommand cmd = new SqlCommand("SP_GETFOODCARTITEMS", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ROOMNO", roomNo);
+            await con.OpenAsync();
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
             {
-                using SqlConnection con = new SqlConnection(GetCs());
-                using SqlCommand cmd = new SqlCommand("SP_GETFOODCARTITEMS", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@ROOMNO", roomNo);
-                await con.OpenAsync();
-                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
+                list.Add(new FoodCartModel
                 {
-                    items.Add(new FoodCartModel
-                    {
-                        ItemId = Convert.ToInt32(reader["ITEMID"]),
-                        ItemName = reader["ITEMNAME"].ToString(),
-                        ItemDesc = reader["ITEMDESC"]?.ToString() ?? "",
-                        Quantity = Convert.ToInt32(reader["QUANTITY"]),
-                        MealType = reader["MEALTYPE"].ToString(),
-                        Calories = reader["CALORIES"] != DBNull.Value ? Convert.ToInt32(reader["CALORIES"]) : 0
-                    });
-                }
+                    RoomNo = reader["ROOMNO"]?.ToString(),
+                    ItemId = Convert.ToInt32(reader["ITEMID"]),
+                    ItemName = reader["ITEMNAME"]?.ToString(),
+                    ItemDesc = reader["ITEMDESC"]?.ToString(),
+                    Quantity = Convert.ToInt32(reader["QUANTITY"]),
+                    OrderType = reader["ORDERTYPE"]?.ToString(),
+                    MealType = reader["MEALTYPE"]?.ToString(),
+                    Calories = reader["CALORIES"] == DBNull.Value ? 0 : Convert.ToInt32(reader["CALORIES"]),
+                    Price = reader["PRICE"] == DBNull.Value ? (decimal?)null : Convert.ToDecimal(reader["PRICE"]),   
+                    DietaryType = reader["DIETARYTYPE"] == DBNull.Value ? "" : reader["DIETARYTYPE"].ToString()          
+                });
             }
-            catch (Exception ex)
-            {
-                ex.Message.ToString();
-            }
-            return items;
+            return list;
         }
 
         public async Task<bool> DeleteCartItemAsync(string roomNo, int itemId, string mealType)
