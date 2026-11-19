@@ -591,6 +591,22 @@
             }
         }
 
+        if (route.indexOf("/mydailycare/") >= 0) {
+            const videoUrl = query.match(/https?:\/\/[^\s]+/i);
+            if (videoUrl) {
+                add("Play the supplied video", {
+                    action: "video.play",
+                    videoUrl: videoUrl[0],
+                    title: "Video"
+                }, "play video " + query);
+            }
+            if ((context.actions || []).some(function (item) {
+                return !item.disabled && /back to my daily care/i.test(item.label);
+            })) {
+                add("Stop the current video", { action: "video.stop" }, "stop close video");
+            }
+        }
+
         const menuItems = (context.items || []).filter(function (item) { return item.foodId && !item.disabled; });
         if (menuItems.length) {
             const remove = /\b(remove|delete)\b/.test(queryText);
@@ -621,6 +637,18 @@
                 add(label, action, name);
             });
             add("List the current menu", { action: "food.list_menu" }, "menu list food");
+            if ((context.actions || []).some(function (item) {
+                return !item.disabled && /review order|checkout|view cart/i.test(item.label);
+            })) {
+                add("Review the current order", { action: "food.review_order" }, "review order checkout cart");
+            }
+        }
+
+        if (route.indexOf("/fooddining/revieworder") >= 0
+            && (context.actions || []).some(function (item) {
+                return !item.disabled && /confirm order|place order|submit order/i.test(item.label);
+            })) {
+            add("Place the order", { action: "food.submit_order" }, "place confirm submit order");
         }
 
         (context.items || []).forEach(function (item) {
@@ -646,7 +674,7 @@
         action.request_id = "local-test-" + Date.now();
         const writesData = [
             "request.create", "food.add_item", "food.set_quantity", "food.remove_item",
-            "food.other_service", "food.submit_order", "feedback.submit"
+            "food.other_service", "food.review_order", "food.submit_order", "feedback.submit"
         ].includes(action.action);
         if (writesData && !window.confirm("This test can change app data. Continue only with a test database?")) return;
         if (testOutput) testOutput.textContent = "Testing: " + label;
