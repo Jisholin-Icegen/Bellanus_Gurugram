@@ -1,20 +1,19 @@
 (function () {
     const frameLayer = document.getElementById("unifiedAiModuleLayer");
     const frame = document.getElementById("unifiedAiModuleFrame");
-    const callPopup = document.getElementById("unifiedAiCallPopup");
-    const endButton = document.getElementById("unifiedAiEndButton");
-    const chatButton = document.getElementById("unifiedAiChatButton");
     const floatingBar = document.getElementById("unifiedAiFloatingBar");
     const returnButton = document.getElementById("unifiedAiReturnButton");
     const barMicButton = document.getElementById("unifiedAiBarMicButton");
-    const testToggleButton = document.getElementById("unifiedAiTestToggleButton");
+    const barChatButton = document.getElementById("unifiedAiBarChatButton");
+    const barEndButton = document.getElementById("unifiedAiBarEndButton");
+    const testLauncher = document.getElementById("unifiedAiTestLauncher");
     const testCloseButton = document.getElementById("unifiedAiTestCloseButton");
     const testPanel = document.getElementById("unifiedAiTestPanel");
     const testActionInput = document.getElementById("unifiedAiTestAction");
     const testRunButton = document.getElementById("unifiedAiTestRunButton");
     const testOutput = document.getElementById("unifiedAiTestOutput");
 
-    if (!frameLayer || !frame || !callPopup) return;
+    if (!frameLayer || !frame) return;
 
     const pageParams = new URLSearchParams(window.location.search);
     const isLocalTestMode = pageParams.get("UnifiedAITest") === "1"
@@ -24,6 +23,11 @@
         room_comfort: "/RoomComfort/Index",
         logistics: "/Logisitics/Index",
         video_request: "/MyDailyCare/Index",
+        my_daily_care: "/MyDailyCare/Index",
+        medications: "/Medication/Index",
+        appointments: "/Appointments/Index",
+        my_library: "/MyLibrary/Index",
+        discharge: "/Discharge/Index",
         food_explore: "/FoodDining/FoodDining",
         food_order: "/FoodDining/FoodOrdering",
         feedback: "/OverAllFeedback/Index"
@@ -32,23 +36,84 @@
     let frameReady = false;
     let pendingActions = [];
     let activeTarget = null;
+    let latestFrameContext = null;
+    let lastSentContext = "";
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
         return state === "connecting" || state === "connected";
     }
 
+    function homePageContext() {
+        const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
+        const text = function (element) {
+            let value = String(element.getAttribute("aria-label") || element.innerText || element.textContent || "")
+                .replace(/\s+/g, " ").trim();
+            ["bedInfo", "bedId", "patientName", "roomNumber", "roomBed", "bedNumber", "uhid", "userId", "ward"]
+                .map(function (key) { return String(bedContext[key] || "").trim(); })
+                .filter(function (identifier) { return identifier.length >= 3; })
+                .forEach(function (identifier) {
+                    const escaped = identifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                    value = value.replace(new RegExp(escaped, "ig"), "[redacted]");
+                });
+            return value.slice(0, 180);
+        };
+        const actions = Array.from(document.querySelectorAll(".navBtn, #pageContent button, #pageContent a[href]"))
+            .filter(function (element) {
+                const style = window.getComputedStyle(element);
+                return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length;
+            })
+            .slice(0, 80)
+            .map(function (element) {
+                const label = text(element);
+                const action = { label: label, disabled: !!element.disabled };
+                if (element instanceof HTMLAnchorElement) {
+                    const url = new URL(element.href, window.location.href);
+                    if (url.origin === window.location.origin) action.route = url.pathname;
+                }
+                return label ? action : null;
+            })
+            .filter(Boolean);
+        return {
+            route: "/Home/Index",
+            title: document.title,
+            headings: Array.from(document.querySelectorAll("#pageContent h1, #pageContent h2, #pageContent h3"))
+                .map(text).filter(Boolean).slice(0, 20),
+            controls: [],
+            items: [],
+            actions: actions
+        };
+    }
+
+    function sendCurrentPageContext() {
+        if (document.body.getAttribute("data-state") !== "connected"
+            || typeof window.sendVoiceAgentMessage !== "function") return;
+        const context = frameLayer.classList.contains("is-open") ? latestFrameContext : homePageContext();
+        if (frameLayer.classList.contains("is-open") && context && frame.contentWindow) {
+            try {
+                if (context.route !== frame.contentWindow.location.pathname) return;
+            } catch (error) {
+                return;
+            }
+        }
+        if (!context) return;
+        const signature = JSON.stringify(context);
+        if (signature === lastSentContext) return;
+        if (window.sendVoiceAgentMessage({ type: "app_context", context: context })) {
+            lastSentContext = signature;
+        }
+    }
+
     function updateFloatingBar() {
-        const active = isCallActive();
+        const connected = document.body.getAttribute("data-state") === "connected";
+        if (!connected) lastSentContext = "";
         if (floatingBar) {
-            floatingBar.hidden = !active && !isLocalTestMode;
+            floatingBar.hidden = !connected;
             const callStatus = document.getElementById("callStatus");
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
             if (statusText) {
-                statusText.textContent = active
-                    ? (callStatus && callStatus.textContent.trim() || "Connected")
-                    : "Test mode · AI disconnected";
+                statusText.textContent = callStatus && callStatus.textContent.trim() || "Connected";
             }
             if (barMicButton) {
                 const muted = !!(micButton && micButton.classList.contains("muted"));
@@ -57,16 +122,15 @@
                     ? '<i class="fa-solid fa-microphone-slash" aria-hidden="true"></i>'
                     : '<i class="fa-solid fa-microphone" aria-hidden="true"></i>';
                 barMicButton.setAttribute("aria-label", muted ? "Unmute microphone" : "Mute microphone");
-                barMicButton.disabled = !active;
+                barMicButton.disabled = !connected;
             }
         }
-        callPopup.classList.toggle("is-open", active && frameLayer.classList.contains("is-open"));
+        if (connected) sendCurrentPageContext();
     }
 
     function showChat() {
         frameLayer.classList.remove("is-open");
         frameLayer.setAttribute("aria-hidden", "true");
-        callPopup.classList.remove("is-open");
         updateFloatingBar();
     }
 
@@ -85,19 +149,21 @@
     }
 
     function loadFrameUrl(targetUrl, target, action) {
+        latestFrameContext = null;
+        lastSentContext = "";
+        activeTarget = target;
         frameLayer.classList.add("is-open");
         frameLayer.setAttribute("aria-hidden", "false");
-        updateFloatingBar();
 
         pendingActions.forEach(function (pendingAction) {
             reportResult(pendingAction, false, null, "The module changed before this action could run.");
         });
         pendingActions = [];
-        activeTarget = target;
 
         if (action && action.action !== "navigate") pendingActions.push(action);
 
         frameReady = false;
+        updateFloatingBar();
         frame.src = targetUrl.toString();
         return true;
     }
@@ -131,6 +197,31 @@
         return loadFrameUrl(url, routeTargetForPath(url.pathname), null);
     }
 
+    function openAppUrl(value) {
+        const path = String(value || "").trim();
+        if (!path) return null;
+        let targetUrl;
+        try {
+            targetUrl = new URL(path, window.location.origin);
+        } catch (error) {
+            return null;
+        }
+        if (targetUrl.origin !== window.location.origin || !targetUrl.pathname.startsWith("/")) return null;
+        if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
+            showChat();
+            return { target: "home" };
+        }
+
+        const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
+        const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
+        targetUrl.searchParams.delete("BedInfo");
+        if (bedInfo) targetUrl.searchParams.set("BedInfo", bedInfo);
+        targetUrl.searchParams.set("Unified", "1");
+        targetUrl.searchParams.set("UnifiedAI", "1");
+        loadFrameUrl(targetUrl, routeTargetForPath(targetUrl.pathname), null);
+        return { path: targetUrl.pathname };
+    }
+
     function routeTargetForPath(path) {
         const normalized = String(path || "").replace(/^\/+|\/+$/g, "").toLowerCase();
         const routeTargets = {
@@ -140,6 +231,14 @@
             "logisitics/index": "logistics",
             "mydailycare": "video_request",
             "mydailycare/index": "video_request",
+            "medication": "medications",
+            "medication/index": "medications",
+            "appointments": "appointments",
+            "appointments/index": "appointments",
+            "mylibrary": "my_library",
+            "mylibrary/index": "my_library",
+            "discharge": "discharge",
+            "discharge/index": "discharge",
             "fooddining": "food_explore",
             "fooddining/fooddining": "food_explore",
             "fooddining/foodordering": "food_order",
@@ -197,8 +296,29 @@
         }
 
         if (action.action === "navigate") {
-            const opened = openModule(action.target);
-            if (opened) reportResult(action, true, { target: action.target });
+            let opened = false;
+            if (routes[action.target]) {
+                opened = openModule(action.target);
+            } else {
+                const destination = action.path || action.url || action.target;
+                const result = openAppUrl(destination);
+                if (result) {
+                    opened = true;
+                    reportResult(action, true, result);
+                } else {
+                    reportResult(action, false, null, "The requested page is not a valid same-site route.");
+                }
+            }
+            if (opened && routes[action.target]) reportResult(action, true, { target: action.target });
+            return;
+        }
+
+        if (action.action === "ui.select") {
+            if (!frameLayer.classList.contains("is-open")) {
+                reportResult(action, false, null, "Open the requested module before changing a dropdown.");
+                return;
+            }
+            sendActionToFrame(action);
             return;
         }
 
@@ -251,20 +371,23 @@
 
         if (event.data.type === "unified_ai_action_result") {
             reportResult(event.data, event.data.success, event.data.result, event.data.error);
+        } else if (event.data.type === "unified_ai_page_context") {
+            latestFrameContext = event.data.context;
+            sendCurrentPageContext();
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
         }
     });
 
-    if (endButton) {
-        endButton.addEventListener("click", function () {
+    if (barEndButton) {
+        barEndButton.addEventListener("click", function () {
             if (typeof window.endChat === "function") window.endChat();
-            callPopup.classList.remove("is-open");
+            showChat();
             updateFloatingBar();
         });
     }
 
-    if (chatButton) chatButton.addEventListener("click", showChat);
+    if (barChatButton) barChatButton.addEventListener("click", showChat);
     if (returnButton) returnButton.addEventListener("click", showChat);
     if (barMicButton) {
         barMicButton.addEventListener("click", function (event) {
@@ -302,15 +425,22 @@
     }
 
     if (testRunButton) testRunButton.addEventListener("click", runTestAction);
-    if (testToggleButton) {
-        testToggleButton.hidden = !isLocalTestMode;
-        testToggleButton.addEventListener("click", function () {
-            if (testPanel) testPanel.hidden = !testPanel.hidden;
+    if (testLauncher) {
+        testLauncher.hidden = !isLocalTestMode || !testPanel || !testPanel.hidden;
+        testLauncher.addEventListener("click", function () {
+            if (!testPanel) return;
+            testPanel.hidden = !testPanel.hidden;
+            testLauncher.hidden = !testPanel.hidden;
+            testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
         });
     }
     if (testCloseButton) {
         testCloseButton.addEventListener("click", function () {
             if (testPanel) testPanel.hidden = true;
+            if (testLauncher) {
+                testLauncher.hidden = !isLocalTestMode;
+                testLauncher.setAttribute("aria-expanded", "false");
+            }
         });
     }
     if (testPanel) {
@@ -320,6 +450,20 @@
                 runTestAction();
             });
         });
+    }
+
+    let homeContextTimer = null;
+    const homeContextObserver = new MutationObserver(function () {
+        if (frameLayer.classList.contains("is-open")) return;
+        if (homeContextTimer) clearTimeout(homeContextTimer);
+        homeContextTimer = setTimeout(function () {
+            lastSentContext = "";
+            sendCurrentPageContext();
+        }, 250);
+    });
+    const pageContent = document.getElementById("pageContent");
+    if (pageContent) {
+        homeContextObserver.observe(pageContent, { childList: true, subtree: true, characterData: true, attributes: true });
     }
 
     document.addEventListener("click", function (event) {

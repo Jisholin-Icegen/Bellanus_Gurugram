@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
     data.forEach(function (item) {
         const card = document.createElement("div");
         card.className = unifiedAI || item.title === "My Library" ? "card focused" : "card faded";
+        card.dataset.route = item.onclick_URL.split("?")[0];
         card.innerHTML = `
             <div class="icon-box">
                 <img src="${item.icon}" alt="${item.title}">

@@ -2250,13 +2250,6 @@
     <div id="unifiedAiModuleLayer" aria-hidden="true">
         <iframe id="unifiedAiModuleFrame" title="Hospital services"></iframe>
     </div>
-    <div id="unifiedAiCallPopup" role="dialog" aria-live="polite" aria-label="Voice assistant options">
-        <p>The voice assistant is still connected.</p>
-        <div class="unified-ai-popup-actions">
-            <button type="button" id="unifiedAiEndButton">End</button>
-            <button type="button" id="unifiedAiChatButton">Go to Chat</button>
-        </div>
-    </div>
     <div id="unifiedAiFloatingBar" aria-live="polite" aria-label="Persistent voice assistant" hidden>
         <button type="button" id="unifiedAiReturnButton" aria-label="Return to the AI screen">
             <img src="~/images/avatar.png" alt="" />
@@ -2268,8 +2261,14 @@
         <button type="button" id="unifiedAiBarMicButton" aria-label="Mute microphone">
             <i class="fa-solid fa-microphone" aria-hidden="true"></i>
         </button>
-        <button type="button" id="unifiedAiTestToggleButton" aria-label="Show local AI test tools" hidden>Test</button>
+        <button type="button" id="unifiedAiBarChatButton" class="unified-ai-bar-action" aria-label="Go to Chat" title="Go to Chat">
+            <i class="fa-solid fa-comments" aria-hidden="true"></i>
+        </button>
+        <button type="button" id="unifiedAiBarEndButton" class="unified-ai-bar-action is-end" aria-label="End call" title="End call">
+            <i class="fa-solid fa-phone-slash" aria-hidden="true"></i>
+        </button>
     </div>
+    <button type="button" id="unifiedAiTestLauncher" aria-controls="unifiedAiTestPanel" aria-expanded="true" hidden>Test tools</button>
     <section id="unifiedAiTestPanel" aria-label="Unified AI local test panel" hidden>
         <div class="unified-ai-test-heading">
             <strong>Unified AI local test</strong>

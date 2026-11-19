@@ -52,9 +52,179 @@
         return matches.length === 1 ? matches[0] : null;
     }
 
+    function normalizeText(value) {
+        return String(value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function redactPatientIdentifiers(value) {
+        let text = normalizeText(value);
+        const context = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
+        ["bedInfo", "bedId", "patientName", "roomNumber", "roomBed", "bedNumber", "uhid", "userId", "ward"]
+            .map(function (key) { return String(context[key] || "").trim(); })
+            .filter(function (identifier) { return identifier.length >= 3; })
+            .forEach(function (identifier) {
+                const escaped = identifier.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                text = text.replace(new RegExp(escaped, "ig"), "[redacted]");
+            });
+        return text.slice(0, 240);
+    }
+
+    function isSafeControl(select) {
+        return !/bed|patient|room|uhid|user|token|password|doctor|physician|provider/i.test(
+            [select.id, select.name, select.getAttribute("aria-label")].join(" ")
+        ) && !select.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]");
+    }
+
+    function isVisible(element) {
+        if (!(element instanceof Element) || element.closest("[hidden], [aria-hidden='true']")) return false;
+        const style = window.getComputedStyle(element);
+        return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+    }
+
+    function safeRoute(element) {
+        if (!element || !element.href) return "";
+        const url = new URL(element.href, window.location.href);
+        return url.origin === window.location.origin ? url.pathname : "";
+    }
+
+    function pageContext() {
+        const controls = Array.from(document.querySelectorAll("select"))
+            .filter(isVisible)
+            .filter(isSafeControl)
+            .slice(0, 20)
+            .map(function (select) {
+                const labels = Array.from(select.labels || []).map(function (label) { return label.textContent; });
+                return {
+                    id: select.id || "",
+                    label: redactPatientIdentifiers(select.getAttribute("aria-label") || labels.join(" ") || select.name || select.id),
+                    selected: select.options[select.selectedIndex]
+                        ? { value: redactPatientIdentifiers(select.value), label: redactPatientIdentifiers(select.options[select.selectedIndex].textContent) }
+                        : null,
+                    options: Array.from(select.options).slice(0, 60).map(function (option) {
+                        return {
+                            value: redactPatientIdentifiers(option.value),
+                            label: redactPatientIdentifiers(option.textContent),
+                            disabled: option.disabled
+                        };
+                    })
+                };
+            });
+        const itemSelector = ".service-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .card";
+        const items = Array.from(document.querySelectorAll(itemSelector))
+            .filter(isVisible)
+            .filter(function (item) { return !item.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]"); })
+            .slice(0, 100)
+            .map(function (item) {
+                const row = { label: redactPatientIdentifiers(item.innerText || item.textContent) };
+                const categoryId = item.getAttribute("data-category-id");
+                const foodId = item.getAttribute("data-food-id");
+                const route = item.getAttribute("data-route");
+                if (categoryId) row.categoryId = categoryId;
+                if (foodId) row.foodId = foodId;
+                const meal = item.getAttribute("data-meal-type") || item.getAttribute("data-mealname");
+                if (meal) row.meal = redactPatientIdentifiers(meal);
+                if (route && route.startsWith("/")) row.route = route.split("?")[0];
+                return row;
+            })
+            .filter(function (item) { return item.label; });
+        const actions = Array.from(document.querySelectorAll("button, a[href], [role='button']"))
+            .filter(isVisible)
+            .slice(0, 100)
+            .map(function (element) {
+                const label = redactPatientIdentifiers(element.getAttribute("aria-label")
+                    || element.getAttribute("title")
+                    || element.innerText
+                    || element.textContent);
+                const route = safeRoute(element);
+                return label ? { label: label, disabled: !!element.disabled, route: route || undefined } : null;
+            })
+            .filter(Boolean);
+
+        return {
+            route: window.location.pathname,
+            title: redactPatientIdentifiers(document.title),
+            headings: Array.from(document.querySelectorAll("h1, h2, h3"))
+                .filter(isVisible)
+                .slice(0, 20)
+                .map(function (heading) { return redactPatientIdentifiers(heading.innerText || heading.textContent); })
+                .filter(Boolean),
+            controls: controls,
+            items: items,
+            actions: actions
+        };
+    }
+
+    let lastContextJson = "";
+    let contextTimer = null;
+    function sendPageContext() {
+        contextTimer = null;
+        const context = pageContext();
+        let encoded = JSON.stringify(context);
+        while (encoded.length > 18000 && context.items.length > 10) {
+            context.items.pop();
+            encoded = JSON.stringify(context);
+        }
+        if (encoded === lastContextJson) return;
+        lastContextJson = encoded;
+        window.parent.postMessage({ type: "unified_ai_page_context", context: context }, window.location.origin);
+    }
+
+    function schedulePageContext() {
+        if (contextTimer) clearTimeout(contextTimer);
+        contextTimer = setTimeout(sendPageContext, 250);
+    }
+
+    function selectVisibleOption(action) {
+        const controlKey = normalizeText(action.controlId || action.control || action.controlName || action.label).toLowerCase();
+        const optionWasProvided = action.optionValue !== undefined && action.optionValue !== null
+            || action.option !== undefined && action.option !== null
+            || action.value !== undefined && action.value !== null;
+        const requestedOption = normalizeText(action.optionValue !== undefined ? action.optionValue
+            : action.option !== undefined ? action.option
+                : action.value).toLowerCase();
+        if (!controlKey || !optionWasProvided) {
+            respond(action, false, null, "A visible dropdown and option are required.");
+            return;
+        }
+
+        const selects = Array.from(document.querySelectorAll("select")).filter(isVisible).filter(isSafeControl);
+        const matchingSelects = selects.filter(function (select) {
+            const labels = Array.from(select.labels || []).map(function (label) { return label.textContent; });
+            return [select.id, select.name, select.getAttribute("aria-label")].concat(labels)
+                .some(function (value) { return normalizeText(value).toLowerCase() === controlKey; });
+        });
+        if (matchingSelects.length !== 1) {
+            respond(action, false, null, matchingSelects.length ? "Dropdown name is ambiguous." : "Visible dropdown was not found.");
+            return;
+        }
+
+        const select = matchingSelects[0];
+        const matchingOptions = Array.from(select.options).filter(function (option) {
+            return !option.disabled && (normalizeText(option.value).toLowerCase() === requestedOption
+                || normalizeText(option.textContent).toLowerCase() === requestedOption);
+        });
+        if (matchingOptions.length !== 1) {
+            respond(action, false, {
+                options: Array.from(select.options).filter(function (option) { return !option.disabled; })
+                    .map(function (option) { return { value: option.value, label: redactPatientIdentifiers(option.textContent) }; })
+            }, matchingOptions.length ? "Dropdown option is ambiguous." : "Dropdown option was not found.");
+            return;
+        }
+
+        select.value = matchingOptions[0].value;
+        select.dispatchEvent(new Event("input", { bubbles: true }));
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        schedulePageContext();
+        respond(action, true, {
+            controlId: select.id || select.name,
+            selected: redactPatientIdentifiers(matchingOptions[0].textContent)
+        });
+    }
+
     window.UnifiedAIChild = {
         respond: respond,
         resolveRequestCategory: resolveRequestCategory,
+        sendPageContext: schedulePageContext,
         showChat: function () {
             window.parent.postMessage({ type: "unified_ai_show_chat" }, window.location.origin);
         },
@@ -122,10 +292,26 @@
         }));
     });
 
+    window.addEventListener("unified-ai:action", function (event) {
+        const action = event.detail;
+        if (action && action.action === "ui.select") selectVisibleOption(action);
+    });
+
+    document.addEventListener("change", schedulePageContext, true);
+    document.addEventListener("input", schedulePageContext, true);
+    document.addEventListener("click", schedulePageContext, true);
+    new MutationObserver(schedulePageContext).observe(document.body, {
+        childList: true,
+        attributes: true,
+        subtree: true,
+        characterData: true
+    });
+
     window.addEventListener("unified-ai:action-result", function (event) {
         const detail = event.detail || {};
         respond(detail.action, detail.success, detail.result, detail.error);
     });
 
     window.parent.postMessage({ type: "unified_ai_frame_ready" }, window.location.origin);
+    schedulePageContext();
 })();

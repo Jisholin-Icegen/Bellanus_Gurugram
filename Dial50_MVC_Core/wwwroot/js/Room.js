@@ -55,6 +55,7 @@ function renderServiceCards(container, data) {
     servicesData.forEach(function (service) {
         var card = document.createElement("div");
         card.className = "service-card";
+        card.dataset.categoryId = service.CategoryId;
         card.innerHTML =
             '<div class="icon-box">' +
             '<img src="/' + service.CategoryImage + '" alt="" loading="lazy" decoding="async">' +

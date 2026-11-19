@@ -55,6 +55,7 @@ function renderServiceCards(container, data) {
     servicesData.forEach(function (service) {
         var card = document.createElement("div");
         card.className = "service-card";
+        card.dataset.categoryId = service.CategoryId;
 
         var titleText = String(service.CategoryDescription).trim();
 

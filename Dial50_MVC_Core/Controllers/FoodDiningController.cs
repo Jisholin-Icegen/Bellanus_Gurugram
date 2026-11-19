@@ -161,13 +161,32 @@ namespace Dial50_MVC_Core.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMenuDetails(string orderType, string mealType, string pRoom, string servingTime)
+        public async Task<IActionResult> GetMenuDetails(string orderType, string mealType, string pRoom, string servingTime, string? vendor = null)
         {
             FoodResponse result = await _foodService.GetMenuDetailsAsync(orderType, mealType, pRoom, servingTime);
 
             if (result == null)
             {
                 return Json(new { menuItems = new List<MenuItem>(), recommendations = new List<MenuItem>() });
+            }
+
+            if (!string.IsNullOrWhiteSpace(vendor))
+            {
+                var allItems = result.MenuItems.Concat(result.Recommendations).ToList();
+                if (allItems.Count > 0 && allItems.All(item => string.IsNullOrWhiteSpace(item.Vendor)))
+                {
+                    return Problem(
+                        statusCode: StatusCodes.Status501NotImplemented,
+                        title: "Vendor filtering is unavailable",
+                        detail: "The food-menu procedure does not return vendor data. Update SP_GETMENUDETAILSFORFOODORDER to include MenuMaster.Vendor.");
+                }
+
+                result.MenuItems = result.MenuItems
+                    .Where(item => string.Equals(item.Vendor, vendor.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                result.Recommendations = result.Recommendations
+                    .Where(item => string.Equals(item.Vendor, vendor.Trim(), StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
 
             return Json(new

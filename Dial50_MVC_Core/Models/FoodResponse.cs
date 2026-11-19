@@ -32,5 +32,6 @@
         public string AllergensDietaryFlags { get; set; }
         public string DietaryType { get; set; }
         public decimal? Price { get; set; }    
+        public string Vendor { get; set; } = "";
     }
 }

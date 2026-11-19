@@ -25,6 +25,19 @@ namespace Dial50_MVC_Core.Repositories
 
         private string GetCs() => _tenantProvider.GetConnectionString();
 
+        private static string ReadOptionalString(SqlDataReader reader, string columnName)
+        {
+            for (var index = 0; index < reader.FieldCount; index++)
+            {
+                if (string.Equals(reader.GetName(index), columnName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return reader.IsDBNull(index) ? "" : reader.GetValue(index)?.ToString()?.Trim() ?? "";
+                }
+            }
+
+            return "";
+        }
+
         public async Task<PatientVM> GetPatientDetailsByRoomAsync(string roomNo)
         {
             PatientVM patient = new PatientVM { IsFound = false };
@@ -223,7 +236,8 @@ namespace Dial50_MVC_Core.Repositories
                                     Ingredients = reader["INGREDIENTS"]?.ToString() ?? "No ingredients listed.",
                                     AllergensDietaryFlags = reader["ALLERGENSDIETARYFLAGS"]?.ToString() ?? "",
                                     DietaryType = reader["DIETARY_TYPE"]?.ToString() ?? "",
-                                    Price = reader["PRICE"] != DBNull.Value ? Convert.ToDecimal(reader["PRICE"]) : (decimal?)null
+                                    Price = reader["PRICE"] != DBNull.Value ? Convert.ToDecimal(reader["PRICE"]) : (decimal?)null,
+                                    Vendor = ReadOptionalString(reader, "VENDOR")
                                 });
                             }
 
@@ -248,7 +262,8 @@ namespace Dial50_MVC_Core.Repositories
                                         DietaryType = reader["DIETARY_TYPE"]?.ToString() ?? "",
                                         Price = reader["PRICE"] != DBNull.Value ? Convert.ToDecimal(reader["PRICE"]) : (decimal?)null,
                                         AvgRating = reader["AVGRATING"] != DBNull.Value ? Convert.ToDecimal(reader["AVGRATING"]) : 0,
-                                        TotalRatings = reader["TOTALRATINGS"] != DBNull.Value ? Convert.ToInt32(reader["TOTALRATINGS"]) : 0
+                                        TotalRatings = reader["TOTALRATINGS"] != DBNull.Value ? Convert.ToInt32(reader["TOTALRATINGS"]) : 0,
+                                        Vendor = ReadOptionalString(reader, "VENDOR")
                                     });
                                 }
                             }

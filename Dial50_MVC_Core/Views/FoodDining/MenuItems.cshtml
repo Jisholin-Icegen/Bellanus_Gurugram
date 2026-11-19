@@ -256,7 +256,13 @@
             $.ajax({
                 url: '/FoodDining/GetMenuDetails',
                 type: 'GET',
-                data: { orderType: orderType, mealType: mealType, pRoom: pRoom, servingTime: servingTime },
+                data: {
+                    orderType: orderType,
+                    mealType: mealType,
+                    pRoom: pRoom,
+                    servingTime: servingTime,
+                    vendor: $("#vendorSelector").val() || ""
+                },
                 success: function (response) {
                     menuDetailsLoaded = true;
                     allMenuItems = [];
@@ -293,7 +299,7 @@
                     if (recCount > 0) {
                         $.each(response.recommendations, function (i, item) {
                             let lovedPercent = Math.round((parseFloat(item.avgRating || 0) / 2) * 100);
-                            recHtml += `<div class="rec-card" onclick="addToOrder('${item.id}', '${mealType}')"><div class="rec-header-row"><span class="rec-title">${i18n.t(item.foodName, item.foodName)}</span><i class="fa-solid fa-arrow-trend-up rec-trend-icon"></i></div><div class="rec-loved-badge"><i class="fa-regular fa-face-smile"></i><span>${lovedPercent}% loved this</span></div><div class="rec-footer-row"><span class="rec-response-count">${item.totalRatings} responses</span><span class="rec-add-btn">+ Add</span></div></div>`;
+                            recHtml += `<div class="rec-card" data-food-id="${item.id}" data-meal-type="${mealType}" onclick="addToOrder('${item.id}', '${mealType}')"><div class="rec-header-row"><span class="rec-title">${i18n.t(item.foodName, item.foodName)}</span><i class="fa-solid fa-arrow-trend-up rec-trend-icon"></i></div><div class="rec-loved-badge"><i class="fa-regular fa-face-smile"></i><span>${lovedPercent}% loved this</span></div><div class="rec-footer-row"><span class="rec-response-count">${item.totalRatings} responses</span><span class="rec-add-btn">+ Add</span></div></div>`;
                         });
                         $("#recommendedSection").html(recHtml);
                         $(".recommended-header").show();
@@ -322,7 +328,7 @@
                     ? `<span class="allergens-tag danger">Contains: ${item.allergens}</span>` : '';
 
                 menuHtml += `
-                <div class="menu-card-v2" data-diet="${dietClass}">
+                <div class="menu-card-v2" data-food-id="${item.id}" data-meal-type="${mealType}" data-diet="${dietClass}">
                     <div class="image-area-creamy ${photoClass}">
                         <img src="${img}" alt="${item.foodName}"
                              onerror="this.src='/images/defaultfood.png'; this.closest('.image-area-creamy').classList.remove('has-photo'); this.closest('.image-area-creamy').classList.add('no-photo');" />
@@ -358,7 +364,10 @@
                 error: function (xhr, status, err) {
                     menuDetailsLoaded = true;
                     console.error('[GetMenuDetails] failed:', status, err, xhr.responseText);
-                    $("#menuGrid").html('<div class="error-msg">Error loading menu. ' + (xhr.status ? '(' + xhr.status + ')' : '') + '</div>');
+                    const message = xhr.responseJSON && xhr.responseJSON.detail
+                        ? xhr.responseJSON.detail
+                        : 'Error loading menu.' + (xhr.status ? ' (' + xhr.status + ')' : '');
+                    $("#menuGrid").empty().append($('<div>', { class: 'error-msg', text: message }));
                 }
             });
         }
@@ -536,6 +545,9 @@
         document.addEventListener("DOMContentLoaded", async function () {
             await (window.i18nReady || Promise.resolve());
             loadMenuVendors();
+            $("#vendorSelector").on("change", function () {
+                if ($("#hdnMealType").val()) LoadMenuDetails();
+            });
             const mode = $("#hdnMealOrderType").val();
             if (mode === "preorder") setPreorderDate(0);
             else loadDynamicMealTabs();
@@ -611,6 +623,18 @@
                 if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, success, result, error);
             };
 
+            const dropdownControls = {
+                "food.select_vendor": { controlId: "vendorSelector", optionValue: action.vendor || action.value },
+                "food.select_diet": { controlId: "dietFilter", optionValue: action.diet || action.value },
+                "food.select_language": { controlId: "languageSelector", optionValue: action.language || action.value }
+            };
+            if (dropdownControls[action.action]) {
+                window.dispatchEvent(new CustomEvent("unified-ai:action", {
+                    detail: Object.assign({ action: "ui.select", request_id: action.request_id }, dropdownControls[action.action])
+                }));
+                return;
+            }
+
             if (action.action === "food.select_meal") {
                 try {
                     await waitForUnifiedFoodMeals(10000);
@@ -630,7 +654,8 @@
                 return;
             }
 
-            if (action.action !== "food.list_menu" && action.action !== "food.add_item" && action.action !== "food.review_order") return;
+            const supportedActions = ["food.list_menu", "food.add_item", "food.set_quantity", "food.remove_item", "food.review_order"];
+            if (supportedActions.indexOf(action.action) < 0) return;
 
             try {
                 await waitForUnifiedFoodMenu(15000);
@@ -642,35 +667,79 @@
             }
 
             if (action.action === "food.list_menu") {
+                const uniqueItems = Array.from(new Map(allMenuItems.map(function (item) {
+                    return [String(item.id), item];
+                })).values());
                 respond(true, {
                     meal: $("#hdnMealType").val(),
-                    items: allMenuItems.map(function (item) {
-                        return { id: item.id, name: item.foodName, meal: item.mealTiming || $("#hdnMealType").val() };
+                    vendor: $("#vendorSelector").val() || "",
+                    items: uniqueItems.map(function (item) {
+                        return {
+                            id: item.id,
+                            name: item.foodName,
+                            meal: item.mealTiming || $("#hdnMealType").val(),
+                            dietaryType: item.dietaryType || "",
+                            allergens: item.allergens || "",
+                            price: item.price == null ? null : item.price,
+                            calories: item.calories == null ? null : item.calories
+                        };
                     })
                 });
                 return;
             }
 
-            if (action.action === "food.add_item") {
-                const requestedName = String(action.itemName || "").trim().toLowerCase();
-                const item = allMenuItems.find(function (candidate) {
+            if (action.action === "food.add_item" || action.action === "food.set_quantity" || action.action === "food.remove_item") {
+                const requestedName = String(action.itemName || action.name || "").trim().toLowerCase();
+                const matches = Array.from(new Map(allMenuItems.map(function (candidate) {
+                    return [String(candidate.id), candidate];
+                })).values()).filter(function (candidate) {
+                    if (action.itemId != null) return String(candidate.id) === String(action.itemId);
                     return candidate.foodName && candidate.foodName.trim().toLowerCase() === requestedName;
                 });
-                if (!item) {
-                    respond(false, null, "The requested menu item was not found.");
+                if (matches.length !== 1) {
+                    respond(false, null, matches.length ? "The menu item name is ambiguous; provide its item ID." : "The requested menu item was not found.");
                     return;
                 }
 
                 const mealType = String(action.meal || $("#hdnMealType").val());
-                const quantity = Math.max(1, Math.min(20, Number.parseInt(action.quantity, 10) || 1));
+                const item = matches[0];
                 try {
-                    await addToOrder(item.id, mealType);
-                    for (let i = 1; i < quantity; i++) await changeQty(item.id, 1, mealType);
+                    if (action.action === "food.add_item") {
+                        const quantity = Math.max(1, Math.min(20, Number.parseInt(action.quantity, 10) || 1));
+                        for (let i = 0; i < quantity; i++) await addToOrder(item.id, mealType);
+                    } else {
+                        if (action.action === "food.set_quantity"
+                            && (action.quantity == null || String(action.quantity).trim() === "")) {
+                            respond(false, null, "A target quantity from 0 to 20 is required.");
+                            return;
+                        }
+                        const quantity = action.action === "food.remove_item" ? 0 : Number(action.quantity);
+                        if (!Number.isInteger(quantity) || quantity < 0 || quantity > 20) {
+                            respond(false, null, "Quantity must be a whole number from 0 to 20.");
+                            return;
+                        }
+                        const cartKey = item.id + "_" + mealType;
+                        let currentQuantity = currentCart[cartKey] ? Number(currentCart[cartKey].qty) || 0 : 0;
+                        while (currentQuantity < quantity) {
+                            await addToOrder(item.id, mealType);
+                            currentQuantity++;
+                        }
+                        while (currentQuantity > quantity) {
+                            await changeQty(item.id, -1, mealType);
+                            currentQuantity--;
+                        }
+                    }
                 } catch (error) {
-                    respond(false, null, "The menu item could not be saved to the cart.");
+                    respond(false, null, error && error.message ? error.message : "The menu item could not be saved to the cart.");
                     return;
                 }
-                respond(true, { itemName: item.foodName, quantity: quantity });
+                const cartKey = item.id + "_" + mealType;
+                respond(true, {
+                    itemId: item.id,
+                    itemName: item.foodName,
+                    quantity: currentCart[cartKey] ? currentCart[cartKey].qty : 0,
+                    meal: mealType
+                });
                 return;
             }
 
