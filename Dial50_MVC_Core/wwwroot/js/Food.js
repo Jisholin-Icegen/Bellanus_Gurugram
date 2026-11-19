@@ -120,8 +120,10 @@ function finishUnifiedFoodAction(success, result, error) {
 }
 
 function preserveUnifiedAI(url) {
-    if (new URLSearchParams(window.location.search).get("UnifiedAI") !== "1") return url;
+    var params = new URLSearchParams(window.location.search);
+    if (params.get("UnifiedAI") !== "1" && params.get("Unified") !== "1") return url;
     var target = new URL(url, window.location.origin);
+    target.searchParams.set("Unified", "1");
     target.searchParams.set("UnifiedAI", "1");
     return target.toString();
 }

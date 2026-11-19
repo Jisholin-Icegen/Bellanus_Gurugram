@@ -59,7 +59,9 @@
 
         url: function (page, extra) {
             var u = '/' + String(page).replace(/^\//, '') + '?BedInfo=' + encodeURIComponent(ctx.bedInfo);
-            if (params.get('UnifiedAI') === '1') u += '&UnifiedAI=1';
+            if (params.get('UnifiedAI') === '1' || params.get('Unified') === '1') {
+                u += '&Unified=1&UnifiedAI=1';
+            }
 
             if (extra) {
                 Object.keys(extra).forEach(function (k) {

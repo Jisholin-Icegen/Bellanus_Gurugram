@@ -928,13 +928,18 @@ window.addEventListener("unified-ai:action", function (event) {
             return;
         }
 
-        var category = String(action.category || "").trim().toLowerCase();
+        var categoryText = action.category || action.categoryName || action.serviceName || action.taskName || "";
         var service = availableServices.find(function (item) {
-            return (action.categoryId != null && String(item.CategoryId) === String(action.categoryId))
-                || (category && item.CategoryDescription.trim().toLowerCase() === category);
-        });
+            return action.categoryId != null && String(item.CategoryId) === String(action.categoryId);
+        }) || (window.UnifiedAIChild && window.UnifiedAIChild.resolveRequestCategory
+            ? window.UnifiedAIChild.resolveRequestCategory(availableServices, categoryText)
+            : null);
         if (!service) {
-            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "The requested logistics service was not found.");
+            if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.respond(action, false, {
+                    availableCategories: availableServices.map(function (item) { return item.CategoryDescription; })
+                }, "Could not uniquely match the requested logistics service. Ask the patient to clarify.");
+            }
             return;
         }
 
@@ -950,7 +955,9 @@ window.addEventListener("unified-ai:action", function (event) {
         window.__unifiedAIRequestAction = action;
         card.click();
         var remarksInput = document.getElementById("modalRemarks");
-        if (remarksInput) remarksInput.value = String(action.remarks || "").slice(0, 1000);
+        var remarks = action.remarks || action.details || action.description || action.userRequest
+            || action.transcript || action.categoryName || action.category || "";
+        if (remarksInput) remarksInput.value = String(remarks).slice(0, 1000);
         var quantityInput = document.getElementById("txtQuantity");
         if (quantityInput && Number.isInteger(Number(action.quantity))) {
             quantityInput.value = String(Math.max(1, Math.min(20, Number(action.quantity))));

@@ -1204,7 +1204,8 @@
 @{
     var useVideoAssistant = ViewData["UseVideoAssistant"] as bool? == true;
     var useCustomVoiceAgent = ViewData["UseCustomVoiceAgent"] as bool? == true;
-    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1"
+        || Context.Request.Query["Unified"] == "1";
 }
 
 @if (!isUnifiedAIFrame && !useVideoAssistant && !useCustomVoiceAgent)

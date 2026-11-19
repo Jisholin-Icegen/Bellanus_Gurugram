@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = ":: Food Services ::";
-    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1"
+        || Context.Request.Query["Unified"] == "1";
 }
 
 <link rel="stylesheet" href="~/fontawesome/css/all.min.css" />

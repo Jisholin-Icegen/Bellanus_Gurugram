@@ -1,6 +1,6 @@
 (function () {
     const params = new URLSearchParams(window.location.search);
-    if (window.parent === window || params.get("UnifiedAI") !== "1") return;
+    if (window.parent === window || (params.get("UnifiedAI") !== "1" && params.get("Unified") !== "1")) return;
 
     function respond(action, success, result, error) {
         if (!action || !action.request_id) return;
@@ -19,6 +19,7 @@
         if (target.origin !== window.location.origin) return null;
         const bedInfo = target.searchParams.get("BedInfo") || sessionStorage.getItem("bedInfo");
         if (bedInfo) target.searchParams.set("BedInfo", bedInfo);
+        target.searchParams.set("Unified", "1");
         target.searchParams.set("UnifiedAI", "1");
         return target;
     }
@@ -27,8 +28,33 @@
         return /\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(pathname);
     }
 
+    function resolveRequestCategory(categories, input) {
+        const stopWords = new Set(["a", "an", "can", "create", "for", "i", "is", "make", "my", "on", "please", "raise", "request", "service", "submit", "the", "want", "would", "you"]);
+        const normalize = function (value) {
+            return String(value || "")
+                .normalize("NFKD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, " ")
+                .trim()
+                .split(/\s+/)
+                .filter(function (word) { return word && !stopWords.has(word); })
+                .join(" ");
+        };
+        const requested = normalize(input);
+        if (!requested) return null;
+
+        const matches = (categories || []).filter(function (category) {
+            const name = normalize(category.CategoryDescription || category.name || category.title);
+            return name && (name === requested || requested.indexOf(" " + name + " ") >= 0
+                || (" " + requested + " ").indexOf(" " + name + " ") >= 0);
+        });
+        return matches.length === 1 ? matches[0] : null;
+    }
+
     window.UnifiedAIChild = {
         respond: respond,
+        resolveRequestCategory: resolveRequestCategory,
         showChat: function () {
             window.parent.postMessage({ type: "unified_ai_show_chat" }, window.location.origin);
         },

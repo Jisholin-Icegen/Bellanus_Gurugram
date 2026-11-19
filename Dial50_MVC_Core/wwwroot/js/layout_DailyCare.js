@@ -30,7 +30,8 @@ function bindNav() {
                 return;
             }
 
-            if (new URLSearchParams(window.location.search).get("UnifiedAI") === "1"
+            var params = new URLSearchParams(window.location.search);
+            if ((params.get("UnifiedAI") === "1" || params.get("Unified") === "1")
                 && window.BedContext && typeof window.BedContext.go === "function") {
                 window.BedContext.go(page === "FoodDining" ? "FoodDining/FoodDining" : page);
                 return;

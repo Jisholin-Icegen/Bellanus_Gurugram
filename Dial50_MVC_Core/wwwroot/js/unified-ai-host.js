@@ -115,6 +115,7 @@
             : {};
         const bedInfo = bedContext.bedInfo || new URLSearchParams(window.location.search).get("BedInfo");
         if (bedInfo) targetUrl.searchParams.set("BedInfo", bedInfo);
+        targetUrl.searchParams.set("Unified", "1");
         targetUrl.searchParams.set("UnifiedAI", "1");
 
         return loadFrameUrl(targetUrl, target, action);
@@ -125,6 +126,7 @@
         const bedContext = window.BedContext.get ? window.BedContext.get() : {};
         const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
         if (bedInfo) url.searchParams.set("BedInfo", bedInfo);
+        url.searchParams.set("Unified", "1");
         url.searchParams.set("UnifiedAI", "1");
         return loadFrameUrl(url, routeTargetForPath(url.pathname), null);
     }
@@ -338,6 +340,7 @@
         const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
         const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
         if (bedInfo && !targetUrl.searchParams.has("BedInfo")) targetUrl.searchParams.set("BedInfo", bedInfo);
+        targetUrl.searchParams.set("Unified", "1");
         targetUrl.searchParams.set("UnifiedAI", "1");
         event.preventDefault();
         event.stopImmediatePropagation();

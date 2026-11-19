@@ -2,7 +2,8 @@
 @{
     ViewData["Title"] = ":: My Daily Care ::";
     ViewData["UseVideoAssistant"] = true;
-    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1"
+        || Context.Request.Query["Unified"] == "1";
 }
 
 <link rel="stylesheet" href="~/css/DailyCare.css">
@@ -2713,10 +2714,7 @@
         <script src="~/js/video-ai/video-script.js"></script>
     }
     <script src="~/js/layout_DailyCare.js"></script>
-    @if (!isUnifiedAIFrame)
-    {
-        <script src="~/js/Dailycare.js"></script>
-    }
+    <script src="~/js/Dailycare.js"></script>
 
 </div>
 

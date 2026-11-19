@@ -29,29 +29,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const container = document.getElementById("pageContent");
     if (!container) return;
+    const params = new URLSearchParams(window.location.search);
+    const unifiedAI = !!window.UnifiedAIChild
+        || params.get("UnifiedAI") === "1"
+        || params.get("Unified") === "1";
+    const bedInfo = sessionStorage.getItem("bedInfo")
+        || new URLSearchParams(window.location.search).get("BedInfo")
+        || "";
+
+    function openDailyCareItem(item) {
+        if (unifiedAI && window.UnifiedAIChild) {
+            window.UnifiedAIChild.navigate(item.onclick_URL + encodeURIComponent(bedInfo));
+            return;
+        }
+        if (unifiedAI) {
+            const target = new URL(item.onclick_URL + encodeURIComponent(bedInfo), window.location.origin);
+            target.searchParams.set("Unified", "1");
+            target.searchParams.set("UnifiedAI", "1");
+            window.location.href = target.toString();
+            return;
+        }
+        if (item.title === "My Library") GoToChat();
+    }
 
     container.innerHTML = "";
 
-    const libraryItem = data.find(x => x.title === "My Library");
-    const otherItems = data.filter(x => x.title !== "My Library");
-
-    if (libraryItem) {
+    data.forEach(function (item) {
         const card = document.createElement("div");
-        card.className = "card focused";
-        card.innerHTML = `
-            <div class="icon-box">
-                <img src="${libraryItem.icon}" alt="${libraryItem.title}">
-            </div>
-            <h3>${libraryItem.title}</h3>
-            <p>${libraryItem.description}</p>
-        `;
-        card.addEventListener("click", GoToChat);
-        container.appendChild(card);
-    }
-
-    otherItems.forEach(item => {
-        const card = document.createElement("div");
-        card.className = "card faded";
+        card.className = unifiedAI || item.title === "My Library" ? "card focused" : "card faded";
         card.innerHTML = `
             <div class="icon-box">
                 <img src="${item.icon}" alt="${item.title}">
@@ -59,6 +64,11 @@ document.addEventListener("DOMContentLoaded", function () {
             <h3>${item.title}</h3>
             <p>${item.description}</p>
         `;
+        if (unifiedAI || item.title === "My Library") {
+            card.addEventListener("click", function () {
+                openDailyCareItem(item);
+            });
+        }
         container.appendChild(card);
     });
 });
