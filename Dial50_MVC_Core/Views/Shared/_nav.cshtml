@@ -146,3 +146,27 @@
         transform: scale(0.96);
     }
 </style>
+
+<script>
+    (function () {
+        var nav = document.getElementById("navContainer");
+        if (!nav) return;
+
+        nav.addEventListener("click", function (e) {
+            var btn = e.target.closest(".navBtn");
+            if (!btn || !nav.contains(btn)) return;
+
+            var page = btn.getAttribute("data-page");
+            if (!page) return;
+
+            var basePath = "/" + page;
+            var id = btn.getAttribute("data-id");
+
+            if (id) {
+                window.goToWithTenant(basePath + "?id=" + id);
+            } else {
+                window.goToWithTenant(basePath);
+            }
+        });
+    })();
+</script>

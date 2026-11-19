@@ -97,6 +97,22 @@
                     Browse menu
                 </button>
             </div>
+            <div class="order-total-card" id="orderTotalCard" style="display:none;">
+                <div class="ots-head">
+                    <span class="ots-title"><i class="fa-solid fa-receipt"></i> Order Summary</span>
+                    <span class="ots-count"><b id="sumItemCount">0</b> items</span>
+                </div>
+                <div class="ots-diet">
+                    <span class="ots-pill veg"><i class="fa-solid fa-leaf"></i> Veg <b id="sumVegCount">0</b></span>
+                    <span class="ots-pill nonveg"><i class="fa-solid fa-drumstick-bite"></i> Non-Veg <b id="sumNonVegCount">0</b></span>
+                </div>
+                <div class="ots-row visitor-only" style="display:none;">
+                    <span>Subtotal</span><span id="sumSubtotal">$0.00</span>
+                </div>
+                <div class="ots-total visitor-only" style="display:none;">
+                    <span>Total to pay</span><span id="sumGrandTotal">$0.00</span>
+                </div>
+            </div> 
             <div id="confirmOrderBar" class="floating-confirm-bar">
                 <button class="confirm-btn-green" onclick="submitFinalOrder()">
                     Confirm Order (<span id="review-total-count">0</span> items)
@@ -165,6 +181,7 @@
             renderReviewItems();
             updateDynamicHeader();
             loadSpecialInstruction();
+
 
             function loadSpecialInstruction() {
                 let note = localStorage.getItem("SpecialInstruction");

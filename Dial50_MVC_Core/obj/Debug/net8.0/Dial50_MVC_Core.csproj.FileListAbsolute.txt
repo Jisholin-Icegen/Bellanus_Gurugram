@@ -5254,6 +5254,7 @@ D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debu
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Composition.Runtime.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Composition.TypedParts.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Data.SqlClient.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Diagnostics.EventLog.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Drawing.Common.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
@@ -5331,6 +5332,11 @@ D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debu
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-arm64\native\sni.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x64\native\sni.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x86\native\sni.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll
+D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Diagnostics.EventLog.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
@@ -5362,9 +5368,3 @@ D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\obj\Debu
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\obj\Debug\net8.0\Dial50_MVC_Core.pdb
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\obj\Debug\net8.0\Dial50_MVC_Core.genruntimeconfig.cache
 D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\obj\Debug\net8.0\ref\Dial50_MVC_Core.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\System.Data.SqlClient.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-arm64\native\sni.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x64\native\sni.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win-x86\native\sni.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll
-D:\PROJECT\BELLANUS & GURUGRAM\GIT CODES\MULTITENANT-QR\Dial50_MVC_Core\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll

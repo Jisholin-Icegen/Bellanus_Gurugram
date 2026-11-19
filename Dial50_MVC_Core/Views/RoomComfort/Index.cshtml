@@ -185,10 +185,20 @@
     var curpage = window.location.pathname.split("/").pop();
 
     function GoToChat() {
-        window.location.href = BedContext.url('@Url.Action("Chat", "AI")');
+
+        if (window.BedContext) {
+            window.location.href = BedContext.url('@Url.Action("Chat", "AI")');
+        } else {
+            window.location.href = '@Url.Action("Chat", "AI")';
+        }
     }
+
     function GoToCurrentRequest() {
-        BedContext.go('CurrentRequests/Index', { FromLoc: 'RoomComfort' });
+        if (window.BedContext) {
+            BedContext.go('CurrentRequests/Index', { FromLoc: 'RoomComfort' });
+        } else {
+            window.location.href = '/CurrentRequests/Index?FromLoc=RoomComfort';
+        }
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -196,14 +206,26 @@
         buttons.forEach(function (button) {
             if (button.dataset.page === curpage) button.classList.add("active");
             button.addEventListener("click", function () {
-                BedContext.go(this.getAttribute("data-page"));
+                if (window.BedContext) {
+                    BedContext.go(this.getAttribute("data-page"));
+                } else {
+                    window.location.href = '/' + this.getAttribute("data-page");
+                }
             });
         });
-    });
 
-    window.__taskTypesRequest = fetch('/RoomComfort/GetTaskTypes', { cache: 'no-store' })
-        .then(function (r) { return r.json(); })
-        .catch(function () { return []; });
+        window.__taskTypesRequest = fetch(window.BedContext ? BedContext.url('/RoomComfort/GetTaskTypes') : '/RoomComfort/GetTaskTypes', {
+            cache: 'no-store'
+        })
+        .then(function (r) {
+            if (!r.ok) throw new Error("HTTP " + r.status);
+            return r.json();
+        })
+        .catch(function (err) {
+            console.warn("Failed to load task types:", err);
+            return [];
+        });
+    });
 </script>
 
 <script src="~/js/layout_DailyCare.js" defer></script>

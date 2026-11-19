@@ -174,7 +174,6 @@
                 overflow-wrap: anywhere !important;
             }
 
-            /* Card description (Increased Size) */
             #pageContent .card p {
                 width: 100% !important;
                 margin: 0 !important;
@@ -188,7 +187,6 @@
                 overflow-wrap: anywhere !important;
             }
 
-            /* Active card - Updated to soft grey shadow */
             #pageContent .card.focused {
                 opacity: 1 !important;
                 filter: none !important;
@@ -250,9 +248,6 @@
 
     }
 
-    /* =====================================================
-           CONFIRM MODAL
-           ===================================================== */
     .chat-confirm-overlay {
         position: fixed;
         inset: 0;
@@ -332,9 +327,6 @@
         color: #ffffff;
     }
 
-    /* =====================================================
-           AUTO-START LOADER (hides the page until the call is starting)
-           ===================================================== */
     html[data-autostart="pending"] .app-wrapper > *:not(#autoStartLoader) {
         visibility: hidden !important;
         opacity: 0 !important;
@@ -801,7 +793,6 @@
         display: none !important;
     }
 
-    /* No animations while a call is running: frees the main thread for audio */
     body:is([data-state="connecting"], [data-state="connected"]) #callLayer,
     body:is([data-state="connecting"], [data-state="connected"]) #callLayer *,
     body:is([data-state="connecting"], [data-state="connected"]) #callLayer *::before,
@@ -810,9 +801,6 @@
         text-shadow: none !important;
     }
 
-    /* =====================================================
-           VIDEO OVERLAY
-           ===================================================== */
     .video-overlay {
         position: fixed;
         inset: 0;

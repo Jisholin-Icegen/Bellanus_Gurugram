@@ -14,13 +14,10 @@ namespace Dial50_MVC_Core.Services
     {
         public string BedInfo { get; set; } = "";
         public string Region { get; set; } = "IN";
-
         public bool IsValid { get; set; }
-
         public string BedId { get; set; } = "";
         public string UserId => BedId;
         public string BedIdHis { get; set; } = "";
-
         public bool HasPatient { get; set; }
         public string PatientName { get; set; } = "";
         public string RoomNumber { get; set; } = "";
@@ -64,7 +61,6 @@ namespace Dial50_MVC_Core.Services
     public class BedContextAccessor : IBedContextAccessor
     {
         private const string ItemKey = "__BedContext";
-
         private readonly IHttpContextAccessor _http;
         private readonly LandingProtector _protector;
         private readonly IPatientRepository _patientRepository;
@@ -178,11 +174,9 @@ namespace Dial50_MVC_Core.Services
                     ctx.Age = Convert.ToString(patient.Age) ?? "";
                     ctx.DietType = Convert.ToString(patient.DietType) ?? "";
                     ctx.Allergies = Convert.ToString(patient.Allergies) ?? "";
-
                     ctx.Tier = Convert.ToString(patient.TierName) ?? "";
                     ctx.TierCode = Convert.ToString(patient.TierCode) ?? "";
                     ctx.TierLevel = Convert.ToString(patient.TierLevel) ?? "";
-
                     ctx.HasPatient = !string.IsNullOrEmpty(ctx.PatientName);
                 }
             }
@@ -201,13 +195,26 @@ namespace Dial50_MVC_Core.Services
         {
             var query = context.HttpContext.Request.Query;
             var token = query["BedInfo"].ToString();
+            var tenantId = query["XTenantID"].ToString();
+            var httpContext = context.HttpContext;
+
+            if (httpContext.Session != null)
+            {
+                if (!string.IsNullOrWhiteSpace(tenantId))
+                {
+                    httpContext.Session.SetString("XTenantID", tenantId);
+                }
+                else
+                {
+                    tenantId = httpContext.Session.GetString("XTenantID") ?? "";
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(token) && context.Controller is Controller c)
             {
                 var b = await _accessor.ResolveAsync(token, query["region"].ToString());
 
                 c.ViewBag.BedContext = b;
-
                 c.ViewBag.bedInfo = b.BedInfo;
                 c.ViewBag.BedId = b.BedId;
                 c.ViewBag.UserId = b.UserId;
@@ -228,8 +235,12 @@ namespace Dial50_MVC_Core.Services
                 c.ViewBag.Tier = b.Tier;
                 c.ViewBag.TierCode = b.TierCode;
                 c.ViewBag.TierLevel = b.TierLevel;
-
                 c.TempData["Region"] = b.Region;
+            }
+
+            if (context.Controller is Controller controller)
+            {
+                controller.ViewBag.TenantId = tenantId;
             }
 
             await next();

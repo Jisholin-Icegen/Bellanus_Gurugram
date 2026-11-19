@@ -76,16 +76,13 @@
     }
 
     async function fetchProfileLanguage(id) {
-        if (!id || !PROFILE_API_URL) return null;
+        if (!id || typeof PROFILE_API_URL === 'undefined') return null;
         try {
-            var rawTenant = new URLSearchParams(window.location.search).get("XTenantID") || "";
-            var tenantId = decodeURIComponent(rawTenant);
-
-            var payload = {
-                userId: id,
-                Status: "GET",
-                "X-Tenant-ID": tenantId
-            };
+            var tenantId = window.BedContext.getTenantId();
+            if (!tenantId) {
+                console.warn("GetProfileOld failed: No TenantId in BedContext");
+                return null;
+            }
 
             var res = await fetch(PROFILE_API_URL, {
                 method: "POST",
@@ -93,7 +90,7 @@
                     "Content-Type": "application/json",
                     "X-Tenant-ID": tenantId
                 },
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ userId: String(id) })
             });
 
             if (!res.ok) throw new Error("HTTP " + res.status);
@@ -101,7 +98,7 @@
             if (!result.status || !result.data || !result.data.Language) return null;
             return result.data.Language;
         } catch (err) {
-            console.warn("GetProfileOld failed — using region default language:", err.message);
+            console.warn("GetProfileOld failed:", err.message);
             return null;
         }
     }

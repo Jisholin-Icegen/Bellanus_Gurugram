@@ -690,7 +690,7 @@
                     sessionStorage.setItem('lastRequestId', currentRequestId);
 
                     closeModal();
-                    $("#mainContentArea").hide();
+                    //$("#mainContentArea").hide();
 
                     loadSuccessTasks();
                     $("#modalSubmit").prop("disabled", false).text("Confirm Request");
@@ -860,7 +860,7 @@
 
     function closeSuccessModal() {
         document.getElementById('requestSuccessScreen').classList.remove('show');
-        $('#mainContentArea').show();
+        //$('#mainContentArea').show();
     }
 
     function GoToBack() {

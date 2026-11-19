@@ -9,6 +9,7 @@
     var ctx = {
         bedInfo: params.get('BedInfo') || S.bedInfo || sessionStorage.getItem('bedInfo') || '',
         region: params.get('region') || S.region || sessionStorage.getItem('region') || '',
+        tenantId: params.get('XTenantID') || S.tenantId || sessionStorage.getItem('XTenantID') || '',
         bedId: pick(S.bedId, 'BedId'),
         userId: pick(S.userId, 'userId'),
         hasPatient: !!S.hasPatient,
@@ -30,6 +31,7 @@
     function save(key, val) { if (val) sessionStorage.setItem(key, val); }
     save('bedInfo', ctx.bedInfo);
     save('region', ctx.region);
+    save('XTenantID', ctx.tenantId); // Saved for API headers
     save('BedId', ctx.bedId);
     save('realBedId', ctx.bedId);
     save('userId', ctx.userId);
@@ -50,17 +52,19 @@
 
     window.BedContext = {
         get: function () { return ctx; },
-
         taskBedId: function () { return ctx.bedId || ctx.bedInfo; },
-
         taskBedNumber: function () { return ctx.roomBed || ctx.bedNumber || ctx.roomNumber; },
+
+        getTenantId: function () { return ctx.tenantId; },
 
         url: function (page, extra) {
             var u = '/' + String(page).replace(/^\//, '') + '?BedInfo=' + encodeURIComponent(ctx.bedInfo);
-            if (ctx.region) u += '&region=' + encodeURIComponent(ctx.region);
-            if (extra) Object.keys(extra).forEach(function (k) {
-                u += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extra[k]);
-            });
+
+            if (extra) {
+                Object.keys(extra).forEach(function (k) {
+                    u += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extra[k]);
+                });
+            }
             return u;
         },
 

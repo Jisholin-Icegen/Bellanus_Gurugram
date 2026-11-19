@@ -18,11 +18,19 @@
         public string Allergens { get; set; }
         public string Tags { get; set; }
         public string ImagePath { get; set; }
-
         public int IsDefaultOrder { get; set; }
         public decimal AvgRating { get; set; }
         public int TotalRatings { get; set; }
         public int? Calories { get; set; }
+        public string Protein { get; set; }
+        public string Carbs { get; set; }  
+        public string TotalFat { get; set; }
+        public string Sodium { get; set; }  
+        public string Sugar { get; set; }   
+        public string Ingredients { get; set; }
 
+        public string AllergensDietaryFlags { get; set; }
+        public string DietaryType { get; set; }
+        public decimal? Price { get; set; }    
     }
 }

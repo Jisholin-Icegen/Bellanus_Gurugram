@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fd8ce0009eef953632383dccab3b39c30f794ba7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d535625716d18923b423b73159c5e3023bbc3fe1")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

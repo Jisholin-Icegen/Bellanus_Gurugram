@@ -138,7 +138,9 @@ function addToOrder(id, specificMealType) {
         mealType: mealType,
         name: item.foodName,
         itemDesc: item.description || "",
-        calories: item.calories, 
+        calories: parseInt(item.calories) || 0,
+        price: parseFloat(item.price) || 0,
+        dietaryType: item.dietaryType || '',
         qty: 1
     };
 
@@ -171,6 +173,9 @@ function LoadCartFromDatabase() {
                     mealType: item.mealType,
                     name: item.itemName,
                     itemDesc: item.itemDesc,
+                    calories: item.quantity > 0 ? Math.round((parseInt(item.calories) || 0) / item.quantity) : 0,
+                    price: parseFloat(item.price) || 0,
+                    dietaryType: item.dietaryType || '',
                     qty: item.quantity
                 };
                 if (item.mealType.toLowerCase() === activeTabMealType.toLowerCase()) {
@@ -218,6 +223,10 @@ function changeQty(id, delta, specificMealType) {
     } else {
         SaveCartToDatabase(currentCart[cartKey]);
         $(`#qty-count-${sanitizedId}`).text(currentCart[cartKey].qty);
+        const c = currentCart[cartKey];
+        if (c.price) {
+            $(`#row-price-${sanitizedId}`).text('$' + (c.price * c.qty).toFixed(2));
+        }
         if ($(`#cal-count-${sanitizedId}`).length) {
             const newTotalCals = baseCalories * currentCart[cartKey].qty;
             $(`#cal-count-${sanitizedId}`).text(newTotalCals);
@@ -245,7 +254,9 @@ function SaveCartToDatabase(item) {
         Quantity: item.qty,
         OrderType: $("#hdnOrderType").val(),
         MealType: item.mealType,
-        Calories: totalCalories
+        Calories: totalCalories,
+        Price: item.price || 0,
+        DietaryType: item.dietaryType || ''
     };
 
     $.ajax({
@@ -254,6 +265,42 @@ function SaveCartToDatabase(item) {
         contentType: 'application/json',
         data: JSON.stringify(payload)
     });
+}
+function getItemMeta(id) {
+    try { return (JSON.parse(localStorage.getItem('MenuMeta') || '{}'))[String(id)] || {}; }
+    catch (e) { return {}; }
+}
+
+function dietInfo(d) {
+    d = (d || '').toLowerCase();
+    if (d.includes('non')) return { cls: 'nonveg', label: 'NON-VEG', icon: 'fa-drumstick-bite' };
+    if (d.includes('vegan')) return { cls: 'vegan', label: 'VEGAN', icon: 'fa-seedling' };
+    return { cls: 'veg', label: 'VEG', icon: 'fa-leaf' };
+}
+
+function renderOrderSummary() {
+    const isVisitor = isVisitorOrder();
+    let count = 0, veg = 0, nonVeg = 0, total = 0;
+
+    Object.values(currentCart || {}).forEach(it => {
+        const q = parseInt(it.qty, 10) || 0;
+        const p = parseFloat(it.price) || 0;
+        count += q;
+        total += p * q;
+        if (dietInfo(it.dietaryType).cls === 'nonveg') nonVeg += q; else veg += q;
+    });
+
+    $("#sumItemCount").text(count);
+    $("#sumVegCount").text(veg);
+    $("#sumNonVegCount").text(nonVeg);
+
+    if (isVisitor) {
+        $("#sumSubtotal, #sumGrandTotal").text("$" + total.toFixed(2));
+        $("#orderTotalCard .visitor-only").show();
+    } else {
+        $("#orderTotalCard .visitor-only").hide();
+    }
+    $("#orderTotalCard").toggle(count > 0);
 }
 
 function updateReviewBar() {
@@ -264,6 +311,8 @@ function updateReviewBar() {
             return sum + (parseInt(item.qty) || 0);
         }, 0);
     }
+
+    if (typeof renderOrderSummary === 'function' && $("#orderTotalCard").length) renderOrderSummary();
 
     $("#total-cart-count").text(totalItems);
     $("#review-total-count").text(totalItems);
@@ -362,50 +411,72 @@ function showEmptyCartUI() {
     updateReviewBar();
 }
 
+function isVisitorOrder() {
+    const hdn = ($("#hdnOrderType").val() || '').toLowerCase();
+    if (hdn) return hdn === 'visitor';
+    return Object.values(currentCart || {}).some(i => (i.orderType || '').toLowerCase() === 'visitor');
+}
+
 function getCartItemRowHtml(item, isStandalone = false) {
     const cartKey = item.itemId + "_" + item.mealType;
-    const sanitizedId = (item.itemId + "_" + item.mealType).replace(/\s+/g, '_');
+    const sid = (item.itemId + "_" + item.mealType).replace(/\s+/g, '_');
+    const meta = getItemMeta(item.itemId);
 
-    const totalCaloriesFromDB = parseInt(item.calories || item.Calories) || 0;
-
-    const baseCalories = totalCaloriesFromDB > 0 ? Math.round(totalCaloriesFromDB / item.quantity) : 0;
+    const totalCal = parseInt(item.calories || item.Calories) || 0;
+    const baseCal = totalCal > 0 ? Math.round(totalCal / item.quantity) : 0;
+    const price = parseFloat(item.price) || 0;
+    const dietType = item.dietaryType || '';
+    const imgPath = meta.imagePath || '';
 
     currentCart[cartKey] = {
-        id: item.itemId,
-        mealType: item.mealType,
-        name: item.itemName,
-        itemDesc: item.itemDesc,
-        calories: baseCalories,
-        qty: item.quantity
+        id: item.itemId, mealType: item.mealType, name: item.itemName,
+        itemDesc: item.itemDesc, calories: baseCal,
+        price: price, dietaryType: dietType,
+        orderType: item.orderType, qty: item.quantity
     };
 
-    return `
-        <div class="${isStandalone ? 'review-item-card' : 'review-item-row-inner'}" id="card-${sanitizedId}">
-            <div class="item-img-box"><img src="/images/defaultfood.png" style="width:45px;" /></div>
-            
-            <div class="item-details">
-                <h3>${i18n.t(item.itemName, item.itemName)}</h3>
-                <p>${item.itemDesc || ''}</p>
-                
-                ${totalCaloriesFromDB > 0 ? `
-                <div class="item-calories-row" id="cal-row-${sanitizedId}">
-                    <i class="fa-solid fa-fire"></i> 
-                    <span id="cal-count-${sanitizedId}">${totalCaloriesFromDB}</span> cal
-                </div>` : ''}
+    const isVisitor = (item.orderType || $("#hdnOrderType").val() || '').toLowerCase() === 'visitor';
 
+    const hasPhoto = imgPath && !/defaultfood/i.test(imgPath);
+    const img = hasPhoto ? imgPath : '/images/defaultfood.png';
+    const d = dietInfo(dietType);
+
+    const priceBlock = (isVisitor && price > 0) ? `
+        <div class="rv-price">
+            <span class="rv-unit">$${price.toFixed(2)} each</span>
+            <span class="rv-line" id="row-price-${sid}">$${(price * item.quantity).toFixed(2)}</span>
+        </div>` : '';
+
+    return `
+    <div class="rv-card" id="card-${sid}">
+            <div class="rv-img ${hasPhoto ? 'has-photo' : 'no-photo'}">
+                ${hasPhoto
+                        ? `<img src="${img}" alt="" onerror="this.outerHTML='<i class=\\'fa-solid fa-utensils rv-ph\\'></i>'; " />`
+                        : `<i class="fa-solid fa-utensils rv-ph"></i>`}
+                <span class="rv-diet-dot ${d.cls}"><i class="fa-solid ${d.icon}"></i></span>
             </div>
-            
-            <div class="qty-selector-v2">
-                <button class="qty-btn-v2 minus" onclick="changeQty('${item.itemId}', -1, '${item.mealType}')">−</button>
-                <span class="qty-count-v2" id="qty-count-${sanitizedId}">${item.quantity}</span>
-                <button class="qty-btn-v2 plus" onclick="changeQty('${item.itemId}', 1, '${item.mealType}')">+</button>
-            </div>
-            <div class="item-remove">
-                <button class="btn-remove" onclick="changeQty('${item.itemId}', -${item.quantity}, '${item.mealType}')">
-                    <img src="/images/Delete.png" style="width:18px;" />
+            <div class="rv-body">
+            <div class="rv-top">
+                <h3 class="rv-title cart-item-title">${i18n.t(item.itemName, item.itemName)}</h3>
+                <button class="rv-del" onclick="changeQty('${item.itemId}', -${item.quantity}, '${item.mealType}')">
+                    <i class="fa-regular fa-trash-can"></i>
                 </button>
             </div>
-        </div>`;
+            <p class="rv-desc">${item.itemDesc || ''}</p>
+            <div class="rv-tags">
+                <span class="diet-chip ${d.cls}">${d.label}</span>
+                ${totalCal > 0 ? `<span class="rv-cal"><i class="fa-solid fa-fire"></i> <span id="cal-count-${sid}">${totalCal}</span> cal</span>` : ''}
+            </div>
+            <div class="rv-bottom">
+                <div class="qty-selector-v2">
+                    <button class="qty-btn-v2 minus" onclick="changeQty('${item.itemId}', -1, '${item.mealType}')">−</button>
+                    <span class="qty-count-v2" id="qty-count-${sid}">${item.quantity}</span>
+                    <button class="qty-btn-v2 plus" onclick="changeQty('${item.itemId}', 1, '${item.mealType}')">+</button>
+                </div>
+                ${priceBlock}
+            </div>
+        </div>
+    </div>`;
 }
 
 function updateDynamicHeader() {
