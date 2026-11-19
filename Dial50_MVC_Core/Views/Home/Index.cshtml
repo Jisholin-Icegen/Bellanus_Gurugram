@@ -2275,6 +2275,8 @@
             <button type="button" id="unifiedAiTestCloseButton" aria-label="Hide local AI test tools">Hide</button>
         </div>
         <p>Dispatch simulated actions without a WebSocket. Creating requests, adding cart items, submitting orders, or submitting feedback may write to the configured database.</p>
+        <button type="button" id="unifiedAiTestSessionButton">Start simulated assistant session</button>
+        <p>This shows the persistent assistant controls and page navigation without connecting to Azure AI. The microphone stays disabled.</p>
         <textarea id="unifiedAiTestAction" spellcheck="false">{"action":"navigate","target":"room_comfort"}</textarea>
         <div class="unified-ai-test-actions">
             <button type="button" data-unified-ai-sample='{"action":"navigate","target":"room_comfort"}'>Room Comfort</button>

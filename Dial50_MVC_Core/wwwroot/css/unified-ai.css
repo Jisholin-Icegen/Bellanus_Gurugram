@@ -205,7 +205,8 @@
     cursor: pointer;
 }
 
-#unifiedAiTestPanel #unifiedAiTestRunButton {
+#unifiedAiTestPanel #unifiedAiTestRunButton,
+#unifiedAiTestPanel #unifiedAiTestSessionButton {
     border-color: #2563eb;
     background: #2563eb;
     color: #ffffff;

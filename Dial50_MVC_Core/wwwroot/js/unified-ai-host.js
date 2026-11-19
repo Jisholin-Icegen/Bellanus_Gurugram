@@ -38,10 +38,11 @@
     let activeTarget = null;
     let latestFrameContext = null;
     let lastSentContext = "";
+    let simulatedSession = false;
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
-        return state === "connecting" || state === "connected";
+        return simulatedSession || state === "connecting" || state === "connected";
     }
 
     function homePageContext() {
@@ -86,7 +87,7 @@
     }
 
     function sendCurrentPageContext() {
-        if (document.body.getAttribute("data-state") !== "connected"
+        if (simulatedSession || document.body.getAttribute("data-state") !== "connected"
             || typeof window.sendVoiceAgentMessage !== "function") return;
         const context = frameLayer.classList.contains("is-open") ? latestFrameContext : homePageContext();
         if (frameLayer.classList.contains("is-open") && context && frame.contentWindow) {
@@ -105,15 +106,18 @@
     }
 
     function updateFloatingBar() {
-        const connected = document.body.getAttribute("data-state") === "connected";
-        if (!connected) lastSentContext = "";
+        const realConnection = document.body.getAttribute("data-state") === "connected";
+        const connected = realConnection || simulatedSession;
+        if (!realConnection) lastSentContext = "";
         if (floatingBar) {
             floatingBar.hidden = !connected;
             const callStatus = document.getElementById("callStatus");
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
             if (statusText) {
-                statusText.textContent = callStatus && callStatus.textContent.trim() || "Connected";
+                statusText.textContent = simulatedSession
+                    ? "Demo mode · AI off"
+                    : callStatus && callStatus.textContent.trim() || "Connected";
             }
             if (barMicButton) {
                 const muted = !!(micButton && micButton.classList.contains("muted"));
@@ -122,7 +126,7 @@
                     ? '<i class="fa-solid fa-microphone-slash" aria-hidden="true"></i>'
                     : '<i class="fa-solid fa-microphone" aria-hidden="true"></i>';
                 barMicButton.setAttribute("aria-label", muted ? "Unmute microphone" : "Mute microphone");
-                barMicButton.disabled = !connected;
+                barMicButton.disabled = !realConnection;
             }
         }
         if (connected) sendCurrentPageContext();
@@ -381,6 +385,12 @@
 
     if (barEndButton) {
         barEndButton.addEventListener("click", function () {
+            if (simulatedSession) {
+                simulatedSession = false;
+                showChat();
+                updateFloatingBar();
+                return;
+            }
             if (typeof window.endChat === "function") window.endChat();
             showChat();
             updateFloatingBar();
@@ -393,7 +403,7 @@
         barMicButton.addEventListener("click", function (event) {
             event.stopPropagation();
             const micButton = document.getElementById("micBtn");
-            if (isCallActive() && micButton) micButton.click();
+            if (!simulatedSession && isCallActive() && micButton) micButton.click();
             updateFloatingBar();
         });
     }
@@ -422,6 +432,17 @@
         } catch (error) {
             if (testOutput) testOutput.textContent = error.message;
         }
+    }
+
+    const testSessionButton = document.getElementById("unifiedAiTestSessionButton");
+    if (testSessionButton) {
+        testSessionButton.addEventListener("click", function () {
+            if (!isLocalTestMode) return;
+            simulatedSession = true;
+            updateFloatingBar();
+            if (testPanel) testPanel.hidden = true;
+            if (testLauncher) testLauncher.hidden = false;
+        });
     }
 
     if (testRunButton) testRunButton.addEventListener("click", runTestAction);
