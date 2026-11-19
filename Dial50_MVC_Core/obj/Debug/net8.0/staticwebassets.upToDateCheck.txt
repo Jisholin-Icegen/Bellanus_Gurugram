@@ -388,6 +388,7 @@ wwwroot\js\video-ai\config.js
 wwwroot\js\video-ai\video-script.js
 wwwroot\js\voice-agent\config.example.js
 wwwroot\js\voice-agent\config.js
+wwwroot\js\voice-agent\script.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
@@ -459,4 +460,3 @@ wwwroot\locales\zh.json
 wwwroot\manifest.json
 wwwroot\models\silero-vad.onnx
 wwwroot\sw.js
-wwwroot\js\voice-agent\script.js

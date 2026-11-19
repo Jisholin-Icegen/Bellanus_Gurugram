@@ -44,6 +44,17 @@
                     <i class="fa-solid fa-chevron-down diet-filter-arrow"></i>
                 </div>
 
+                <div class="lang-group vendor-group">
+                    <label for="vendorSelector" style="font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin: 0; white-space: nowrap;">
+                        <i class="fa-solid fa-store" style="font-size: 14px;"></i> Vendor
+                    </label>
+                    <div class="lang-dropdown-wrap">
+                        <select id="vendorSelector" class="lang-select" aria-label="Select vendor">
+                            <option value="">Loading vendors...</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="lang-group">
                     <label for="languageSelector" style="font-size: 13px; font-weight: 600; color: #64748b; display: flex; align-items: center; gap: 6px; margin: 0; white-space: nowrap;">
                         <i class="fa-solid fa-globe" style="font-size: 14px;"></i> Choose Your Language
@@ -190,6 +201,26 @@
             };
             const end = getMinutes(endTimeStr);
             return currentTimeMinutes >= end;
+        }
+
+        function loadMenuVendors() {
+            const $vendorSelector = $("#vendorSelector");
+            $.ajax({
+                url: '/FoodDining/GetMenuVendors',
+                type: 'GET',
+                success: function (vendors) {
+                    $vendorSelector.empty().append($('<option>', { value: '', text: 'All Vendors' }));
+                    vendors.forEach(function (vendor) {
+                        $vendorSelector.append($('<option>', { value: vendor, text: vendor }));
+                    });
+                },
+                error: function (xhr, status, err) {
+                    console.error('[GetMenuVendors] failed:', status, err, xhr.responseText);
+                    $vendorSelector.empty()
+                        .append($('<option>', { value: '', text: 'Unable to load vendors' }))
+                        .prop('disabled', true);
+                }
+            });
         }
 
         function loadDynamicMealTabs() {
@@ -499,6 +530,7 @@
 
         document.addEventListener("DOMContentLoaded", async function () {
             await (window.i18nReady || Promise.resolve());
+            loadMenuVendors();
             const mode = $("#hdnMealOrderType").val();
             if (mode === "preorder") setPreorderDate(0);
             else loadDynamicMealTabs();
