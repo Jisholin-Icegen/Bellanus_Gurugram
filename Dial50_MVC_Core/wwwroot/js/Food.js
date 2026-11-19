@@ -112,6 +112,20 @@ function setSpecialInstruction(val) {
 var allMenuItems = allMenuItems || [];
 var currentCart = currentCart || {};
 
+function finishUnifiedFoodAction(success, result, error) {
+    var action = window.__unifiedAIFoodAction;
+    if (!action || !window.UnifiedAIChild) return;
+    window.__unifiedAIFoodAction = null;
+    window.UnifiedAIChild.respond(action, success, result, error);
+}
+
+function preserveUnifiedAI(url) {
+    if (new URLSearchParams(window.location.search).get("UnifiedAI") !== "1") return url;
+    var target = new URL(url, window.location.origin);
+    target.searchParams.set("UnifiedAI", "1");
+    return target.toString();
+}
+
 function getRoomBed() {
     return sessionStorage.getItem('RoomBed')
         || sessionStorage.getItem('bedInfo')
@@ -126,12 +140,11 @@ function addToOrder(id, specificMealType) {
     if (!currentCart) { currentCart = {}; }
 
     if (currentCart[cartKey]) {
-        changeQty(id, 1, mealType);
-        return;
+        return changeQty(id, 1, mealType);
     }
 
     var item = allMenuItems.find(x => x.id == id);
-    if (!item) return;
+    if (!item) return null;
 
     currentCart[cartKey] = {
         id: item.id,
@@ -144,7 +157,7 @@ function addToOrder(id, specificMealType) {
         qty: 1
     };
 
-    SaveCartToDatabase(currentCart[cartKey]);
+    var saveRequest = SaveCartToDatabase(currentCart[cartKey]);
 
     $(`#add-btn-${sanitizedId}`).hide();
     $(`#qty-selector-${sanitizedId}`).css("display", "inline-flex");
@@ -153,6 +166,7 @@ function addToOrder(id, specificMealType) {
     updateReviewBar();
     const translatedName = i18n.t(item.foodName, item.foodName);
     showCancelToast(translatedName + " added to cart");
+    return saveRequest;
 }
 
 function LoadCartFromDatabase() {
@@ -161,7 +175,7 @@ function LoadCartFromDatabase() {
 
     if (!roomNo) return;
 
-    $.get('/FoodDining/GetCartItems', { roomNo: roomNo }, function (data) {
+    return $.get('/FoodDining/GetCartItems', { roomNo: roomNo }, function (data) {
         currentCart = {};
 
         if (data) {
@@ -198,15 +212,16 @@ function changeQty(id, delta, specificMealType) {
     const cartKey = id + "_" + mealType;
     const sanitizedId = (id + "_" + mealType).replace(/\s+/g, '_');
 
-    if (!currentCart[cartKey]) return;
+    if (!currentCart[cartKey]) return null;
     const itemName = currentCart[cartKey].name || "Item";
+    let saveRequest;
 
     const baseCalories = parseInt(currentCart[cartKey].calories) || 0;
 
     currentCart[cartKey].qty += delta;
 
     if (currentCart[cartKey].qty <= 0) {
-        $.post('/FoodDining/DeleteCartItem', {
+        saveRequest = $.post('/FoodDining/DeleteCartItem', {
             roomNo: getRoomBed(),
             itemId: id,
             mealType: mealType
@@ -221,7 +236,7 @@ function changeQty(id, delta, specificMealType) {
         showCancelToast(translatedName + " removed");
 
     } else {
-        SaveCartToDatabase(currentCart[cartKey]);
+        saveRequest = SaveCartToDatabase(currentCart[cartKey]);
         $(`#qty-count-${sanitizedId}`).text(currentCart[cartKey].qty);
         const c = currentCart[cartKey];
         if (c.price) {
@@ -242,6 +257,7 @@ function changeQty(id, delta, specificMealType) {
     }
 
     updateReviewBar();
+    return saveRequest;
 }
 
 function SaveCartToDatabase(item) {
@@ -259,7 +275,7 @@ function SaveCartToDatabase(item) {
         DietaryType: item.dietaryType || ''
     };
 
-    $.ajax({
+    return $.ajax({
         url: '/FoodDining/SaveCartItem',
         type: 'POST',
         contentType: 'application/json',
@@ -619,10 +635,14 @@ function submitReviewWithAJAX() {
         data: reviewData,
         success: function (response) {
             if (response.success) {
-                window.location.href = response.redirectUrl;
+                finishUnifiedFoodAction(true, { reviewReady: true });
+                window.location.href = preserveUnifiedAI(response.redirectUrl);
+            } else {
+                finishUnifiedFoodAction(false, null, "Could not prepare the order review.");
             }
         },
         error: function () {
+            finishUnifiedFoodAction(false, null, "Could not prepare the order review.");
             alert("Error preparing order review.");
         }
     });
@@ -638,11 +658,13 @@ function submitFinalOrder() {
     orddate = parseOrderDate(rawDate);
 
     if (!orddate) {
+        finishUnifiedFoodAction(false, null, "Invalid order date.");
         alert("Invalid order date.");
         return;
     }
 
     if (!roomNo) {
+        finishUnifiedFoodAction(false, null, "Room information is missing.");
         alert("Room information missing. Please rescan your QR code.");
         return;
     }
@@ -675,12 +697,15 @@ function submitFinalOrder() {
                 var url = "/FoodDining/OrderSuccess?orderIds=" + res.orderIds + "&isPreorder=" + isPreorder;
                 if (bedInfo) url += "&BedInfo=" + encodeURIComponent(bedInfo);
 
-                window.location.href = url;
+                finishUnifiedFoodAction(true, { orderIds: res.orderIds });
+                window.location.href = preserveUnifiedAI(url);
             } else {
+                finishUnifiedFoodAction(false, null, res.message || "Order failed.");
                 alert(res.message || "Order failed");
             }
         },
         error: function () {
+            finishUnifiedFoodAction(false, null, "Order submission failed.");
             alert("Order submission failed.");
         }
     });

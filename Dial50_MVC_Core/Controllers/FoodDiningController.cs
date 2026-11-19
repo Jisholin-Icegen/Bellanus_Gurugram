@@ -161,6 +161,13 @@ namespace Dial50_MVC_Core.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetMenuVendors()
+        {
+            var vendors = await _foodService.GetMenuVendorsAsync();
+            return Json(vendors);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetMenuDetails(string orderType, string mealType, string pRoom, string servingTime)
         {
             FoodResponse result = await _foodService.GetMenuDetailsAsync(orderType, mealType, pRoom, servingTime);

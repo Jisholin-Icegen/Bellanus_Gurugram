@@ -8,6 +8,7 @@ namespace Dial50_MVC_Core.Repositories
         Task<MyOrdersDashboardVM> GetMyOrdersDashboardAsync(string roomNo);
 
         Task<List<ServingWindowVM>> GetActiveServingWindowsAsync();
+        Task<List<string>> GetMenuVendorsAsync();
 
         Task<List<string>> GetMenuVendorsAsync();
         Task<FoodResponse> GetMenuDetailsAsync(string orderType, string mealType, string pRoom,string servingTime);

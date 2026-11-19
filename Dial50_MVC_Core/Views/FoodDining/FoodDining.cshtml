@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = ":: Food Services ::";
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
 }
 
 <link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
@@ -77,15 +78,18 @@
                 <h1 style="margin: 0 0 4px 0;">Food &amp; Dining</h1>
                 <p style="margin: 0;">Order meals, track delivery, and check your diet plan.</p>
             </div>
-            <button type="button" onclick="openVoiceAgent()" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #ffffff; border: none; border-radius: 30px; padding: 10px 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                Order with Thara
-            </button>
+            @if (!isUnifiedAIFrame)
+            {
+                <button type="button" onclick="openVoiceAgent()" style="display: inline-flex; align-items: center; gap: 8px; background: #10b981; color: #ffffff; border: none; border-radius: 30px; padding: 10px 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); transition: all 0.2s ease;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Order with Thara
+                </button>
+            }
         </div>
 
         @if (ViewBag.IsFoodOrderingShown == true)
         {
-            <div class="food-card food-ordering" onclick="window.location.href='/FoodDining/FoodOrdering'">
+            <div class="food-card food-ordering" onclick="BedContext.go('FoodDining/FoodOrdering')">
                 <div class="card-pill">NEW ORDER</div>
                 <h3>Food Ordering</h3>
                 <p>Browse meals approved for your diet and place an order.</p>
@@ -157,8 +161,11 @@
 
 <script src="~/js/layout_DailyCare.js"></script>
 <script src="~/js/Food.js"></script>
-<script src="~/js/food-aria/food-config.js"></script>
-<script src="~/js/food-aria/food-script.js"></script>
+@if (!isUnifiedAIFrame)
+{
+    <script src="~/js/food-aria/food-config.js"></script>
+    <script src="~/js/food-aria/food-script.js"></script>
+}
 
 <script>
     window.goTo = function (basePath) {

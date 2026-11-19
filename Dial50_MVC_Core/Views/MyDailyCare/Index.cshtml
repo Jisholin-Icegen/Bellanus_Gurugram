@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = ":: My Daily Care ::";
     ViewData["UseVideoAssistant"] = true;
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
 }
 
 <link rel="stylesheet" href="~/css/DailyCare.css">
@@ -2003,6 +2004,28 @@
         window.closeVideoOverlay = closeVideoOverlay;
         window.goBackFromVideo   = goBackFromVideo;
 
+        window.addEventListener("unified-ai:action", function (event) {
+            var action = event.detail;
+            if (!action || (action.action !== "video.play" && action.action !== "video.stop")) return;
+
+            if (action.action === "video.stop") {
+                closeVideoOverlay();
+                if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, true, { stopped: true });
+                return;
+            }
+
+            if (!action.videoUrl || !String(action.videoUrl).trim()) {
+                if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "A video URL is required.");
+                return;
+            }
+            openVideoOverlay(action.videoUrl, action.title || action.categoryName || "");
+            var isOpen = document.getElementById("videoOverlay").classList.contains("show");
+            if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.respond(action, isOpen, isOpen ? { opened: true } : null,
+                    isOpen ? null : "The video could not be opened.");
+            }
+        });
+
         var lastSeenTaskId = null;
         var polling = true;
         var taskPollInFlight = false;
@@ -2676,9 +2699,15 @@
         window.goToRequestIndex = goToRequestIndex;
     </script>
 
-    <script src="~/js/video-ai/video-script.js"></script>
+    @if (!isUnifiedAIFrame)
+    {
+        <script src="~/js/video-ai/video-script.js"></script>
+    }
     <script src="~/js/layout_DailyCare.js"></script>
-    <script src="~/js/Dailycare.js"></script>
+    @if (!isUnifiedAIFrame)
+    {
+        <script src="~/js/Dailycare.js"></script>
+    }
 
 </div>
 

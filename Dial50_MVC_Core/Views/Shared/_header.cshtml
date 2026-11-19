@@ -1204,9 +1204,10 @@
 @{
     var useVideoAssistant = ViewData["UseVideoAssistant"] as bool? == true;
     var useCustomVoiceAgent = ViewData["UseCustomVoiceAgent"] as bool? == true;
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
 }
 
-@if (!useVideoAssistant && !useCustomVoiceAgent)
+@if (!isUnifiedAIFrame && !useVideoAssistant && !useCustomVoiceAgent)
 {
     <script src="~/js/voice-agent/config.js"></script>
     <script src="~/js/voice-agent/script.js"></script>

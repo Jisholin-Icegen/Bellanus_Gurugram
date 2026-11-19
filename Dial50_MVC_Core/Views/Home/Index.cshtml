@@ -10,6 +10,7 @@
 
 <link rel="stylesheet" href="~/css/DailyCare.css">
 <link rel="stylesheet" href="~/css/voice-agent/styles.css">
+<link rel="stylesheet" href="~/css/unified-ai.css" asp-append-version="true">
 
 <style>
 
@@ -2246,6 +2247,17 @@
         </div>
     </div>
 
+    <div id="unifiedAiModuleLayer" aria-hidden="true">
+        <iframe id="unifiedAiModuleFrame" title="Hospital services"></iframe>
+    </div>
+    <div id="unifiedAiCallPopup" role="dialog" aria-live="polite" aria-label="Voice assistant options">
+        <p>The voice assistant is still connected.</p>
+        <div class="unified-ai-popup-actions">
+            <button type="button" id="unifiedAiEndButton">End</button>
+            <button type="button" id="unifiedAiChatButton">Go to Chat</button>
+        </div>
+    </div>
+
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var bed       = BedContext.get();
@@ -3309,4 +3321,5 @@
 </div>
 
 <script src="~/js/layout_DailyCare.js"></script>
+<script src="~/js/unified-ai-host.js" asp-append-version="true"></script>
 

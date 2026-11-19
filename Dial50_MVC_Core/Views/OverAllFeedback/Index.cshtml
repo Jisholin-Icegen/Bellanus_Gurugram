@@ -83,7 +83,7 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         if (typeof initFeedback === 'function') {
-            initFeedback();
+            window.__feedbackInitPromise = initFeedback();
         }
     });
 </script>

@@ -799,6 +799,17 @@ async function connectToAvatarBackend() {
                     }
                     break;
 
+                case "app_action":
+                    window.dispatchEvent(new CustomEvent("voice-agent:app-action", { detail: msg }));
+                    break;
+
+                case "video.play":
+                case "video.stop":
+                    window.dispatchEvent(new CustomEvent("voice-agent:app-action", {
+                        detail: Object.assign({}, msg, { action: msg.type })
+                    }));
+                    break;
+
                 case "transcript_delta":
                 case "transcript_done":
                 case "ping":
@@ -1043,6 +1054,20 @@ window.setState = setState;
 window.setCallStatus = setCallStatus;
 window.connectToAvatarBackend = connectToAvatarBackend;
 window.endChat = endChat;
+window.sendVoiceAgentMessage = function (message) {
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        console.error("Voice-agent action result could not be sent: WebSocket is not open.");
+        return false;
+    }
+
+    try {
+        ws.send(JSON.stringify(message));
+        return true;
+    } catch (error) {
+        console.error("Voice-agent action result could not be sent:", error);
+        return false;
+    }
+};
 window.Dial50VAD = {
     Detector: SileroVoiceActivityDetector,
     instance: localVad,

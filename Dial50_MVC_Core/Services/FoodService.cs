@@ -42,6 +42,10 @@ namespace Dial50_MVC_Core.Services
             var data = await _foodRepository.GetActiveServingWindowsAsync();
             return data;
         }
+        public async Task<List<string>> GetMenuVendorsAsync()
+        {
+            return await _foodRepository.GetMenuVendorsAsync();
+        }
         public async Task<FoodResponse> GetMenuDetailsAsync(string orderType, string mealType, string pRoom,string servingTime)
         {
             var data = await _foodRepository.GetMenuDetailsAsync(orderType, mealType, pRoom, servingTime);

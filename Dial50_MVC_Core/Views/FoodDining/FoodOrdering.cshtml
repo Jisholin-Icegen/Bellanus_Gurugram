@@ -97,13 +97,14 @@
     }
 
     let isPatientNpo = false;
+    let npoCheckPromise = Promise.resolve();
 
     if (bedInfo) {
-        checkNpoStatus(bedInfo);
+        npoCheckPromise = checkNpoStatus(bedInfo);
     }
 
     function checkNpoStatus(room) {
-        $.ajax({
+        return $.ajax({
             url: '/FoodDining/GetNpoStatus',
             type: 'GET',
             data: { roomNo: room },
@@ -125,6 +126,30 @@
     function goBackToFlow() {
         BedContext.go('FoodDining');
     }
+
+    window.addEventListener("unified-ai:action", async function (event) {
+        var action = event.detail;
+        if (!action || action.action !== "food.select_order_type") return;
+
+        var type = String(action.orderType || "").toLowerCase();
+        if (type !== "patient" && type !== "visitor") {
+            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "Order type must be patient or visitor.");
+            return;
+        }
+        try {
+            await npoCheckPromise;
+        } catch (error) {
+            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "Could not verify patient food-order eligibility.");
+            return;
+        }
+        if (type === "patient" && isPatientNpo) {
+            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "Patient food ordering is currently unavailable.");
+            return;
+        }
+
+        if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, true, { orderType: type });
+        selectOrderType(type);
+    });
 
     document.addEventListener("DOMContentLoaded", function () {
         var buttons = document.querySelectorAll(".navBtn");

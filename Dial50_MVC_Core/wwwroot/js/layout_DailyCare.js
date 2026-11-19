@@ -30,6 +30,12 @@ function bindNav() {
                 return;
             }
 
+            if (new URLSearchParams(window.location.search).get("UnifiedAI") === "1"
+                && window.BedContext && typeof window.BedContext.go === "function") {
+                window.BedContext.go(page === "FoodDining" ? "FoodDining/FoodDining" : page);
+                return;
+            }
+
             var base = (page === "FoodDining")
                 ? "/FoodDining/FoodDining"
                 : "/" + page;
@@ -61,11 +67,21 @@ function updateTime() {
 }
 
 function GoToAI() {
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: "unified_ai_show_chat" }, window.location.origin);
+        return;
+    }
+
+    if (window.location.pathname.toLowerCase() === "/home") {
+        var startButton = document.getElementById("idleBtn");
+        if (startButton) startButton.click();
+        return;
+    }
+
     var bedInfo = sessionStorage.getItem("bedInfo") || "";
-    var base = "/AI/Chat";
-    window.location.href = bedInfo
-        ? base + "?BedInfo=" + encodeURIComponent(bedInfo)
-        : base;
+    var url = "/Home?autoStartCall=1";
+    if (bedInfo) url += "&BedInfo=" + encodeURIComponent(bedInfo);
+    window.location.href = url;
 }
 
 function getFormattedDateTime(date = new Date()) {

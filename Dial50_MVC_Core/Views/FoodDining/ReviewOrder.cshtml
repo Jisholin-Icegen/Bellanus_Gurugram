@@ -276,4 +276,14 @@
 
     document.addEventListener('DOMContentLoaded', applyReviewPageTranslations);
     document.addEventListener('languageChanged', applyReviewPageTranslations);
+
+    window.addEventListener("unified-ai:action", function (event) {
+        var action = event.detail;
+        if (!action || action.action !== "food.submit_order") return;
+        if (action.specialInstructions != null) {
+            localStorage.setItem("SpecialInstruction", String(action.specialInstructions).slice(0, 1000));
+        }
+        window.__unifiedAIFoodAction = action;
+        submitFinalOrder();
+    });
 </script>

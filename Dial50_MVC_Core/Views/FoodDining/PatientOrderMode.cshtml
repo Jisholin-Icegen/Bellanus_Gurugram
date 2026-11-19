@@ -107,6 +107,19 @@
         BedContext.go('FoodDining/FoodOrdering');
     }
 
+    window.addEventListener("unified-ai:action", function (event) {
+       var action = event.detail;
+       if (!action || action.action !== "food.select_mode") return;
+
+       var mode = String(action.mode || "").toLowerCase();
+       if (mode !== "now" && mode !== "preorder") {
+           if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "Order mode must be now or preorder.");
+           return;
+       }
+       if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, true, { mode: mode });
+       selectPatientMode(mode);
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         var pName = BedContext.get().patientName || "Patient";
         var pRoom = BedContext.get().roomBed || BedContext.get().roomNumber || "N/A";

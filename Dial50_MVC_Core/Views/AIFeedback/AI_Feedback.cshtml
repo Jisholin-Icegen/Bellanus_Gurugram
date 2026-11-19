@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = ":: Patient Experience ::";
     ViewData["UseCustomVoiceAgent"] = true;
+    var isUnifiedAIFrame = Context.Request.Query["UnifiedAI"] == "1";
 }
 
 <link rel="stylesheet" href="~/css/AI_Feedback.css">
@@ -356,5 +357,8 @@
 
 </div>
 <script src="~/js/config.js"></script>
-<script src="~/js/AI_Feedback.js"></script>
+@if (!isUnifiedAIFrame)
+{
+    <script src="~/js/AI_Feedback.js"></script>
+}
 <script src="~/js/layout_DailyCare.js"></script>

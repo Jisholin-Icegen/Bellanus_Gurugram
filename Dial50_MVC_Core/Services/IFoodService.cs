@@ -10,6 +10,7 @@ namespace Dial50_MVC_Core.Services
         Task<OrderSuccessVM> GetOrderSuccessDetailsAsync(string orderId);
 
         Task<List<ServingWindowVM>> GetActiveServingWindowsAsync();
+        Task<List<string>> GetMenuVendorsAsync();
 
         Task<FoodResponse> GetMenuDetailsAsync(string orderType, string mealType, string pRoom,string servingTime);
 
