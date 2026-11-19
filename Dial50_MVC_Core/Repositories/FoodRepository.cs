@@ -262,6 +262,25 @@ namespace Dial50_MVC_Core.Repositories
             }
             return response;
         }
+
+        public async Task<List<string>> GetMenuVendorsAsync()
+        {
+            var vendors = new List<string>();
+            using SqlConnection con = new SqlConnection(GetCs());
+            using SqlCommand cmd = new SqlCommand("SP_GET_FOOD_MENU_VENDORS", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            await con.OpenAsync();
+            using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                var vendor = reader["Vendor"]?.ToString();
+                if (!string.IsNullOrWhiteSpace(vendor))
+                {
+                    vendors.Add(vendor);
+                }
+            }
+            return vendors;
+        }
         public async Task<bool> SaveCartItemAsync(FoodCartModel cart)
         {
             try

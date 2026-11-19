@@ -9,6 +9,7 @@ namespace Dial50_MVC_Core.Repositories
 
         Task<List<ServingWindowVM>> GetActiveServingWindowsAsync();
 
+        Task<List<string>> GetMenuVendorsAsync();
         Task<FoodResponse> GetMenuDetailsAsync(string orderType, string mealType, string pRoom,string servingTime);
         Task<bool> SaveCartItemAsync(FoodCartModel cart);
         Task<bool> DeleteCartItemAsync(string roomNo, int itemId, string mealType);

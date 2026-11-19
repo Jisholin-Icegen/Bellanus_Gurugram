@@ -4,6 +4,7 @@ using Dial50_MVC_Core.Repositories;
 using Dial50_MVC_Core.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.StaticFiles;
 using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
@@ -86,8 +87,12 @@ app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 
+var contentTypeProvider = new FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".onnx"] = "application/octet-stream";
+
 app.UseStaticFiles(new StaticFileOptions
 {
+    ContentTypeProvider = contentTypeProvider,
     OnPrepareResponse = ctx =>
     {
         if (ctx.File.Name.Equals("sw.js", StringComparison.OrdinalIgnoreCase))
@@ -97,7 +102,6 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
-
 app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 
 app.UseRouting();

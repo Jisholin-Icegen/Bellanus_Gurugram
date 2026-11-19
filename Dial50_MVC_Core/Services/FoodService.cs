@@ -66,6 +66,11 @@ namespace Dial50_MVC_Core.Services
             return data;
         }
 
+        public async Task<List<string>> GetMenuVendorsAsync()
+        {
+            return await _foodRepository.GetMenuVendorsAsync();
+        }
+
         public async Task<List<string>> SubmitOrderAsync(string roomNo, string specialInstruction, string orddate, string isPreorder, string Calories)
         {
             var data = await _foodRepository.SubmitOrderAsync(roomNo, specialInstruction, orddate, isPreorder, Calories);

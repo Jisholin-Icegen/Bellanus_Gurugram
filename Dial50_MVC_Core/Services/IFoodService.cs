@@ -17,6 +17,8 @@ namespace Dial50_MVC_Core.Services
         Task<bool> DeleteCartItemAsync(string roomNo, int itemId, string mealType);
         Task<List<FoodCartModel>> GetCartItemsAsync(string roomNo);
 
+        Task<List<string>> GetMenuVendorsAsync();
+
         Task<List<string>> SubmitOrderAsync(string roomNo, string specialInstruction, string orddate, string isPreorder,string Calories);
         Task<bool> CancelPreorderAsync(string orderId);
 

@@ -75,6 +75,13 @@ namespace Dial50_MVC_Core.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetMenuVendors()
+        {
+            var vendors = await _foodService.GetMenuVendorsAsync();
+            return Json(vendors);
+        }
+
+        [HttpGet]
         public IActionResult ReviewOrder()
         {
             ViewBag.OrderType = TempData.Peek("OrderType");

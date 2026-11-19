@@ -78,22 +78,11 @@
     async function fetchProfileLanguage(id) {
         if (!id || typeof PROFILE_API_URL === 'undefined') return null;
         try {
-<<<<<<< HEAD
             var tenantId = window.BedContext.getTenantId();
             if (!tenantId) {
                 console.warn("GetProfileOld failed: No TenantId in BedContext");
                 return null;
             }
-=======
-            var rawTenant = new URLSearchParams(window.location.search).get("XTenantID") || "";
-            var tenantId = decodeURIComponent(rawTenant);
-
-            var payload = {
-                userId: id,
-                Status: "GET",
-                "X-Tenant-ID": tenantId
-            };
->>>>>>> d535625716d18923b423b73159c5e3023bbc3fe1
 
             var res = await fetch(PROFILE_API_URL, {
                 method: "POST",
@@ -101,11 +90,7 @@
                     "Content-Type": "application/json",
                     "X-Tenant-ID": tenantId
                 },
-<<<<<<< HEAD
                 body: JSON.stringify({ userId: String(id) })
-=======
-                body: JSON.stringify(payload)
->>>>>>> d535625716d18923b423b73159c5e3023bbc3fe1
             });
 
             if (!res.ok) throw new Error("HTTP " + res.status);
@@ -113,11 +98,7 @@
             if (!result.status || !result.data || !result.data.Language) return null;
             return result.data.Language;
         } catch (err) {
-<<<<<<< HEAD
             console.warn("GetProfileOld failed:", err.message);
-=======
-            console.warn("GetProfileOld failed — using region default language:", err.message);
->>>>>>> d535625716d18923b423b73159c5e3023bbc3fe1
             return null;
         }
     }
