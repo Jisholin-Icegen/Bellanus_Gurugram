@@ -555,6 +555,26 @@
                 $card.data('img')
             );
         });
+
+        window.addEventListener("unified-ai:action", function (event) {
+            var action = event.detail;
+            if (!action || action.action !== "food.other_service") return;
+
+            var service = allServices.find(function (item) {
+                return String(item.categoryId) === String(action.categoryId);
+            });
+            if (!service) {
+                if (window.UnifiedAIChild) {
+                    window.UnifiedAIChild.respond(action, false, null, "The selected service is no longer available.");
+                }
+                return;
+            }
+
+            openServiceModal(service.categoryDescription, service.categoryId, service.categoryImage);
+            $("#modalRemarks").val(String(action.remarks || "").slice(0, 1000));
+            document.getElementById("modalOverlay").scrollIntoView({ behavior: "smooth", block: "center" });
+            submitTaskRequest(action);
+        });
     });
 
     function fetchServices() {
@@ -601,6 +621,7 @@
             <div class="service-card"
                  data-title="${title}"
                  data-id="${id}"
+                 data-category-id="${id}"
                  data-img="/${img}">
                 <div class="service-icon-box">
                     <img src="/${img}"
@@ -661,7 +682,7 @@
         }
     }
 
-    function submitTaskRequest() {
+    function submitTaskRequest(unifiedAction) {
         const remarks    = $("#modalRemarks").val();
         const categoryId = $("#hdnTaskTypeId").val();
         const bc         = BedContext.get();
@@ -688,6 +709,9 @@
                 if (response.success) {
                     currentRequestId = response.requestId || 0;
                     sessionStorage.setItem('lastRequestId', currentRequestId);
+                    if (unifiedAction && window.UnifiedAIChild) {
+                        window.UnifiedAIChild.respond(unifiedAction, true, { requestId: currentRequestId });
+                    }
 
                     closeModal();
                     //$("#mainContentArea").hide();
@@ -695,11 +719,17 @@
                     loadSuccessTasks();
                     $("#modalSubmit").prop("disabled", false).text("Confirm Request");
                 } else {
+                    if (unifiedAction && window.UnifiedAIChild) {
+                        window.UnifiedAIChild.respond(unifiedAction, false, null, "The service request could not be submitted.");
+                    }
                     alert("Failed to raise request.");
                     $("#modalSubmit").prop("disabled", false).text("Confirm Request");
                 }
             },
             error: function () {
+                if (unifiedAction && window.UnifiedAIChild) {
+                    window.UnifiedAIChild.respond(unifiedAction, false, null, "The service request failed.");
+                }
                 alert("Ajax Error");
                 $("#modalSubmit").prop("disabled", false).text("Confirm Request");
             }

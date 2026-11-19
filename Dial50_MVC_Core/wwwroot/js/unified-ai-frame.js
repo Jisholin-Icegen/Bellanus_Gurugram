@@ -109,13 +109,22 @@
                     })
                 };
             });
-        const itemSelector = ".service-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .card";
+        const itemSelector = ".service-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .timing-card, .feedback-question, .card, [data-category-id], [data-food-id], [data-order-type], [data-order-mode]";
         const items = Array.from(document.querySelectorAll(itemSelector))
             .filter(isVisible)
             .filter(function (item) { return !item.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]"); })
             .slice(0, 100)
             .map(function (item) {
-                const row = { label: redactPatientIdentifiers(item.innerText || item.textContent) };
+                const nameElement = item.querySelector(".food-title, .rec-title, .service-title, .tab-name, .meal-label-name, .question-text, h3, h4");
+                const isMenuItem = item.classList.contains("menu-card-v2") || item.classList.contains("rec-card");
+                const row = {
+                    label: redactPatientIdentifiers(isMenuItem && nameElement
+                        ? nameElement.textContent
+                        : item.innerText || item.textContent)
+                };
+                if (nameElement) row.name = redactPatientIdentifiers(nameElement.textContent);
+                row.disabled = !!item.disabled || item.classList.contains("disabled-card")
+                    || item.getAttribute("aria-disabled") === "true";
                 const categoryId = item.getAttribute("data-category-id");
                 const foodId = item.getAttribute("data-food-id");
                 const route = item.getAttribute("data-route");
@@ -124,6 +133,22 @@
                 const meal = item.getAttribute("data-meal-type") || item.getAttribute("data-mealname");
                 if (meal) row.meal = redactPatientIdentifiers(meal);
                 if (route && route.startsWith("/")) row.route = route.split("?")[0];
+                const orderType = item.getAttribute("data-order-type");
+                if (orderType) row.orderType = orderType;
+                const orderMode = item.getAttribute("data-order-mode");
+                if (orderMode) row.orderMode = orderMode;
+                if (item.classList.contains("feedback-question")) {
+                    if (item.dataset.questionId) row.feedbackQuestionId = item.dataset.questionId;
+                    if (item.dataset.departmentId) row.feedbackDepartmentId = item.dataset.departmentId;
+                    if (item.dataset.type) row.feedbackType = item.dataset.type;
+                    row.feedbackChoices = Array.from(item.querySelectorAll(".rating-option"))
+                        .map(function (option) { return option.dataset.value; })
+                        .filter(Boolean);
+                }
+                if (foodId) {
+                    const cartItem = window.currentCart && window.currentCart[String(foodId) + "_" + String(meal || "")];
+                    row.quantity = cartItem ? Number(cartItem.qty) || 0 : 0;
+                }
                 return row;
             })
             .filter(function (item) { return item.label; });
@@ -136,7 +161,14 @@
                     || element.innerText
                     || element.textContent);
                 const route = safeRoute(element);
-                return label ? { label: label, disabled: !!element.disabled, route: route || undefined } : null;
+                const action = element.getAttribute("data-action");
+                return label ? {
+                    label: label,
+                    disabled: !!element.disabled || element.getAttribute("aria-disabled") === "true",
+                    id: element.id || undefined,
+                    action: action || undefined,
+                    route: route || undefined
+                } : null;
             })
             .filter(Boolean);
 

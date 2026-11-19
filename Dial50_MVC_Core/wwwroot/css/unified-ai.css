@@ -176,20 +176,31 @@
 
 #unifiedAiTestAction {
     width: 100%;
-    min-height: 90px;
-    resize: vertical;
+    min-height: 44px;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 10px 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
-    font: 12px/1.45 Consolas, monospace;
+    font: inherit;
+    font-size: 14px;
 }
 
-.unified-ai-test-actions {
-    display: flex;
-    flex-wrap: wrap;
+#unifiedAiTestSuggestions {
+    display: grid;
     gap: 6px;
-    margin: 8px 0;
+    max-height: min(28vh, 220px);
+    overflow: auto;
+    margin-top: 8px;
+}
+
+#unifiedAiTestPanel .unified-ai-test-suggestion {
+    width: 100%;
+    text-align: left;
+}
+
+#unifiedAiTestPanel .unified-ai-test-empty {
+    margin: 4px 0;
+    color: #64748b;
 }
 
 #unifiedAiTestPanel button {
@@ -205,7 +216,6 @@
     cursor: pointer;
 }
 
-#unifiedAiTestPanel #unifiedAiTestRunButton,
 #unifiedAiTestPanel #unifiedAiTestSessionButton {
     border-color: #2563eb;
     background: #2563eb;
@@ -254,5 +264,16 @@
         height: 38px;
         flex-basis: 38px;
         font-size: 16px;
+    }
+
+    #unifiedAiTestPanel {
+        right: 10px;
+        bottom: calc(86px + env(safe-area-inset-bottom));
+        width: calc(100vw - 20px);
+        max-height: calc(100dvh - 108px);
+    }
+
+    #unifiedAiTestSuggestions {
+        max-height: 25dvh;
     }
 }

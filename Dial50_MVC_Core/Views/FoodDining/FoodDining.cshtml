@@ -90,7 +90,7 @@
 
         @if (ViewBag.IsFoodOrderingShown == true)
         {
-            <div class="food-card food-ordering" onclick="BedContext.go('FoodDining/FoodOrdering')">
+            <div class="food-card food-ordering" data-route="/FoodDining/FoodOrdering" onclick="BedContext.go('FoodDining/FoodOrdering')">
                 <div class="card-pill">NEW ORDER</div>
                 <h3>Food Ordering</h3>
                 <p>Browse meals approved for your diet and place an order.</p>
@@ -99,7 +99,7 @@
             </div>
         }
 
-        <div class="food-card my-orders" onclick="goTo('/FoodDining/MyOrders')">
+        <div class="food-card my-orders" data-route="/FoodDining/MyOrders" onclick="goTo('/FoodDining/MyOrders')">
             <div class="card-pill">TRACK &amp; HISTORY</div>
             <h3>My Orders</h3>
             <p>Track active deliveries and view your order history.</p>
@@ -107,7 +107,7 @@
             <i class="fa-solid fa-clipboard-list bg-icon"></i>
         </div>
 
-        <div class="food-card other-services" onclick="goTo('/FoodDining/OtherServices')">
+        <div class="food-card other-services" data-route="/FoodDining/OtherServices" onclick="goTo('/FoodDining/OtherServices')">
             <div class="card-pill">BEDSIDE SUPPORT</div>
             <h3>Other Services</h3>
             <p>Extra condiments, utensils, tray pickup, drinking water, and more.</p>

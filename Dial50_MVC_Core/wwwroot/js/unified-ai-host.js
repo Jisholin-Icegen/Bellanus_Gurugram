@@ -10,7 +10,7 @@
     const testCloseButton = document.getElementById("unifiedAiTestCloseButton");
     const testPanel = document.getElementById("unifiedAiTestPanel");
     const testActionInput = document.getElementById("unifiedAiTestAction");
-    const testRunButton = document.getElementById("unifiedAiTestRunButton");
+    const testSuggestions = document.getElementById("unifiedAiTestSuggestions");
     const testOutput = document.getElementById("unifiedAiTestOutput");
 
     if (!frameLayer || !frame) return;
@@ -45,6 +45,38 @@
         return simulatedSession || state === "connecting" || state === "connected";
     }
 
+    function updateTestPanelState(openForActiveModule) {
+        if (!testPanel || !testLauncher) return;
+        if (!isLocalTestMode) {
+            testPanel.hidden = true;
+            testLauncher.hidden = true;
+            return;
+        }
+
+        const state = document.body.getAttribute("data-state");
+        const realCall = state === "connecting" || state === "connected";
+        const onModule = frameLayer.classList.contains("is-open");
+        const simulationButton = document.getElementById("unifiedAiTestSessionButton");
+        if (simulationButton) simulationButton.hidden = realCall || simulatedSession;
+        if (!onModule) {
+            if (realCall || simulatedSession) testPanel.hidden = true;
+            testLauncher.hidden = realCall || simulatedSession || !testPanel.hidden;
+            testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
+            return;
+        }
+
+        if (openForActiveModule && (realCall || simulatedSession)) {
+            testPanel.hidden = false;
+            testLauncher.hidden = true;
+            testLauncher.setAttribute("aria-expanded", "true");
+            renderTestSuggestions();
+            return;
+        }
+
+        testLauncher.hidden = !testPanel.hidden;
+        testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
+    }
+
     function homePageContext() {
         const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
         const text = function (element) {
@@ -71,6 +103,8 @@
                 if (element instanceof HTMLAnchorElement) {
                     const url = new URL(element.href, window.location.href);
                     if (url.origin === window.location.origin) action.route = url.pathname;
+                } else if (element.dataset && element.dataset.page) {
+                    action.route = "/" + element.dataset.page;
                 }
                 return label ? action : null;
             })
@@ -116,7 +150,7 @@
             const statusText = document.getElementById("unifiedAiBarStatus");
             if (statusText) {
                 statusText.textContent = simulatedSession
-                    ? "Demo mode · AI off"
+                    ? "Test simulation"
                     : callStatus && callStatus.textContent.trim() || "Connected";
             }
             if (barMicButton) {
@@ -129,12 +163,14 @@
                 barMicButton.disabled = !realConnection;
             }
         }
+        updateTestPanelState(false);
         if (connected) sendCurrentPageContext();
     }
 
     function showChat() {
         frameLayer.classList.remove("is-open");
         frameLayer.setAttribute("aria-hidden", "true");
+        if (testPanel) testPanel.hidden = true;
         updateFloatingBar();
     }
 
@@ -147,7 +183,9 @@
             error: error || null
         };
         window.dispatchEvent(new CustomEvent("unified-ai:action-result", { detail: response }));
-        if (isLocalTestMode || typeof window.sendVoiceAgentMessage !== "function") return;
+        if (simulatedSession
+            || document.body.getAttribute("data-state") !== "connected"
+            || typeof window.sendVoiceAgentMessage !== "function") return;
 
         window.sendVoiceAgentMessage(Object.assign({ type: "app_action_result" }, response));
     }
@@ -168,6 +206,7 @@
 
         frameReady = false;
         updateFloatingBar();
+        updateTestPanelState(true);
         frame.src = targetUrl.toString();
         return true;
     }
@@ -245,6 +284,7 @@
             "discharge/index": "discharge",
             "fooddining": "food_explore",
             "fooddining/fooddining": "food_explore",
+            "fooddining/otherservices": "food_explore",
             "fooddining/foodordering": "food_order",
             "fooddining/patientordermode": "food_order",
             "fooddining/menuitems": "food_order",
@@ -347,7 +387,12 @@
 
         if (action.action.indexOf("food.") === 0) {
             const target = action.target === "food_explore" ? "food_explore" : "food_order";
-            dispatchToModule(target, action);
+            const currentRoute = String(latestFrameContext && latestFrameContext.route || "");
+            if (frameLayer.classList.contains("is-open") && /\/FoodDining\//i.test(currentRoute)) {
+                sendActionToFrame(action);
+            } else {
+                dispatchToModule(target, action);
+            }
             return;
         }
 
@@ -363,6 +408,7 @@
             }, window.location.origin);
         }
         updateFloatingBar();
+        renderTestSuggestions();
     });
 
     window.addEventListener("voice-agent:app-action", function (event) {
@@ -377,7 +423,11 @@
             reportResult(event.data, event.data.success, event.data.result, event.data.error);
         } else if (event.data.type === "unified_ai_page_context") {
             latestFrameContext = event.data.context;
+            if (latestFrameContext && latestFrameContext.route) {
+                activeTarget = routeTargetForPath(latestFrameContext.route);
+            }
             sendCurrentPageContext();
+            renderTestSuggestions();
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
         }
@@ -408,30 +458,227 @@
         });
     }
 
-    if (testPanel) testPanel.hidden = !isLocalTestMode;
+    if (testPanel) testPanel.hidden = true;
     if (isLocalTestMode && testOutput) {
         window.addEventListener("unified-ai:action-result", function (event) {
             testOutput.textContent = JSON.stringify(event.detail, null, 2);
         });
     }
 
-    function runTestAction() {
-        if (!isLocalTestMode || !testActionInput) return;
-        try {
-            const action = JSON.parse(testActionInput.value);
-            if (!action || typeof action !== "object" || typeof action.action !== "string") {
-                throw new Error("Enter an action object with an action name.");
-            }
-            action.request_id = action.request_id || ("local-test-" + Date.now());
-            if (["request.create", "food.add_item", "food.submit_order", "feedback.submit"].includes(action.action)
-                && !window.confirm("This test may write app data such as requests, cart items, orders, or feedback. Continue only on a test database.")) {
-                return;
-            }
-            if (testOutput) testOutput.textContent = "Running " + action.action + "...";
-            handleAction(action);
-        } catch (error) {
-            if (testOutput) testOutput.textContent = error.message;
+    const testCommandWords = new Set([
+        "a", "an", "add", "and", "can", "change", "choose", "count", "delete", "decrease",
+        "for", "food", "i", "in", "increase", "item", "make", "minus", "more", "my", "of",
+        "one", "order", "please", "plus", "quantity", "raise", "remove", "request", "select",
+        "set", "the", "this", "to", "want", "with"
+    ]);
+
+    function normalizeTestText(value) {
+        return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    }
+
+    function testQuantity(value, fallback, minimum) {
+        const words = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5 };
+        const text = String(value || "").toLowerCase();
+        const parsed = Object.prototype.hasOwnProperty.call(words, text) ? words[text] : Number.parseInt(text, 10);
+        return Math.max(minimum == null ? 1 : minimum, Math.min(20, Number.isNaN(parsed) ? fallback : parsed));
+    }
+
+    function buildTestSuggestions() {
+        const context = frameLayer.classList.contains("is-open")
+            ? latestFrameContext
+            : homePageContext();
+        if (!context) return [];
+
+        const query = String(testActionInput && testActionInput.value || "").trim();
+        const queryText = normalizeTestText(query);
+        const tokens = queryText.split(/\s+/).filter(function (word) {
+            return word && !testCommandWords.has(word);
+        });
+        const suggestions = [];
+
+        function add(label, action, searchText) {
+            const haystack = normalizeTestText(searchText || label);
+            const score = tokens.filter(function (token) { return haystack.includes(token); }).length;
+            if (tokens.length && score === 0) return;
+            suggestions.push({ label: label, action: action, score: score });
         }
+
+        (context.actions || []).forEach(function (item) {
+            if (item.route && !item.disabled) {
+                add("Open " + item.label, { action: "navigate", path: item.route }, item.label + " " + item.route);
+            }
+        });
+        (context.items || []).forEach(function (item) {
+            if (item.route && !item.disabled) {
+                add("Open " + (item.name || item.label), { action: "navigate", path: item.route }, item.name || item.label);
+            }
+        });
+
+        (context.controls || []).forEach(function (control) {
+            (control.options || []).forEach(function (option) {
+                if (option.disabled || String(option.value) === String(control.selected ? control.selected.value : "")) return;
+                add("Select " + option.label + " in " + (control.label || control.id), {
+                    action: "ui.select",
+                    controlId: control.id || control.label,
+                    optionValue: option.value
+                }, (control.label || control.id) + " " + option.label);
+            });
+        });
+
+        const route = String(context.route || "").toLowerCase();
+        const requestModule = route.indexOf("roomcomfort") >= 0
+            ? "room_comfort"
+            : route.indexOf("logisitics") >= 0 ? "logistics" : null;
+        if (requestModule) {
+            (context.items || []).filter(function (item) { return item.categoryId && !item.disabled; }).forEach(function (item) {
+                const category = item.name || item.label;
+                const quantityMatch = queryText.match(/\b(?:quantity|qty|need|want|add)\s+(one|two|three|four|five|\d+)\b/);
+                add("Create " + category + " request", {
+                    action: "request.create",
+                    module: requestModule,
+                    categoryId: item.categoryId,
+                    category: category,
+                    remarks: query || category,
+                    quantity: testQuantity(quantityMatch && quantityMatch[1], 1)
+                }, category);
+            });
+        }
+
+        if (route.indexOf("/fooddining/otherservices") >= 0) {
+            (context.items || []).filter(function (item) {
+                return item.categoryId && !item.disabled;
+            }).forEach(function (item) {
+                const category = item.name || item.label;
+                add("Request " + category, {
+                    action: "food.other_service",
+                    target: "food_explore",
+                    categoryId: item.categoryId,
+                    category: category,
+                    remarks: query
+                }, category);
+            });
+        }
+
+        if (route.indexOf("/overallfeedback/") >= 0) {
+            (context.items || []).filter(function (item) {
+                return item.feedbackQuestionId || item.feedbackDepartmentId;
+            }).forEach(function (item) {
+                const question = item.name || item.label;
+                (item.feedbackChoices || []).forEach(function (choice) {
+                    add("Answer " + question + ": " + choice, {
+                        action: "feedback.answer",
+                        questionId: item.feedbackQuestionId,
+                        departmentId: item.feedbackDepartmentId,
+                        question: question,
+                        value: choice
+                    }, question + " " + choice);
+                });
+                if (query && ["text", "comments"].includes(item.feedbackType)) {
+                    add("Enter your response for " + question, {
+                        action: "feedback.answer",
+                        questionId: item.feedbackQuestionId,
+                        departmentId: item.feedbackDepartmentId,
+                        question: question,
+                        value: query
+                    }, question + " " + query);
+                }
+            });
+            if ((context.actions || []).some(function (item) {
+                return !item.disabled && /submit feedback/i.test(item.label);
+            })) {
+                add("Submit feedback", { action: "feedback.submit" }, "submit feedback");
+            }
+        }
+
+        const menuItems = (context.items || []).filter(function (item) { return item.foodId && !item.disabled; });
+        if (menuItems.length) {
+            const remove = /\b(remove|delete)\b/.test(queryText);
+            const decrease = /\b(minus|decrease|subtract|less)\b/.test(queryText);
+            const setQuantity = queryText.match(/\b(?:quantity|qty)\s*(?:to\s*)?(zero|one|two|three|four|five|\d+)\b|\bset\s+(?:to\s*)?(zero|one|two|three|four|five|\d+)\b/);
+            const addCount = queryText.match(/\badd\s+(one|two|three|four|five|\d+)\b/);
+            menuItems.forEach(function (item) {
+                const name = item.name || item.label;
+                const meal = item.meal || "";
+                let action;
+                let label;
+                if (remove) {
+                    action = { action: "food.remove_item", itemId: item.foodId, itemName: name, meal: meal };
+                    label = "Remove " + name;
+                } else if (decrease) {
+                    const quantity = Math.max(0, (Number(item.quantity) || 0) - 1);
+                    action = { action: "food.set_quantity", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
+                    label = "Decrease " + name + " to " + quantity;
+                } else if (setQuantity) {
+                    const quantity = testQuantity(setQuantity[1] || setQuantity[2], 0, 0);
+                    action = { action: "food.set_quantity", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
+                    label = "Set " + name + " quantity to " + quantity;
+                } else {
+                    const quantity = testQuantity(addCount && addCount[1], 1);
+                    action = { action: "food.add_item", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
+                    label = "Add " + quantity + " " + name;
+                }
+                add(label, action, name);
+            });
+            add("List the current menu", { action: "food.list_menu" }, "menu list food");
+        }
+
+        (context.items || []).forEach(function (item) {
+            if (!item.disabled && item.orderType) {
+                add("Choose " + item.name + " ordering", {
+                    action: "food.select_order_type",
+                    orderType: item.orderType
+                }, item.name || item.label);
+            }
+            if (!item.disabled && item.orderMode) {
+                add("Choose " + item.name, {
+                    action: "food.select_mode",
+                    mode: item.orderMode
+                }, item.name || item.label);
+            }
+        });
+
+        return suggestions.sort(function (left, right) { return right.score - left.score; }).slice(0, 24);
+    }
+
+    function runTestAction(action, label) {
+        if (!isLocalTestMode || !action) return;
+        action.request_id = "local-test-" + Date.now();
+        const writesData = [
+            "request.create", "food.add_item", "food.set_quantity", "food.remove_item",
+            "food.other_service", "food.submit_order", "feedback.submit"
+        ].includes(action.action);
+        if (writesData && !window.confirm("This test can change app data. Continue only with a test database?")) return;
+        if (testOutput) testOutput.textContent = "Testing: " + label;
+        handleAction(action);
+    }
+
+    function renderTestSuggestions() {
+        if (!testSuggestions) return;
+        const suggestions = buildTestSuggestions();
+        testSuggestions.replaceChildren();
+        if (!suggestions.length) {
+            const empty = document.createElement("p");
+            empty.className = "unified-ai-test-empty";
+            empty.textContent = frameLayer.classList.contains("is-open") && !latestFrameContext
+                ? "Loading visible page options..."
+                : "No matching actions are visible on this screen.";
+            testSuggestions.appendChild(empty);
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+        suggestions.forEach(function (suggestion) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "unified-ai-test-suggestion";
+            button.textContent = suggestion.label;
+            button.addEventListener("click", function () {
+                runTestAction(suggestion.action, suggestion.label);
+            });
+            fragment.appendChild(button);
+        });
+        testSuggestions.appendChild(fragment);
     }
 
     const testSessionButton = document.getElementById("unifiedAiTestSessionButton");
@@ -440,36 +687,33 @@
             if (!isLocalTestMode) return;
             simulatedSession = true;
             updateFloatingBar();
-            if (testPanel) testPanel.hidden = true;
-            if (testLauncher) testLauncher.hidden = false;
+            updateTestPanelState(false);
         });
     }
 
-    if (testRunButton) testRunButton.addEventListener("click", runTestAction);
     if (testLauncher) {
-        testLauncher.hidden = !isLocalTestMode || !testPanel || !testPanel.hidden;
         testLauncher.addEventListener("click", function () {
             if (!testPanel) return;
             testPanel.hidden = !testPanel.hidden;
-            testLauncher.hidden = !testPanel.hidden;
-            testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
+            updateTestPanelState(false);
+            renderTestSuggestions();
         });
     }
     if (testCloseButton) {
         testCloseButton.addEventListener("click", function () {
             if (testPanel) testPanel.hidden = true;
-            if (testLauncher) {
-                testLauncher.hidden = !isLocalTestMode;
-                testLauncher.setAttribute("aria-expanded", "false");
-            }
+            updateTestPanelState(false);
         });
     }
-    if (testPanel) {
-        testPanel.querySelectorAll("[data-unified-ai-sample]").forEach(function (button) {
-            button.addEventListener("click", function () {
-                if (testActionInput) testActionInput.value = button.getAttribute("data-unified-ai-sample");
-                runTestAction();
-            });
+    if (testActionInput) {
+        testActionInput.addEventListener("input", renderTestSuggestions);
+        testActionInput.addEventListener("keydown", function (event) {
+            if (event.key !== "Enter") return;
+            const firstSuggestion = testSuggestions && testSuggestions.querySelector("button");
+            if (firstSuggestion) {
+                event.preventDefault();
+                firstSuggestion.click();
+            }
         });
     }
 
@@ -518,7 +762,11 @@
         handleAction: handleAction
     };
 
-    const bodyObserver = new MutationObserver(updateFloatingBar);
+    const bodyObserver = new MutationObserver(function () {
+        const state = document.body.getAttribute("data-state");
+        if (state === "connecting" || state === "connected") simulatedSession = false;
+        updateFloatingBar();
+    });
     bodyObserver.observe(document.body, { attributes: true, attributeFilter: ["data-state"] });
     const statusElement = document.getElementById("callStatus");
     if (statusElement) {

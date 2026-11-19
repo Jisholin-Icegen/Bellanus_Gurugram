@@ -42,7 +42,13 @@
         padding: 8px 3px 7px;
         box-sizing: border-box;
         flex-wrap: nowrap;
-        overflow: hidden;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+    }
+
+    .parent-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .navBtn {
@@ -145,6 +151,39 @@
     .navBtn:active .circle {
         transform: scale(0.96);
     }
+
+    @@media (max-width: 600px) {
+        .parent-nav {
+            justify-content: flex-start;
+            gap: 2px;
+            padding: 6px 4px;
+        }
+
+        .navBtn {
+            flex: 0 0 56px;
+        }
+
+        .navBtn .circle {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .navBtn .circle img {
+            width: 24px;
+            height: 24px;
+            max-width: 24px;
+            max-height: 24px;
+        }
+
+        .navBtn span {
+            min-height: 28px;
+            overflow: visible;
+            font-size: 10px;
+            line-height: 12px;
+        }
+    }
 </style>
 
 <script>
@@ -159,14 +198,15 @@
             var page = btn.getAttribute("data-page");
             if (!page) return;
 
-            var basePath = "/" + page;
             var id = btn.getAttribute("data-id");
-
-            if (id) {
-                window.goToWithTenant(basePath + "?id=" + id);
-            } else {
-                window.goToWithTenant(basePath);
+            if (window.BedContext && typeof window.BedContext.go === "function") {
+                window.BedContext.go(page, id ? { id: id } : undefined);
+                return;
             }
+
+            var target = new URL("/" + page, window.location.origin);
+            if (id) target.searchParams.set("id", id);
+            window.location.href = target.toString();
         });
     })();
 </script>

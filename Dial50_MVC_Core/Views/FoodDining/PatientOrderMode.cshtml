@@ -28,12 +28,12 @@
                 <p>Choose between planning tomorrow's meals or ordering something right now.</p>
             </div>
             <div class="selection-cards-stack">
-                <div class="timing-card preorder-card" onclick="selectPatientMode('preorder')">
+                <div class="timing-card preorder-card" data-order-mode="preorder" onclick="selectPatientMode('preorder')">
                     <div class="icon-wrap"><i class="fa-regular fa-calendar-days"></i></div>
                     <h3>Pre-order</h3>
                     <p>Plan tomorrow's meals — select Breakfast, Lunch &amp; Dinner all at once so the kitchen can prepare ahead.</p>
                 </div>
-                <div class="timing-card ordernow-card" onclick="selectPatientMode('now')">
+                <div class="timing-card ordernow-card" data-order-mode="now" onclick="selectPatientMode('now')">
                     <div class="icon-wrap"><i class="fa-solid fa-bolt-lightning"></i></div>
                     <h3>Order Now</h3>
                     <p>Instant request — order something right away, anytime you want. No limits.</p>

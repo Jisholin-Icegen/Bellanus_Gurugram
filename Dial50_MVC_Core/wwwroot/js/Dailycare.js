@@ -1,5 +1,11 @@
 ﻿const data = [
     {
+        title: "My Library",
+        description: "Educational resources for you",
+        icon: "/images/ChildIcons/mdc_c.png",
+        onclick_URL: "/MyLibrary/Index?BedInfo="
+    },
+    {
         title: "Medications",
         description: "View your daily medication schedule",
         icon: "/images/ChildIcons/mdc_a.png",
@@ -10,12 +16,6 @@
         description: "Check upcoming doctors visits",
         icon: "/images/ChildIcons/mdc_b.png",
         onclick_URL: "/Appointments/Index?BedInfo="
-    },
-    {
-        title: "My Library",
-        description: "Educational resources for you",
-        icon: "/images/ChildIcons/mdc_c.png",
-        onclick_URL: "/MyLibrary/Index?BedInfo="
     },
     {
         title: "Discharge",

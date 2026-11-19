@@ -650,6 +650,7 @@ window.addEventListener('unified-ai:action', function (event) {
             return;
         }
 
+        questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         var value = String(action.value == null ? '' : action.value).trim().toLowerCase();
         var answerOption = Array.from(questionElement.querySelectorAll('.rating-option')).find(function (option) {
             return option.dataset.value === value;
@@ -664,6 +665,7 @@ window.addEventListener('unified-ai:action', function (event) {
             }
             textArea.value = String(action.value || '').slice(0, 2000);
             textArea.dispatchEvent(new Event('input', { bubbles: true }));
+            textArea.focus({ preventScroll: true });
         } else {
             respond(false, null, 'Unsupported feedback answer.');
             return;

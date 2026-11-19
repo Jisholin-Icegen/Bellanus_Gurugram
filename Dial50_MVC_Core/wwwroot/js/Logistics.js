@@ -954,6 +954,7 @@ window.addEventListener("unified-ai:action", function (event) {
         }
 
         window.__unifiedAIRequestAction = action;
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
         card.click();
         var remarksInput = document.getElementById("modalRemarks");
         var remarks = action.remarks || action.details || action.description || action.userRequest

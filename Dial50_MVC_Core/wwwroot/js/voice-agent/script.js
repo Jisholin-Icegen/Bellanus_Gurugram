@@ -1056,7 +1056,6 @@ window.connectToAvatarBackend = connectToAvatarBackend;
 window.endChat = endChat;
 window.sendVoiceAgentMessage = function (message) {
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-        console.error("Voice-agent action result could not be sent: WebSocket is not open.");
         return false;
     }
 

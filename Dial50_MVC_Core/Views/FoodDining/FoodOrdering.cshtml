@@ -25,14 +25,14 @@
                 </div>
                 <div id="npoAlertContainer"></div>
                 <div class="mode-stack">
-                    <div id="patientCard" class="selection-card patient-theme" onclick="selectOrderType('patient')">
+                    <div id="patientCard" class="selection-card patient-theme" data-order-type="patient" onclick="selectOrderType('patient')">
                         <div class="card-icon-clean"><i class="fa-regular fa-user"></i></div>
                         <div class="card-text-content">
                             <h3>For the Patient</h3>
                             <p>Show only meals approved by the patient's prescribed diet plan.</p>
                         </div>
                     </div>
-                    <div class="selection-card visitor-theme" onclick="selectOrderType('visitor')">
+                    <div class="selection-card visitor-theme" data-order-type="visitor" onclick="selectOrderType('visitor')">
                         <div class="card-icon-clean"><i class="fa-solid fa-users"></i></div>
                         <div class="card-text-content">
                             <h3>For a Visitor / Companion</h3>

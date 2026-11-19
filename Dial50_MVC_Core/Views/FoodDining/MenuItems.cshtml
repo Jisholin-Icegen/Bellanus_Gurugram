@@ -679,7 +679,6 @@
                             name: item.foodName,
                             meal: item.mealTiming || $("#hdnMealType").val(),
                             dietaryType: item.dietaryType || "",
-                            allergens: item.allergens || "",
                             price: item.price == null ? null : item.price,
                             calories: item.calories == null ? null : item.calories
                         };
@@ -703,6 +702,12 @@
 
                 const mealType = String(action.meal || $("#hdnMealType").val());
                 const item = matches[0];
+                const visibleCard = Array.from(document.querySelectorAll(".menu-card-v2, .rec-card"))
+                    .find(function (card) {
+                        return String(card.getAttribute("data-food-id")) === String(item.id)
+                            && String(card.getAttribute("data-meal-type") || "") === mealType;
+                    });
+                if (visibleCard) visibleCard.scrollIntoView({ behavior: "smooth", block: "center" });
                 try {
                     if (action.action === "food.add_item") {
                         const quantity = Math.max(1, Math.min(20, Number.parseInt(action.quantity, 10) || 1));
