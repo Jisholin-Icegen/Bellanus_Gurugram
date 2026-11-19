@@ -892,7 +892,11 @@ window.nextRequest = nextRequest;
 window.goToRequestIndex = goToRequestIndex;
 
 function DailCareRedirect(RedirectURL) {
-    window.location.href = RedirectURL;
+    if (window.UnifiedAIChild) {
+        window.UnifiedAIChild.navigate(RedirectURL);
+    } else {
+        window.location.href = RedirectURL;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function () {

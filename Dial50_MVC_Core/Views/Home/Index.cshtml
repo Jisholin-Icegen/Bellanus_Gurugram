@@ -2257,6 +2257,39 @@
             <button type="button" id="unifiedAiChatButton">Go to Chat</button>
         </div>
     </div>
+    <div id="unifiedAiFloatingBar" aria-live="polite" aria-label="Persistent voice assistant" hidden>
+        <button type="button" id="unifiedAiReturnButton" aria-label="Return to the AI screen">
+            <img src="~/images/avatar.png" alt="" />
+            <span class="unified-ai-bar-copy">
+                <strong>Thara AI Assistant</strong>
+                <span id="unifiedAiBarStatus">Ready</span>
+            </span>
+        </button>
+        <button type="button" id="unifiedAiBarMicButton" aria-label="Mute microphone">
+            <i class="fa-solid fa-microphone" aria-hidden="true"></i>
+        </button>
+        <button type="button" id="unifiedAiTestToggleButton" aria-label="Show local AI test tools" hidden>Test</button>
+    </div>
+    <section id="unifiedAiTestPanel" aria-label="Unified AI local test panel" hidden>
+        <div class="unified-ai-test-heading">
+            <strong>Unified AI local test</strong>
+            <button type="button" id="unifiedAiTestCloseButton" aria-label="Hide local AI test tools">Hide</button>
+        </div>
+        <p>Dispatch simulated actions without a WebSocket. Creating requests, adding cart items, submitting orders, or submitting feedback may write to the configured database.</p>
+        <textarea id="unifiedAiTestAction" spellcheck="false">{"action":"navigate","target":"room_comfort"}</textarea>
+        <div class="unified-ai-test-actions">
+            <button type="button" data-unified-ai-sample='{"action":"navigate","target":"room_comfort"}'>Room Comfort</button>
+            <button type="button" data-unified-ai-sample='{"action":"navigate","target":"logistics"}'>Logistics</button>
+            <button type="button" data-unified-ai-sample='{"action":"navigate","target":"video_request"}'>My Daily Care</button>
+            <button type="button" data-unified-ai-sample='{"action":"navigate","target":"food_explore"}'>Food Explore</button>
+            <button type="button" data-unified-ai-sample='{"action":"food.intent","intent":"order"}'>Food Order</button>
+            <button type="button" data-unified-ai-sample='{"action":"navigate","target":"feedback"}'>Feedback</button>
+            <button type="button" data-unified-ai-sample='{"action":"request.options","module":"room_comfort"}'>Room request options</button>
+            <button type="button" data-unified-ai-sample='{"action":"request.options","module":"logistics"}'>Logistics options</button>
+        </div>
+        <button type="button" id="unifiedAiTestRunButton">Run action</button>
+        <pre id="unifiedAiTestOutput" aria-live="polite"></pre>
+    </section>
 
     <script>
         var urlParams = new URLSearchParams(window.location.search);
@@ -2277,10 +2310,10 @@
         (function () {
             var bedInfoParam = new URLSearchParams(window.location.search).get('BedInfo');
             if (!bedInfoParam && bedInfo) {
-                var newUrl = window.location.pathname
-                           + '?BedInfo=' + encodeURIComponent(bedInfo)
-                           + (region ? '&region=' + encodeURIComponent(region) : '');
-                window.location.href = newUrl;
+                var newUrl = new URL(window.location.href);
+                newUrl.searchParams.set('BedInfo', bedInfo);
+                if (region) newUrl.searchParams.set('region', region);
+                window.location.href = newUrl.toString();
             }
         })();
 

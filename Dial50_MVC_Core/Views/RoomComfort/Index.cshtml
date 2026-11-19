@@ -185,6 +185,10 @@
     var curpage = window.location.pathname.split("/").pop();
 
     function GoToChat() {
+        if (window.UnifiedAIChild) {
+            window.UnifiedAIChild.showChat();
+            return;
+        }
 
         if (window.BedContext) {
             window.location.href = BedContext.url('@Url.Action("Chat", "AI")');
@@ -194,6 +198,10 @@
     }
 
     function GoToCurrentRequest() {
+        if (window.UnifiedAIChild) {
+            window.UnifiedAIChild.navigate('@Url.Action("Index", "CurrentRequests")?FromLoc=RoomComfort');
+            return;
+        }
         if (window.BedContext) {
             BedContext.go('CurrentRequests/Index', { FromLoc: 'RoomComfort' });
         } else {

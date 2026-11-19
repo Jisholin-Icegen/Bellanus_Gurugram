@@ -37,7 +37,7 @@ function closeModal() {
 }
 
 function DailCareRedirect(RedirectURL) {
-    window.location.href = RedirectURL;
+    navigateFoodPage(RedirectURL);
 }
 
 function browseOtherMeals() {
@@ -124,6 +124,14 @@ function preserveUnifiedAI(url) {
     var target = new URL(url, window.location.origin);
     target.searchParams.set("UnifiedAI", "1");
     return target.toString();
+}
+
+function navigateFoodPage(url) {
+    if (window.UnifiedAIChild) {
+        window.UnifiedAIChild.navigate(url);
+    } else {
+        window.location.href = preserveUnifiedAI(url);
+    }
 }
 
 function getRoomBed() {
@@ -913,7 +921,7 @@ function processCancel(orderId, mealName) {
                 var b = sessionStorage.getItem('bedInfo') || '';
                 $(`#action-area-${orderId}`).html(`
                     <button class="btn-view-details-full" 
-                            onclick="window.location.href='/FoodDining/OrderSuccess?orderIds=${orderId}&isPreorder=1${b ? '&BedInfo=' + encodeURIComponent(b) : ''}'">
+                            onclick="navigateFoodPage('/FoodDining/OrderSuccess?orderIds=${orderId}&isPreorder=1${b ? '&BedInfo=' + encodeURIComponent(b) : ''}')">
                         View details
                     </button>
                 `);
@@ -992,9 +1000,9 @@ function loadOrdersDashboard(roomNo) {
             </div>
             <div class="action-container" id="action-area-${order.orderId}">
                 ${isCancelled ?
-                            `<button class="btn-view-details-full" onclick="window.location.href='/FoodDining/OrderSuccess?orderIds=${order.orderId}&isPreorder=1${bedQuery}'">View details</button>` :
+                            `<button class="btn-view-details-full" onclick="navigateFoodPage('/FoodDining/OrderSuccess?orderIds=${order.orderId}&isPreorder=1${bedQuery}')">View details</button>` :
                             `<div class="card-action-btns">
-                        <button class="btn-outline-details" onclick="window.location.href='/FoodDining/OrderSuccess?orderIds=${order.orderId}&isPreorder=1${bedQuery}'">View details</button>
+                        <button class="btn-outline-details" onclick="navigateFoodPage('/FoodDining/OrderSuccess?orderIds=${order.orderId}&isPreorder=1${bedQuery}')">View details</button>
                         <button class="btn-outline-cancel" onclick="togglePreConfirm('${order.orderId}', true)">Cancel</button>
                     </div>`
                         }
@@ -1003,7 +1011,7 @@ function loadOrdersDashboard(roomNo) {
     </div>`;
                 } else {
                     tomorrowHtml += `
-                    <div class="meal-placeholder-card" onclick="window.location.href='/FoodDining/PatientOrderMode?BedInfo=${encodeURIComponent(bedInfo)}'">
+                    <div class="meal-placeholder-card" onclick="navigateFoodPage('/FoodDining/PatientOrderMode?BedInfo=${encodeURIComponent(bedInfo)}')">
                         <div class="placeholder-icon-circle"><i class="fa-solid ${iconClass}"></i></div>
                         <div class="placeholder-content">
                             <strong>${m.type.toUpperCase()}</strong><span>${m.time}</span>
@@ -1136,7 +1144,7 @@ function loadOrdersDashboard(roomNo) {
                             }
 
                             let trackButtonHtml = (!isDelivered && !isActuallyCancelled)
-                                ? `<button class="btn-track-modern" onclick="window.location.href='/FoodDining/OrderSuccess?orderIds=${order.orderId}${bedQuery}'">
+                                ? `<button class="btn-track-modern" onclick="navigateFoodPage('/FoodDining/OrderSuccess?orderIds=${order.orderId}${bedQuery}')">
                                        <i class="fa-solid fa-stopwatch"></i> Track
                                    </button>`
                                 : (isDelivered && isActuallyRated
@@ -1468,7 +1476,7 @@ function RemoveDefaultPreference(itemId) {
                 if (!bedInfo) return;
 
                 var base = (page === 'FoodDining') ? '/FoodDining/FoodDining' : '/' + page;
-                window.location.href = base + '?BedInfo=' + encodeURIComponent(bedInfo);
+                navigateFoodPage(base + '?BedInfo=' + encodeURIComponent(bedInfo));
             });
         });
     }

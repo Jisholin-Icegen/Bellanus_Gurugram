@@ -35,6 +35,192 @@
     font-family: inherit;
 }
 
+#unifiedAiFloatingBar[hidden],
+#unifiedAiTestPanel[hidden] {
+    display: none !important;
+}
+
+#unifiedAiFloatingBar {
+    position: fixed;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    left: 50%;
+    z-index: 100003;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: min(560px, calc(100vw - 24px));
+    min-height: 78px;
+    padding: 10px 12px 10px 16px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 999px;
+    background: #0c1820;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .34);
+    color: #ffffff;
+    font-family: inherit;
+}
+
+#unifiedAiReturnButton {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+#unifiedAiReturnButton img {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    border: 2px solid rgba(255, 255, 255, .85);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.unified-ai-bar-copy {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.unified-ai-bar-copy strong {
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#unifiedAiBarStatus {
+    overflow: hidden;
+    color: #40d187;
+    font-size: 14px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#unifiedAiBarMicButton {
+    display: grid;
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    place-items: center;
+    border: 0;
+    border-radius: 50%;
+    background: #05b989;
+    color: #ffffff;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+#unifiedAiBarMicButton.is-muted {
+    background: #dc3545;
+}
+
+#unifiedAiTestToggleButton[hidden] {
+    display: none !important;
+}
+
+#unifiedAiTestToggleButton {
+    min-height: 38px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 999px;
+    background: transparent;
+    color: #ffffff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#unifiedAiTestPanel {
+    position: fixed;
+    right: 12px;
+    bottom: 104px;
+    z-index: 100004;
+    width: min(420px, calc(100vw - 24px));
+    max-height: min(62vh, 560px);
+    overflow: auto;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, .24);
+    color: #172b4d;
+    font-family: inherit;
+}
+
+#unifiedAiTestPanel .unified-ai-test-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#unifiedAiTestPanel p {
+    margin: 8px 0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+#unifiedAiTestAction {
+    width: 100%;
+    min-height: 90px;
+    resize: vertical;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: 12px/1.45 Consolas, monospace;
+}
+
+.unified-ai-test-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 8px 0;
+}
+
+#unifiedAiTestPanel button {
+    min-height: 34px;
+    padding: 6px 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #172b4d;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#unifiedAiTestPanel #unifiedAiTestRunButton {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+#unifiedAiTestOutput {
+    max-height: 170px;
+    overflow: auto;
+    margin: 8px 0 0;
+    padding: 8px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #d1fae5;
+    font: 11px/1.4 Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
 #unifiedAiCallPopup.is-open {
     display: block;
 }
@@ -68,4 +254,29 @@
     border-color: #dc2626;
     background: #dc2626;
     color: #ffffff;
+}
+
+@media (max-width: 480px) {
+    #unifiedAiFloatingBar {
+        min-height: 68px;
+        padding: 8px 9px 8px 12px;
+    }
+
+    #unifiedAiReturnButton img {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .unified-ai-bar-copy strong,
+    #unifiedAiBarStatus {
+        font-size: 13px;
+    }
+
+    #unifiedAiBarMicButton {
+        width: 48px;
+        height: 48px;
+        flex-basis: 48px;
+        font-size: 20px;
+    }
 }

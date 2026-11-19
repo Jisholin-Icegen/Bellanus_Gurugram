@@ -233,7 +233,11 @@
         function goBackToMenu() {
             const lastMenu = sessionStorage.getItem("LastMenuPage");
             if (lastMenu && lastMenu !== "null") {
-                window.location.href = lastMenu;
+                if (window.UnifiedAIChild) {
+                    window.UnifiedAIChild.navigate(lastMenu);
+                } else {
+                    window.location.href = lastMenu;
+                }
                 return;
             }
             BedContext.go('FoodDining/MenuItems');

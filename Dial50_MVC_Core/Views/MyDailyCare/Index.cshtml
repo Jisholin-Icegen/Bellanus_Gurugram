@@ -1878,7 +1878,7 @@
                     e.stopPropagation();
 
                     if (document.body.getAttribute('data-state') !== 'idle') {
-                        if (typeof window.endChat === 'function' && isCallActive()) {
+                        if (!window.UnifiedAIChild && typeof window.endChat === 'function' && isCallActive()) {
                             window.endChat();
                         }
                         navigateToDailyCare();
@@ -1901,6 +1901,10 @@
         });
 
         function navigateToDailyCare() {
+            if (window.UnifiedAIChild) {
+                window.BedContext.go('Home/Index');
+                return;
+            }
             if (document.body.getAttribute('data-state') !== 'idle') {
                 if (typeof window.endChat === 'function' && isCallActive()) {
                     window.endChat();
@@ -1917,8 +1921,13 @@
         function DailCareRedirect(RedirectURL) {
             var b = BedContext.get();
             if (!b.bedInfo) return;
-            window.location.href = RedirectURL + encodeURIComponent(b.bedInfo)
+            var url = RedirectURL + encodeURIComponent(b.bedInfo)
                 + '&region=' + encodeURIComponent(b.region || 'IN');
+            if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.navigate(url);
+            } else {
+                window.location.href = url;
+            }
         }
 
         function convertToEmbedUrl(url) {

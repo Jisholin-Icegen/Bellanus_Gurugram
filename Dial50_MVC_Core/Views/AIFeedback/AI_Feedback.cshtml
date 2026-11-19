@@ -336,10 +336,18 @@
         }
 
         function GoToCurrentRequest() {
+            if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.navigate('@Url.Action("Index", "CurrentRequests")');
+                return;
+            }
             window.location.href = '@Url.Action("Index", "CurrentRequests")';
         }
 
         function UseClassicForm() {
+            if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.navigate('@Url.Action("Feedback", "Home")');
+                return;
+            }
             window.location.href = '@Url.Action("Feedback", "Home")';
         }
 
