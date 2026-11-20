@@ -15,7 +15,9 @@ The voice client requests one access token per explicit call start. A failed
 token request, including HTTP 429, ends that attempt and is never retried
 automatically; the user must explicitly start another call to request a new
 token. WebSocket reconnects reuse the call's existing token and use exponential
-backoff capped at 15 seconds. The voice service must accept that token for a
+backoff capped at 15 seconds for at most five retries per call. A clean
+WebSocket close or server call_ended event ends the session instead of opening
+another socket. The voice service must accept the existing token for a
 reconnect; the client will not request another token in the same call. It keeps
 the call timer running and reuses a live microphone stream, reacquiring it if
 the browser ended the track. Calls have no default time limit; a positive
@@ -25,8 +27,9 @@ Thinking, or Speaking status as the Home call screen while the call is
 connecting or connected.
 The assistant bar remains above the unified page frame. Go to Chat only hides
 that frame and returns to the Home call screen; it must not end or recreate the
-voice socket. The explicit End Call control, a valid server call_ended event,
-or an unrecoverable call-start failure ends the session.
+voice socket. The explicit End Call control, a clean server WebSocket close, a
+valid server call_ended event, or an exhausted connection-retry limit ends the
+session.
 
 This client-side reconnect does not replace a healthy voice backend. The AI
 team must keep its server-side voice session valid, accept the existing token
@@ -163,8 +166,9 @@ active. Ending or failing a call while minimized does not restore the full call
 screen over Home. The Home AI card and the popup's return/chat control both
 restore the full call screen and hide the popup. A voice route to Home returns
 to the Home layout with the popup still active. Hiding the page also minimizes
-the screen. The call stays active until the user selects End Call; remote
-disconnects reuse the current token when reconnecting.
+the screen. Abnormal voice disconnects reuse the current token for at most
+five reconnect attempts. A clean server close or valid call_ended event ends
+the session without reopening the WebSocket.
 
 Tenant and data handling
 ------------------------

@@ -268,7 +268,6 @@ var ws = null;
 var pendingVoiceMessages = [];
 var reconnectTimer = null;
 var connectionTimeoutTimer = null;
-var stableConnectionTimer = null;
 var statusTransitionTimer = null;
 var serverEndTimer = null;
 var connectionInProgress = false;
@@ -276,7 +275,7 @@ var callSessionActive = false;
 var callAccessToken = null;
 var callSessionGeneration = 0;
 var reconnectAttempts = 0;
-var maxReconnectBackoffStep = 5;
+var maxReconnectAttempts = 5;
 var audioContext = null;
 var mediaStream = null;
 var micNode = null;
@@ -832,10 +831,6 @@ async function connectToAvatarBackend() {
             clearTimeout(connectionTimeoutTimer);
             connectionTimeoutTimer = null;
             connectionInProgress = false;
-            clearTimeout(stableConnectionTimer);
-            stableConnectionTimer = setTimeout(function () {
-                if (ws === socket && socket.readyState === WebSocket.OPEN) reconnectAttempts = 0;
-            }, 15000);
             goConnected();
             window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
                 detail: { connected: true, reconnecting: reconnectAttempts > 0 }
@@ -909,30 +904,12 @@ async function connectToAvatarBackend() {
                 case "call_ended": {
                     serverEnding = true;
                     clearTimeout(serverEndTimer);
-                    setCallStatus("reconnecting");
-                    var endedSocket = socket;
                     var remainingMs = audioContext
                         ? Math.max(0, (nextPlayTime - audioContext.currentTime) * 1000)
                         : 0;
                     serverEndTimer = setTimeout(function () {
                         serverEndTimer = null;
-                        if (ws !== endedSocket) return;
-                        if (!callSessionActive || !body
-                            || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
-                            serverEnding = false;
-                            endChat();
-                            return;
-                        }
-                        serverEnding = false;
-                        ws = null;
-                        try {
-                            if (endedSocket.readyState !== WebSocket.CLOSED) {
-                                endedSocket.close(4001, "Remote call completed");
-                            }
-                        } catch (error) {
-                            console.warn("Could not close the completed voice session:", error && error.message ? error.message : error);
-                        }
-                        scheduleVoiceReconnect();
+                        endChat("ended");
                     }, remainingMs + 300);
                     break;
                 }
@@ -946,19 +923,16 @@ async function connectToAvatarBackend() {
             if (ws !== socket) return;
             clearTimeout(connectionTimeoutTimer);
             connectionTimeoutTimer = null;
-            clearTimeout(stableConnectionTimer);
-            stableConnectionTimer = null;
             connectionInProgress = false;
             ws = null;
             if (serverEnding) {
-                serverEnding = false;
-                clearTimeout(serverEndTimer);
-                serverEndTimer = null;
-                if (callSessionActive) scheduleVoiceReconnect();
-                else endChat();
                 return;
             }
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason");
+            if (event.code === 1000) {
+                endChat("disconnected");
+                return;
+            }
             scheduleVoiceReconnect();
         };
 
@@ -967,7 +941,7 @@ async function connectToAvatarBackend() {
             setCallStatus("reconnecting");
             try {
                 if (socket.readyState === WebSocket.CONNECTING || socket.readyState === WebSocket.OPEN) {
-                    socket.close();
+                    socket.close(4000, "Connection error");
                 }
             } catch (error) {
                 console.warn("Could not close the failed voice WebSocket:", error && error.message ? error.message : error);
@@ -1001,7 +975,12 @@ function scheduleVoiceReconnect() {
         return;
     }
 
-    reconnectAttempts = Math.min(reconnectAttempts + 1, maxReconnectBackoffStep);
+    if (reconnectAttempts >= maxReconnectAttempts) {
+        endChat("disconnected");
+        return;
+    }
+
+    reconnectAttempts += 1;
     var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
     setCallStatus("reconnecting");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
@@ -1081,12 +1060,10 @@ function endChat(finalStatus) {
     clearTimeout(drainTimer);
     clearTimeout(reconnectTimer);
     clearTimeout(connectionTimeoutTimer);
-    clearTimeout(stableConnectionTimer);
     clearTimeout(statusTransitionTimer);
     clearTimeout(serverEndTimer);
     reconnectTimer = null;
     connectionTimeoutTimer = null;
-    stableConnectionTimer = null;
     statusTransitionTimer = null;
     serverEndTimer = null;
     reconnectAttempts = 0;
