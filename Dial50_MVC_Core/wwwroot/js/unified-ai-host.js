@@ -6,19 +6,9 @@
     const barMicButton = document.getElementById("unifiedAiBarMicButton");
     const barChatButton = document.getElementById("unifiedAiBarChatButton");
     const barEndButton = document.getElementById("unifiedAiBarEndButton");
-    const testLauncher = document.getElementById("unifiedAiTestLauncher");
-    const testCloseButton = document.getElementById("unifiedAiTestCloseButton");
-    const testPanel = document.getElementById("unifiedAiTestPanel");
-    const testStatus = document.getElementById("unifiedAiTestStatus");
-    const testActionInput = document.getElementById("unifiedAiTestAction");
-    const testSuggestions = document.getElementById("unifiedAiTestSuggestions");
-    const testOutput = document.getElementById("unifiedAiTestOutput");
-
     if (!frameLayer || !frame) return;
 
     const pageParams = new URLSearchParams(window.location.search);
-    const isLocalTestMode = pageParams.get("UnifiedAITest") === "1"
-        && ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
 
     const routes = {
         room_comfort: "/RoomComfort/Index",
@@ -40,7 +30,6 @@
     let activeTarget = null;
     let latestFrameContext = null;
     let lastSentContext = "";
-    let simulatedSession = false;
     let screenWakeLock = null;
     let wakeLockRequestPending = false;
     let suppressReturnClickUntil = 0;
@@ -48,38 +37,7 @@
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
-        return simulatedSession || state === "connecting" || state === "connected";
-    }
-
-    function updateTestPanelState(openForActiveModule) {
-        if (!testPanel || !testLauncher) return;
-        if (!isLocalTestMode) {
-            testPanel.hidden = true;
-            testLauncher.hidden = true;
-            return;
-        }
-
-        const state = document.body.getAttribute("data-state");
-        const realCall = state === "connecting" || state === "connected";
-        const onModule = frameLayer.classList.contains("is-open");
-        const simulationButton = document.getElementById("unifiedAiTestSessionButton");
-        if (simulationButton) simulationButton.hidden = realCall || simulatedSession;
-        if (!onModule) {
-            testLauncher.hidden = !testPanel.hidden;
-            testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
-            return;
-        }
-
-        if (openForActiveModule && (realCall || simulatedSession)) {
-            testPanel.hidden = false;
-            testLauncher.hidden = true;
-            testLauncher.setAttribute("aria-expanded", "true");
-            renderTestSuggestions();
-            return;
-        }
-
-        testLauncher.hidden = !testPanel.hidden;
-        testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
+        return state === "connecting" || state === "connected";
     }
 
     function homePageContext() {
@@ -99,7 +57,7 @@
             return value.slice(0, 180);
         };
         const isVisible = function (element) {
-            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar")) return false;
+            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiFloatingBar")) return false;
             const style = window.getComputedStyle(element);
             if (style.display === "none" || style.visibility === "hidden" || !element.getClientRects().length) return false;
             for (let ancestor = element; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
@@ -222,7 +180,7 @@
     }
 
     function sendCurrentPageContext() {
-        if (simulatedSession || document.body.getAttribute("data-state") !== "connected"
+        if (document.body.getAttribute("data-state") !== "connected"
             || typeof window.sendVoiceAgentMessage !== "function") return;
         const context = frameLayer.classList.contains("is-open") ? latestFrameContext : homePageContext();
         if (frameLayer.classList.contains("is-open") && context && frame.contentWindow) {
@@ -269,24 +227,18 @@
     }
 
     function updateFloatingBar() {
-        const realConnection = document.body.getAttribute("data-state") === "connected";
-        const connected = realConnection || simulatedSession;
-        syncScreenWakeLock(connected);
-        if (!realConnection) lastSentContext = "";
+        const state = document.body.getAttribute("data-state");
+        const activeCall = state === "connecting" || state === "connected";
+        syncScreenWakeLock(activeCall);
+        if (!activeCall) lastSentContext = "";
         if (floatingBar) {
-            floatingBar.hidden = !connected;
+            floatingBar.hidden = !activeCall;
             const callStatus = document.getElementById("callStatus");
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
-            if (testStatus) {
-                testStatus.textContent = simulatedSession
-                    ? "Test simulation"
-                    : callStatus && callStatus.textContent.trim() || "Idle";
-            }
             if (statusText) {
-                statusText.textContent = simulatedSession
-                    ? "Test simulation"
-                    : callStatus && callStatus.textContent.trim() || "Connected";
+                statusText.textContent = callStatus && callStatus.textContent.trim()
+                    || (state === "connecting" ? "Connecting..." : "Listening...");
             }
             if (barMicButton) {
                 const muted = !!(micButton && micButton.classList.contains("muted"));
@@ -295,17 +247,15 @@
                     ? '<i class="fa-solid fa-microphone-slash" aria-hidden="true"></i>'
                     : '<i class="fa-solid fa-microphone" aria-hidden="true"></i>';
                 barMicButton.setAttribute("aria-label", muted ? "Unmute microphone" : "Mute microphone");
-                barMicButton.disabled = !realConnection;
+                barMicButton.disabled = state !== "connected";
             }
         }
-        updateTestPanelState(false);
-        if (connected) sendCurrentPageContext();
+        if (state === "connected") sendCurrentPageContext();
     }
 
     function showChat() {
         frameLayer.classList.remove("is-open");
         frameLayer.setAttribute("aria-hidden", "true");
-        if (testPanel) testPanel.hidden = true;
         updateFloatingBar();
     }
 
@@ -318,8 +268,7 @@
             error: error || null
         };
         window.dispatchEvent(new CustomEvent("unified-ai:action-result", { detail: response }));
-        if (simulatedSession
-            || document.body.getAttribute("data-state") !== "connected"
+        if (document.body.getAttribute("data-state") !== "connected"
             || typeof window.sendVoiceAgentMessage !== "function") return;
 
         window.sendVoiceAgentMessage(Object.assign({ type: "app_action_result" }, response));
@@ -341,7 +290,6 @@
 
         frameReady = false;
         updateFloatingBar();
-        updateTestPanelState(true);
         frame.src = targetUrl.toString();
         return true;
     }
@@ -725,7 +673,6 @@
             }, window.location.origin);
         }
         updateFloatingBar();
-        renderTestSuggestions();
     });
 
     window.addEventListener("voice-agent:app-action", function (event) {
@@ -750,7 +697,6 @@
                 activeTarget = routeTargetForPath(latestFrameContext.route);
             }
             sendCurrentPageContext();
-            renderTestSuggestions();
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
         }
@@ -758,12 +704,6 @@
 
     if (barEndButton) {
         barEndButton.addEventListener("click", function () {
-            if (simulatedSession) {
-                simulatedSession = false;
-                showChat();
-                updateFloatingBar();
-                return;
-            }
             if (typeof window.endChat === "function") window.endChat();
             showChat();
             updateFloatingBar();
@@ -779,363 +719,8 @@
         barMicButton.addEventListener("click", function (event) {
             event.stopPropagation();
             const micButton = document.getElementById("micBtn");
-            if (!simulatedSession && isCallActive() && micButton) micButton.click();
+            if (isCallActive() && micButton) micButton.click();
             updateFloatingBar();
-        });
-    }
-
-    if (testPanel) testPanel.hidden = true;
-    if (isLocalTestMode && testOutput) {
-        window.addEventListener("unified-ai:action-result", function (event) {
-            testOutput.textContent = JSON.stringify(event.detail, null, 2);
-        });
-    }
-
-    const testCommandWords = new Set([
-        "a", "an", "add", "and", "can", "change", "choose", "count", "delete", "decrease",
-        "for", "food", "i", "in", "increase", "item", "make", "minus", "more", "my", "of",
-        "one", "order", "please", "plus", "quantity", "raise", "remove", "request", "select",
-        "set", "the", "this", "to", "want", "with"
-    ]);
-
-    function normalizeTestText(value) {
-        return String(value || "").normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
-            .toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-    }
-
-    function testQuantity(value, fallback, minimum) {
-        const words = { zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5 };
-        const text = String(value || "").toLowerCase();
-        const parsed = Object.prototype.hasOwnProperty.call(words, text) ? words[text] : Number.parseInt(text, 10);
-        return Math.max(minimum == null ? 1 : minimum, Math.min(20, Number.isNaN(parsed) ? fallback : parsed));
-    }
-
-    function buildTestSuggestions() {
-        const context = frameLayer.classList.contains("is-open")
-            ? latestFrameContext
-            : homePageContext();
-        if (!context) return [];
-
-        const query = String(testActionInput && testActionInput.value || "").trim();
-        const queryText = normalizeTestText(query);
-        const tokens = queryText.split(/\s+/).filter(function (word) {
-            return word && !testCommandWords.has(word);
-        });
-        const suggestions = [];
-
-        function add(label, action, searchText) {
-            const haystack = normalizeTestText(searchText || label);
-            const score = tokens.filter(function (token) { return haystack.includes(token); }).length;
-            if (tokens.length && score === 0) return;
-            suggestions.push({ label: label, action: action, score: score });
-        }
-
-        (context.actions || []).forEach(function (item) {
-            if (item.route && !item.disabled) {
-                add("Open " + item.label, { action: "navigate", path: item.route }, item.label + " " + item.route);
-            } else if (item.targetId && !item.disabled) {
-                add("Click " + item.label, { action: "ui.click", targetId: item.targetId, label: item.label }, item.label);
-            }
-        });
-        (context.items || []).forEach(function (item) {
-            const route = item.voiceRoute || (!item.disabled && item.route);
-            if (route) {
-                add("Open " + (item.name || item.label), { action: "navigate", path: route }, item.name || item.label);
-            }
-        });
-
-        (context.controls || []).forEach(function (control) {
-            (control.options || []).forEach(function (option) {
-                if (option.disabled || String(option.value) === String(control.selected ? control.selected.value : "")) return;
-                add("Select " + option.label + " in " + (control.label || control.id), {
-                    action: "ui.select",
-                    controlId: control.id || control.label,
-                    optionValue: option.value
-                }, (control.label || control.id) + " " + option.label);
-            });
-        });
-
-        (context.choices || []).forEach(function (choice) {
-            if (!choice.targetId || choice.disabled) return;
-            const shouldCheck = choice.type === "radio" || !choice.checked;
-            const label = choice.label || choice.value || "choice";
-            add((shouldCheck ? "Select " : "Clear ") + label, {
-                action: "ui.set_choice",
-                targetId: choice.targetId,
-                checked: shouldCheck
-            }, label + " " + choice.name);
-        });
-
-        if (query) {
-            (context.fields || []).forEach(function (field) {
-                if (!field.targetId) return;
-                const label = field.label || "the visible field";
-                const fieldMatchesQuery = normalizeTestText(label + " " + (field.placeholder || ""))
-                    .split(/\s+/).some(function (word) { return tokens.includes(word); });
-                const isFreeTextField = /remark|comment|description|feedback|message|reason|note/i.test(label + " " + (field.placeholder || ""));
-                if (!fieldMatchesQuery && !isFreeTextField) return;
-                add("Enter your text in " + (field.label || "the visible field"), {
-                    action: "ui.fill",
-                    targetId: field.targetId,
-                    label: field.label,
-                    value: query
-                }, (field.label || "") + " " + (field.placeholder || "") + " " + query);
-            });
-        }
-
-        const route = String(context.route || "").toLowerCase();
-        if (/\/home(?:\/index)?$/.test(route)
-            && (context.actions || []).some(function (item) { return /food|dining/i.test(item.label); })) {
-            add("Explore Food & Dining", {
-                action: "food.intent",
-                intent: "explore"
-            }, "food dining explore");
-            add("Place a food order", {
-                action: "food.intent",
-                intent: "order"
-            }, "food dining order");
-        }
-        const requestModule = route.indexOf("roomcomfort") >= 0
-            ? "room_comfort"
-            : route.indexOf("logisitics") >= 0 ? "logistics" : null;
-        if (requestModule) {
-            (context.items || []).filter(function (item) {
-                const category = item.name || item.label || "";
-                return item.categoryId && !item.disabled
-                    && !(requestModule === "logistics" && /prepare guest pass/i.test(category));
-            }).forEach(function (item) {
-                const category = item.name || item.label;
-                const quantityMatch = queryText.match(/\b(?:quantity|qty|need|want|add)\s+(one|two|three|four|five|\d+)\b/);
-                add("Create " + category + " request", {
-                    action: "request.create",
-                    module: requestModule,
-                    categoryId: item.categoryId,
-                    category: category,
-                    remarks: query || category,
-                    quantity: testQuantity(quantityMatch && quantityMatch[1], 1)
-                }, category);
-            });
-        }
-
-        if (route.indexOf("/fooddining/otherservices") >= 0) {
-            (context.items || []).filter(function (item) {
-                return item.categoryId && !item.disabled;
-            }).forEach(function (item) {
-                const category = item.name || item.label;
-                add("Submit " + category + " request", {
-                    action: "request.create",
-                    module: "food_other_services",
-                    categoryId: item.categoryId,
-                    category: category,
-                    remarks: query
-                }, category);
-            });
-        }
-
-        const notificationItems = (context.items || []).filter(function (item) {
-            return item.notificationId;
-        });
-        if (queryText.includes("notification") || queryText.includes("alert")) {
-            add("Load latest notifications", { action: "notification.list" }, "notification alert unread");
-        }
-        notificationItems.forEach(function (item) {
-            const label = item.name || item.label || "notification";
-            add("Open notification: " + label, {
-                action: "notification.open",
-                notificationId: item.notificationId
-            }, label + " " + item.status);
-            if (!item.notificationRead) {
-                add("Mark notification as read: " + label, {
-                    action: "notification.mark_read",
-                    notificationId: item.notificationId
-                }, "mark read " + label);
-            }
-        });
-        if (queryText.includes("mark all")) {
-            add("Mark all notifications as read", { action: "notification.mark_all_read" }, "mark all notifications read");
-        }
-
-        if (route.indexOf("/overallfeedback/") >= 0) {
-            (context.items || []).filter(function (item) {
-                return item.feedbackQuestionId || item.feedbackDepartmentId;
-            }).forEach(function (item) {
-                const question = item.name || item.label;
-                (item.feedbackChoices || []).forEach(function (choice) {
-                    add("Answer " + question + ": " + choice, {
-                        action: "feedback.answer",
-                        questionId: item.feedbackQuestionId,
-                        departmentId: item.feedbackDepartmentId,
-                        question: question,
-                        value: choice
-                    }, question + " " + choice);
-                });
-                if (query && ["text", "comments"].includes(item.feedbackType)) {
-                    add("Enter your response for " + question, {
-                        action: "feedback.answer",
-                        questionId: item.feedbackQuestionId,
-                        departmentId: item.feedbackDepartmentId,
-                        question: question,
-                        value: query
-                    }, question + " " + query);
-                }
-            });
-            if ((context.actions || []).some(function (item) {
-                return !item.disabled && /submit feedback/i.test(item.label);
-            })) {
-                add("Submit feedback", { action: "feedback.submit" }, "submit feedback");
-            }
-        }
-
-        if (route.indexOf("/mydailycare/") >= 0) {
-            const videoUrl = query.match(/https?:\/\/[^\s]+/i);
-            if (videoUrl) {
-                add("Play the supplied video", {
-                    action: "video.play",
-                    videoUrl: videoUrl[0],
-                    title: "Video"
-                }, "play video " + query);
-            }
-            if ((context.actions || []).some(function (item) {
-                return !item.disabled && /back to my daily care/i.test(item.label);
-            })) {
-                add("Stop the current video", { action: "video.stop" }, "stop close video");
-            }
-        }
-
-        const menuItems = (context.items || []).filter(function (item) { return item.foodId && !item.disabled; });
-        if (menuItems.length) {
-            const remove = /\b(remove|delete)\b/.test(queryText);
-            const decrease = /\b(minus|decrease|subtract|less)\b/.test(queryText);
-            const setQuantity = queryText.match(/\b(?:quantity|qty)\s*(?:to\s*)?(zero|one|two|three|four|five|\d+)\b|\bset\s+(?:to\s*)?(zero|one|two|three|four|five|\d+)\b/);
-            const addCount = queryText.match(/\badd\s+(one|two|three|four|five|\d+)\b/);
-            menuItems.forEach(function (item) {
-                const name = item.name || item.label;
-                const meal = item.meal || "";
-                let action;
-                let label;
-                if (remove) {
-                    action = { action: "food.remove_item", itemId: item.foodId, itemName: name, meal: meal };
-                    label = "Remove " + name;
-                } else if (decrease) {
-                    const quantity = Math.max(0, (Number(item.quantity) || 0) - 1);
-                    action = { action: "food.set_quantity", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
-                    label = "Decrease " + name + " to " + quantity;
-                } else if (setQuantity) {
-                    const quantity = testQuantity(setQuantity[1] || setQuantity[2], 0, 0);
-                    action = { action: "food.set_quantity", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
-                    label = "Set " + name + " quantity to " + quantity;
-                } else {
-                    const quantity = testQuantity(addCount && addCount[1], 1);
-                    action = { action: "food.add_item", itemId: item.foodId, itemName: name, meal: meal, quantity: quantity };
-                    label = "Add " + quantity + " " + name;
-                }
-                add(label, action, name);
-            });
-            add("List the current menu", { action: "food.list_menu" }, "menu list food");
-            if ((context.actions || []).some(function (item) {
-                return !item.disabled && /review order|checkout|view cart/i.test(item.label);
-            })) {
-                add("Review the current order", { action: "food.review_order" }, "review order checkout cart");
-            }
-            if (route.indexOf("/fooddining/menuitems") >= 0
-                && menuItems.some(function (item) { return Number(item.quantity) > 0; })) {
-                add("Submit the current order", { action: "food.submit_order" }, "submit confirm place order");
-            }
-        }
-
-        if (route.indexOf("/fooddining/revieworder") >= 0
-            && (context.actions || []).some(function (item) {
-                return !item.disabled && /confirm order|place order|submit order/i.test(item.label);
-            })) {
-            add("Place the order", { action: "food.submit_order" }, "place confirm submit order");
-        }
-
-        (context.items || []).forEach(function (item) {
-            if (!item.disabled && item.orderType) {
-                add("Choose " + item.name + " ordering", {
-                    action: "food.select_order_type",
-                    orderType: item.orderType
-                }, item.name || item.label);
-            }
-            if (!item.disabled && item.orderMode) {
-                add("Choose " + item.name, {
-                    action: "food.select_mode",
-                    mode: item.orderMode
-                }, item.name || item.label);
-            }
-        });
-
-        return suggestions.sort(function (left, right) { return right.score - left.score; }).slice(0, 200);
-    }
-
-    function runTestAction(action, label) {
-        if (!isLocalTestMode || !action) return;
-        action.request_id = "local-test-" + Date.now();
-        if (testOutput) testOutput.textContent = "Testing: " + label + "\nThe current app backend will handle this action.";
-        handleAction(action);
-    }
-
-    function renderTestSuggestions() {
-        if (!testSuggestions) return;
-        const suggestions = buildTestSuggestions();
-        testSuggestions.replaceChildren();
-        if (!suggestions.length) {
-            const empty = document.createElement("p");
-            empty.className = "unified-ai-test-empty";
-            empty.textContent = frameLayer.classList.contains("is-open") && !latestFrameContext
-                ? "Loading visible page options..."
-                : "No matching actions are visible on this screen.";
-            testSuggestions.appendChild(empty);
-            return;
-        }
-
-        const fragment = document.createDocumentFragment();
-        suggestions.forEach(function (suggestion) {
-            const button = document.createElement("button");
-            button.type = "button";
-            button.className = "unified-ai-test-suggestion";
-            button.textContent = suggestion.label;
-            button.addEventListener("click", function () {
-                runTestAction(suggestion.action, suggestion.label);
-            });
-            fragment.appendChild(button);
-        });
-        testSuggestions.appendChild(fragment);
-    }
-
-    const testSessionButton = document.getElementById("unifiedAiTestSessionButton");
-    if (testSessionButton) {
-        testSessionButton.addEventListener("click", function () {
-            if (!isLocalTestMode) return;
-            simulatedSession = true;
-            updateFloatingBar();
-            updateTestPanelState(false);
-        });
-    }
-
-    if (testLauncher) {
-        testLauncher.addEventListener("click", function () {
-            if (!testPanel) return;
-            testPanel.hidden = !testPanel.hidden;
-            updateTestPanelState(false);
-            renderTestSuggestions();
-        });
-    }
-    if (testCloseButton) {
-        testCloseButton.addEventListener("click", function () {
-            if (testPanel) testPanel.hidden = true;
-            updateTestPanelState(false);
-        });
-    }
-    if (testActionInput) {
-        testActionInput.addEventListener("input", renderTestSuggestions);
-        testActionInput.addEventListener("keydown", function (event) {
-            if (event.key !== "Enter") return;
-            const firstSuggestion = testSuggestions && testSuggestions.querySelector("button");
-            if (firstSuggestion) {
-                event.preventDefault();
-                firstSuggestion.click();
-            }
         });
     }
 
@@ -1185,7 +770,7 @@
         if (frameLayer.classList.contains("is-open")) return;
         const relevantChanges = records.some(function (record) {
             const target = record.target instanceof Element ? record.target : record.target.parentElement;
-            if (target && target.closest("#unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar")) return false;
+            if (target && target.closest("#unifiedAiFloatingBar")) return false;
             return record.type !== "attributes"
                 || !["data-unified-ai-target", "data-unified-ai-field"].includes(record.attributeName);
         });
@@ -1194,7 +779,6 @@
         homeContextTimer = setTimeout(function () {
             lastSentContext = "";
             sendCurrentPageContext();
-            if (isLocalTestMode) renderTestSuggestions();
         }, 250);
     });
     homeContextObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
@@ -1238,8 +822,6 @@
     };
 
     const bodyObserver = new MutationObserver(function () {
-        const state = document.body.getAttribute("data-state");
-        if (state === "connecting" || state === "connected") simulatedSession = false;
         updateFloatingBar();
     });
     bodyObserver.observe(document.body, { attributes: true, attributeFilter: ["data-state"] });

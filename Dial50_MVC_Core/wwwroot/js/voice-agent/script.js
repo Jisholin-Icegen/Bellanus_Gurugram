@@ -1110,13 +1110,13 @@ function initializeAvatarEvents() {
 
     if (assistantBackBtn) {
         assistantBackBtn.addEventListener("click", function () {
-
-            console.log("Dial50: Assistant Back clicked");
-
-            if (body.getAttribute("data-state") !== "idle") {
-                endChat();
+            if (body.getAttribute("data-state") === "connecting"
+                || body.getAttribute("data-state") === "connected") {
+                if (window.UnifiedAIHost && typeof window.UnifiedAIHost.showChat === "function") {
+                    window.UnifiedAIHost.showChat();
+                }
+                return;
             }
-
             setState("idle");
         });
     }

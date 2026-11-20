@@ -16,9 +16,13 @@ temporary WebSocket outage, then retries with exponential backoff capped at
 15 seconds until the patient or server ends the call. It keeps the call timer
 running and reuses a live microphone stream, reacquiring it if the browser ended
 the track. Calls have no default time limit; a positive SESSION_SECONDS value
-in APP_CONFIG can still set an explicit limit. The assistant bar and local test
-panel display the same Connecting, Reconnecting, Listening, Thinking, or
-Speaking status.
+in APP_CONFIG can still set an explicit limit. The persistent assistant bar
+shows the same Connecting, Reconnecting, Listening, Thinking, or Speaking
+status as the Home call screen while the call is connecting or connected.
+The assistant bar remains above the unified page frame. Go to Chat only hides
+that frame and returns to the Home call screen; it must not end or recreate the
+voice socket. Only the explicit End Call control or a valid server call_ended
+event should end the session.
 
 This client-side retry does not replace a healthy voice backend. The AI team
 must keep its server-side voice session valid, accept a fresh token during a
@@ -50,6 +54,9 @@ The app returns:
 Always include a unique request_id and wait for the corresponding result before
 claiming a write succeeded. An error result means the app did not confirm the
 requested action.
+For ui.click, the app refreshes visible page context after the click before
+returning success, so follow-up actions can use newly visible controls such as
+the Nutrition modal's Done button.
 
 Actions
 -------
@@ -149,18 +156,17 @@ tenant-connection lookups are cached for five minutes to avoid repeating the
 central-database lookup on each request. Do not put tenant IDs, database
 connection strings, or patient identifiers into AI prompts or logs.
 
-Local test procedure
---------------------
+Local smoke test
+----------------
 Use:
 
-  https://localhost:7116/PreLanding?BedInfo=9330&region=SA&XTenantID=2&UnifiedAITest=1
+  https://localhost:7116/PreLanding?BedInfo=9330&region=SA&XTenantID=2
 
-The Test tools panel can simulate page actions without connecting the external
-voice service. Read-only checks include notification.list, request.options,
-food.list_menu, and feedback.start. The test panel uses the application's
-configured backend; request.create, food.add_item, food.submit_order,
-notification mark-read actions, feedback.submit, and generic submit buttons
-can change real data. Only run those against a confirmed test database.
+There is no local assistant simulation. Start Talk to AI to test the real voice
+service and exercise navigation or non-submitting UI controls. AI actions that
+create requests, change notification state, update a cart, submit feedback, or
+place orders can change application data; only test those against a confirmed
+test database.
 
 The supplied local tenant/database must be verified as test data before writes.
 Exercise each configured tenant and the voice service separately; a local build

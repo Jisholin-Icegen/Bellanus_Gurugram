@@ -275,7 +275,7 @@
             "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .service-card, .order-card, .selection-card, .timing-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box"
         ))
             .filter(function (element) {
-                return !element.closest("#unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar");
+                return !element.closest("#unifiedAiFloatingBar");
             })
             .filter(isVisible)
             .slice(0, 150);
@@ -397,8 +397,11 @@
                 return;
             }
             target.scrollIntoView({ behavior: "smooth", block: "center" });
-            respond(action, true, { clicked: interactiveLabel(target) });
-            window.setTimeout(function () { target.click(); }, 25);
+            window.setTimeout(function () {
+                target.click();
+                sendPageContext();
+                respond(action, true, { clicked: interactiveLabel(target) });
+            }, 25);
             return;
         }
 

@@ -2268,21 +2268,6 @@
             <i class="fa-solid fa-phone-slash" aria-hidden="true"></i>
         </button>
     </div>
-    <button type="button" id="unifiedAiTestLauncher" aria-controls="unifiedAiTestPanel" aria-expanded="false" hidden>Test tools</button>
-    <section id="unifiedAiTestPanel" aria-label="Unified AI local test panel" hidden>
-        <div class="unified-ai-test-heading">
-            <strong>Unified AI action test</strong>
-            <span id="unifiedAiTestStatus" aria-live="polite">Idle</span>
-            <button type="button" id="unifiedAiTestCloseButton" aria-label="Hide local AI test tools">Hide</button>
-        </div>
-        <button type="button" id="unifiedAiTestSessionButton">Start simulated assistant session</button>
-        <p>Suggestions use visible page data. Test actions use this app's configured backend and can create requests, update the cart, place orders, or submit feedback.</p>
-        <label class="unified-ai-test-label" for="unifiedAiTestAction">Describe an action to test</label>
-        <input id="unifiedAiTestAction" type="text" autocomplete="off" placeholder="Type a visible item, request, or dropdown value" />
-        <div id="unifiedAiTestSuggestions" aria-label="Available actions for this screen"></div>
-        <pre id="unifiedAiTestOutput" aria-live="polite"></pre>
-    </section>
-
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var bed       = BedContext.get();
@@ -2338,18 +2323,18 @@
                 e.preventDefault();
                 e.stopPropagation();
 
-                pendingSuccessTaskId = null;
-                _postCallFetchInFlight = true;
-                hideRequestLoading();
-
-                if (document.body.getAttribute('data-state') !== 'idle') {
-                    if (typeof window.endChat === 'function') {
-                        window.endChat();
+                var state = document.body.getAttribute('data-state');
+                if (state === 'connecting' || state === 'connected') {
+                    if (window.UnifiedAIHost
+                        && typeof window.UnifiedAIHost.showChat === 'function') {
+                        window.UnifiedAIHost.showChat();
                     }
-                    setTimeout(navigateHome, 100);
                     return;
                 }
 
+                pendingSuccessTaskId = null;
+                _postCallFetchInFlight = true;
+                hideRequestLoading();
                 navigateHome();
             });
 
