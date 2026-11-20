@@ -10,10 +10,12 @@
         : {};
     var bedInfo = bedContext.bedInfo || pageParameters.get("BedInfo") || "";
     var tenantId = bedContext.tenantId || pageParameters.get("XTenantID") || "";
-    var identity = window.location.origin + "|" + tenantId + "|" + bedInfo;
-    var windowName = "Dial50UnifiedVoiceCall_" + hash(identity);
+    var identity = window.location.protocol + "//" + window.location.hostname + "|" + tenantId + "|" + bedInfo;
+    var callKey = hash(identity);
+    var ownerOrigin = isOwner ? window.location.origin : null;
+    var windowName = "Dial50UnifiedVoiceCall_" + callKey;
     var channel = typeof window.BroadcastChannel === "function"
-        ? new window.BroadcastChannel("dial50-unified-voice-call-" + hash(identity))
+        ? new window.BroadcastChannel("dial50-unified-voice-call-" + callKey)
         : null;
     var callBar = document.getElementById("unifiedVoiceCallBar");
     var callBarStatus = document.getElementById("unifiedVoiceCallBarStatus");
@@ -39,14 +41,84 @@
         var status = document.getElementById("callStatus");
         return {
             type: "state",
+            callKey: callKey,
+            ownerOrigin: window.location.origin,
             active: active,
             state: state,
             status: status && status.textContent.trim() || (active ? "Connecting..." : "Call ended.")
         };
     }
 
-    function publishCallState() {
-        if (isOwner && channel) channel.postMessage(callState());
+    function publishCallState(message) {
+        if (!isOwner) return;
+        var state = message || callState();
+        if (channel) channel.postMessage(state);
+        if (window.opener && !window.opener.closed) {
+            try {
+                window.opener.postMessage(state, "*");
+            } catch (error) {
+                console.warn("Unified AI call status could not reach the app page:", error && error.message ? error.message : error);
+            }
+        }
+    }
+
+    function isTrustedAppOrigin(origin) {
+        try {
+            var source = new URL(origin);
+            return source.protocol === window.location.protocol
+                && source.hostname === window.location.hostname;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function handleOwnerCommand(message) {
+        if (!isOwner || !message || message.callKey !== callKey) return;
+        if (message.type === "state-request") {
+            publishCallState();
+        } else if (message.type === "focus" || message.type === "start") {
+            if (message.type === "start") {
+                var state = document.body && document.body.getAttribute("data-state");
+                if (state !== "connecting" && state !== "connected") {
+                    var startButton = document.getElementById("idleBtn");
+                    if (startButton) startButton.click();
+                }
+            }
+            window.focus();
+        } else if (message.type === "end") {
+            if (typeof window.endChat === "function") {
+                window.endChat();
+            } else {
+                console.error("Unified AI call owner cannot end the call because the voice client is unavailable.");
+            }
+        }
+    }
+
+    function findOwnerWindow() {
+        var popup = window.open("", windowName);
+        if (!popup) return null;
+        try {
+            var popupUrl = new URL(popup.location.href);
+            if (popup.__dial50UnifiedVoiceCallOwner !== true
+                && popupUrl.searchParams.get(ownerParameter) !== "1") {
+                popup.close();
+                return null;
+            }
+        } catch (error) {
+            // A same-host app on another local port is an existing cross-origin owner.
+        }
+        return popup;
+    }
+
+    function sendOwnerCommand(type) {
+        var message = { type: type, callKey: callKey };
+        if (channel && ownerOrigin === window.location.origin) {
+            channel.postMessage(message);
+            return;
+        }
+
+        var popup = findOwnerWindow();
+        if (popup) popup.postMessage(message, "*");
     }
 
     function showNotice(message) {
@@ -96,16 +168,25 @@
         }
 
         var existingOwner = false;
+        var crossOriginOwner = false;
         try {
             existingOwner = popup.__dial50UnifiedVoiceCallOwner === true
                 || new URL(popup.location.href).searchParams.get(ownerParameter) === "1";
         } catch (error) {
-            existingOwner = false;
+            existingOwner = true;
+            crossOriginOwner = true;
         }
 
         if (existingOwner) {
             popup.focus();
-            if (channel) channel.postMessage({ type: "start" });
+            var startMessage = { type: "start", callKey: callKey };
+            if (crossOriginOwner) {
+                popup.postMessage(startMessage, "*");
+            } else if (channel) {
+                channel.postMessage(startMessage);
+            } else {
+                popup.postMessage(startMessage, "*");
+            }
             return true;
         }
 
@@ -158,6 +239,8 @@
 
     function updateCallBar(message) {
         if (!callBar || isOwner || isUnifiedFrame) return;
+        if (message.callKey !== callKey) return;
+        ownerOrigin = message.ownerOrigin || ownerOrigin;
         callBar.hidden = !message.active;
         if (callBarStatus && message.active) {
             callBarStatus.textContent = message.status || "Call in progress";
@@ -170,24 +253,7 @@
             if (!message || typeof message.type !== "string") return;
 
             if (isOwner) {
-                if (message.type === "state-request") {
-                    publishCallState();
-                } else if (message.type === "focus") {
-                    window.focus();
-                } else if (message.type === "start") {
-                    var state = document.body && document.body.getAttribute("data-state");
-                    if (state !== "connecting" && state !== "connected") {
-                        var startButton = document.getElementById("idleBtn");
-                        if (startButton) startButton.click();
-                    }
-                    window.focus();
-                } else if (message.type === "end") {
-                    if (typeof window.endChat === "function") {
-                        window.endChat();
-                    } else {
-                        console.error("Unified AI call owner cannot end the call because the voice client is unavailable.");
-                    }
-                }
+                handleOwnerCommand(message);
                 return;
             }
 
@@ -196,6 +262,16 @@
     } else {
         console.error("BroadcastChannel is unavailable; cross-page call controls will not be synchronized.");
     }
+
+    window.addEventListener("message", function (event) {
+        if (!isTrustedAppOrigin(event.origin) || !event.data
+            || event.data.callKey !== callKey) return;
+        if (isOwner) {
+            handleOwnerCommand(event.data);
+            return;
+        }
+        if (event.data.type === "state") updateCallBar(event.data);
+    });
 
     if (isOwner) {
         var body = document.body;
@@ -209,9 +285,14 @@
         });
 
         publishCallState();
+        window.setInterval(function () {
+            if (callState().active) publishCallState();
+        }, 2000);
         window.addEventListener("pagehide", function () {
-            if (channel) channel.postMessage({
+            publishCallState({
                 type: "state",
+                callKey: callKey,
+                ownerOrigin: window.location.origin,
                 active: false,
                 state: "closed",
                 status: "Call window closed."
@@ -241,20 +322,22 @@
         if (callBar && !isUnifiedFrame) {
             var focusButton = document.getElementById("unifiedVoiceCallBarFocus");
             var endButton = document.getElementById("unifiedVoiceCallBarEnd");
-            if (focusButton && channel) {
+            if (focusButton) {
                 focusButton.addEventListener("click", function () {
-                    channel.postMessage({ type: "focus" });
+                    sendOwnerCommand("focus");
                 });
             }
-            if (endButton && channel) {
+            if (endButton) {
                 endButton.addEventListener("click", function () {
-                    channel.postMessage({ type: "end" });
+                    sendOwnerCommand("end");
                 });
             }
         }
 
         if (channel) {
-            var requestState = function () { channel.postMessage({ type: "state-request" }); };
+            var requestState = function () {
+                channel.postMessage({ type: "state-request", callKey: callKey });
+            };
             if (document.readyState === "loading") {
                 document.addEventListener("DOMContentLoaded", requestState, { once: true });
             } else {

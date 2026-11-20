@@ -934,8 +934,7 @@ async function connectToAvatarBackend() {
                     serverEndTimer = setTimeout(function () {
                         serverEndTimer = null;
                         if (ws === socket && socket.readyState === WebSocket.OPEN) {
-                            setCallStatus("reconnecting");
-                            socket.close(4001, "Voice service ended; preserving active call");
+                            setCallStatus("listening");
                         }
                     }, remainingMs + 300);
                     break;
@@ -949,11 +948,14 @@ async function connectToAvatarBackend() {
         socket.onclose = function (event) {
             if (ws !== socket) return;
             clearTimeout(connectionTimeoutTimer);
+            clearTimeout(serverEndTimer);
             connectionTimeoutTimer = null;
+            serverEndTimer = null;
             connectionInProgress = false;
             ws = null;
-            console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason");
-            scheduleVoiceReconnect();
+            console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason",
+                "wasClean:", event.wasClean);
+            scheduleVoiceReconnect("WebSocket close " + event.code);
         };
 
         socket.onerror = function () {
@@ -983,11 +985,11 @@ async function connectToAvatarBackend() {
             setCallStatus("connection-failed");
             return;
         }
-        scheduleVoiceReconnect();
+        scheduleVoiceReconnect("connection setup failure");
     }
 }
 
-function scheduleVoiceReconnect() {
+function scheduleVoiceReconnect(reason) {
     if (!callSessionActive || !body) return;
     if (!["connecting", "connected"].includes(body.getAttribute("data-state"))) {
         setState("connecting");
@@ -1000,6 +1002,8 @@ function scheduleVoiceReconnect() {
     reconnectAttempts += 1;
     var delay = Math.min(15000, 1000 * Math.pow(2, Math.min(reconnectAttempts - 1, 4)));
     setCallStatus("reconnecting");
+    console.warn("Voice call reconnect scheduled after " + (reason || "connection loss")
+        + " in " + delay + "ms; reusing the existing access token.");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
         detail: { connected: false, reconnecting: true, attempt: reconnectAttempts, retryInMs: delay }
     }));
