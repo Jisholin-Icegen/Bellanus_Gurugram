@@ -1148,8 +1148,10 @@ function initializeAvatarEvents() {
         assistantBackBtn.addEventListener("click", function () {
             if (body.getAttribute("data-state") === "connecting"
                 || body.getAttribute("data-state") === "connected") {
-                if (window.UnifiedAIHost && typeof window.UnifiedAIHost.showChat === "function") {
-                    window.UnifiedAIHost.showChat();
+                if (window.UnifiedAIHost && typeof window.UnifiedAIHost.minimizeCall === "function") {
+                    window.UnifiedAIHost.minimizeCall();
+                } else {
+                    console.warn("Unified AI call popup is unavailable; the active call will continue.");
                 }
                 return;
             }

@@ -150,13 +150,14 @@ enabling the other three cards or changing the Home assistant layout.
 
 Active call window
 ------------------
-The existing Home call screen is reused as the floating call window; no second
-call UI or voice connection is created. Navigating to another module or hiding
-the page moves the active call screen into a small docked window. Dragging it to
-either screen edge stashes it behind a side tab. Selecting that tab restores
-the window, and Expand returns it to full screen. The call stays active until
-the user selects End Call; if the voice service disconnects, the client
-reconnects while keeping the call interface open.
+The existing floating assistant popup is the minimized call UI; there is no
+separate minimize window or extra control. Pressing the call screen's Back
+button or navigating to another module hides the full call screen and shows the
+popup while the call stays active. Selecting the popup's return/chat control
+restores the full call screen and hides the popup. Hiding the page also
+minimizes the screen, and returning to the Home screen restores it. The call
+stays active until the user selects End Call; remote disconnects trigger
+reconnection.
 
 Tenant and data handling
 ------------------------

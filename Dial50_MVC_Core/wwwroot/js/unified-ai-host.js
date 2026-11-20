@@ -7,17 +7,8 @@
     const barChatButton = document.getElementById("unifiedAiBarChatButton");
     const barEndButton = document.getElementById("unifiedAiBarEndButton");
     const testPanel = document.getElementById("unifiedAiTestPanel");
-    const callLayer = document.getElementById("callLayer");
-    const callPipTab = document.getElementById("callPipStashedTab");
-    const callPipDragHandle = document.getElementById("callPipDragHandle");
-    const callPipMinimizeButton = document.getElementById("callPipMinimizeButton");
-    const callPipStashButton = document.getElementById("callPipStashButton");
-    const callPipExpandButton = document.getElementById("callPipExpandButton");
+    const interactiveCard = document.getElementById("interactiveCard");
     if (!frameLayer || !frame) return;
-
-    const callLayerPlaceholder = callLayer && callLayer.parentNode
-        ? document.createComment("call-layer-placeholder") : null;
-    if (callLayerPlaceholder) callLayer.parentNode.insertBefore(callLayerPlaceholder, callLayer);
 
     const pageParams = new URLSearchParams(window.location.search);
     const isLocalTestMode = pageParams.get("UnifiedAITest") === "1"
@@ -48,8 +39,9 @@
     let wakeLockRequestPending = false;
     let suppressReturnClickUntil = 0;
     let dragState = null;
-    let callWindowMode = "full";
-    let callPipDragState = null;
+    let callPresentation = "full";
+    const originalCardDisplay = interactiveCard ? interactiveCard.style.getPropertyValue("display") : "";
+    const originalCardDisplayPriority = interactiveCard ? interactiveCard.style.getPropertyPriority("display") : "";
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
@@ -61,53 +53,31 @@
         return state === "connecting" || state === "connected";
     }
 
-    function setCallWindowMode(mode, side) {
-        if (!callLayer || !["full", "pip", "stashed"].includes(mode)) return;
-        if (mode !== "full" && !isRealCallActive()) return;
+    function setCallPresentation(presentation) {
+        if (presentation !== "full" && presentation !== "minimized") return;
+        if (presentation === "minimized" && !isRealCallActive()) return;
 
-        if (mode === "full") {
-            if (callLayer.parentNode === document.body && callLayerPlaceholder && callLayerPlaceholder.parentNode) {
-                callLayerPlaceholder.parentNode.insertBefore(callLayer, callLayerPlaceholder.nextSibling);
+        callPresentation = presentation;
+        if (presentation === "minimized") {
+            document.body.setAttribute("data-call-presentation", "minimized");
+            if (interactiveCard) interactiveCard.style.setProperty("display", "none", "important");
+        } else {
+            document.body.removeAttribute("data-call-presentation");
+            if (interactiveCard) {
+                if (originalCardDisplay) {
+                    interactiveCard.style.setProperty("display", originalCardDisplay, originalCardDisplayPriority);
+                } else {
+                    interactiveCard.style.removeProperty("display");
+                }
             }
-            callLayer.setAttribute("data-window-mode", "full");
-            callLayer.style.removeProperty("left");
-            callLayer.style.removeProperty("top");
-            callLayer.style.removeProperty("right");
-            callLayer.style.removeProperty("bottom");
-            callLayer.style.removeProperty("transform");
-            document.body.removeAttribute("data-call-window-mode");
-            document.body.removeAttribute("data-call-stash-side");
-            if (callPipTab) callPipTab.hidden = true;
-            if (callPipDragHandle) callPipDragHandle.hidden = true;
-            if (callPipMinimizeButton) callPipMinimizeButton.hidden = false;
-            if (callPipStashButton) callPipStashButton.hidden = true;
-            if (callPipExpandButton) callPipExpandButton.hidden = true;
-            callWindowMode = "full";
-            return;
-        }
-
-        if (callLayer.parentNode !== document.body) document.body.appendChild(callLayer);
-        callWindowMode = mode;
-        callLayer.setAttribute("data-window-mode", mode);
-        document.body.setAttribute("data-call-window-mode", mode);
-        if (callPipTab) callPipTab.hidden = mode !== "stashed";
-        if (callPipDragHandle) callPipDragHandle.hidden = mode !== "pip";
-        if (callPipMinimizeButton) callPipMinimizeButton.hidden = true;
-        if (callPipStashButton) callPipStashButton.hidden = mode !== "pip";
-        if (callPipExpandButton) callPipExpandButton.hidden = mode !== "pip";
-        if (mode === "stashed") {
-            document.body.setAttribute("data-call-stash-side", side === "left" ? "left" : "right");
         }
     }
 
-    function syncCallWindowMode() {
-        if (isRealCallActive()
-            && (frameLayer.classList.contains("is-open") || document.visibilityState === "hidden")
-            && callWindowMode === "full") {
-            setCallWindowMode("pip");
-        } else if (!isRealCallActive() && callWindowMode !== "full") {
-            setCallWindowMode("full");
-        }
+    function minimizeCall() {
+        if (!isRealCallActive()) return false;
+        setCallPresentation("minimized");
+        updateFloatingBar();
+        return true;
     }
 
     function currentPageContext() {
@@ -137,7 +107,7 @@
             return value.slice(0, 180);
         };
         const isVisible = function (element) {
-            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiFloatingBar, #unifiedAiTestPanel, #unifiedAiTestLauncher, #callLayer, #callPipStashedTab")) return false;
+            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiFloatingBar, #unifiedAiTestPanel, #unifiedAiTestLauncher, #callLayer")) return false;
             const style = window.getComputedStyle(element);
             if (style.display === "none" || style.visibility === "hidden" || !element.getClientRects().length) return false;
             for (let ancestor = element; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
@@ -309,12 +279,11 @@
     function updateFloatingBar() {
         const state = document.body.getAttribute("data-state");
         const realCall = state === "connecting" || state === "connected";
-        syncCallWindowMode();
         const activeCall = simulatedSession || realCall;
         syncScreenWakeLock(realCall);
         if (!activeCall) lastSentContext = "";
         if (floatingBar) {
-            floatingBar.hidden = !activeCall || realCall && callWindowMode !== "stashed";
+            floatingBar.hidden = !activeCall || realCall && callPresentation !== "minimized";
             const callStatus = document.getElementById("callStatus");
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
@@ -340,7 +309,7 @@
     function showChat() {
         frameLayer.classList.remove("is-open");
         frameLayer.setAttribute("aria-hidden", "true");
-        setCallWindowMode("full");
+        setCallPresentation("full");
         updateFloatingBar();
     }
 
@@ -365,7 +334,7 @@
         activeTarget = target;
         frameLayer.classList.add("is-open");
         frameLayer.setAttribute("aria-hidden", "false");
-        syncCallWindowMode();
+        if (isRealCallActive()) setCallPresentation("minimized");
 
         pendingActions.forEach(function (pendingAction) {
             reportResult(pendingAction, false, null, "The module changed before this action could run.");
@@ -808,65 +777,6 @@
     }
 
     if (barChatButton) barChatButton.addEventListener("click", showChat);
-    if (callPipMinimizeButton) {
-        callPipMinimizeButton.addEventListener("click", function () {
-            setCallWindowMode("pip");
-            updateFloatingBar();
-        });
-    }
-    if (callPipStashButton) {
-        callPipStashButton.addEventListener("click", function () {
-            setCallWindowMode("stashed");
-            updateFloatingBar();
-        });
-    }
-    if (callPipExpandButton) callPipExpandButton.addEventListener("click", showChat);
-    if (callPipTab) {
-        callPipTab.addEventListener("click", function () {
-            setCallWindowMode("pip");
-            updateFloatingBar();
-        });
-    }
-    if (callPipDragHandle && callLayer) {
-        callPipDragHandle.addEventListener("pointerdown", function (event) {
-            if (callWindowMode !== "pip" || !event.isPrimary || event.button !== 0) return;
-            const rect = callLayer.getBoundingClientRect();
-            callPipDragState = {
-                pointerId: event.pointerId,
-                startX: event.clientX,
-                startY: event.clientY,
-                left: rect.left,
-                top: rect.top,
-                moved: false
-            };
-            callPipDragHandle.setPointerCapture(event.pointerId);
-        });
-        callPipDragHandle.addEventListener("pointermove", function (event) {
-            if (!callPipDragState || callPipDragState.pointerId !== event.pointerId) return;
-            const dx = event.clientX - callPipDragState.startX;
-            const dy = event.clientY - callPipDragState.startY;
-            if (!callPipDragState.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
-            callPipDragState.moved = true;
-            const maxLeft = Math.max(0, window.innerWidth - callLayer.offsetWidth);
-            const maxTop = Math.max(0, window.innerHeight - callLayer.offsetHeight);
-            callLayer.style.left = Math.max(0, Math.min(maxLeft, callPipDragState.left + dx)) + "px";
-            callLayer.style.top = Math.max(0, Math.min(maxTop, callPipDragState.top + dy)) + "px";
-            callLayer.style.right = "auto";
-            callLayer.style.bottom = "auto";
-            callLayer.style.transform = "none";
-        });
-        const finishCallPipDrag = function (event) {
-            if (!callPipDragState || callPipDragState.pointerId !== event.pointerId) return;
-            const moved = callPipDragState.moved;
-            const rect = callLayer.getBoundingClientRect();
-            callPipDragState = null;
-            if (!moved) return;
-            if (rect.left <= 16) setCallWindowMode("stashed", "left");
-            else if (rect.right >= window.innerWidth - 16) setCallWindowMode("stashed", "right");
-        };
-        callPipDragHandle.addEventListener("pointerup", finishCallPipDrag);
-        callPipDragHandle.addEventListener("pointercancel", finishCallPipDrag);
-    }
     if (returnButton) returnButton.addEventListener("click", function () {
         if (Date.now() < suppressReturnClickUntil) return;
         showChat();
@@ -918,7 +828,12 @@
     }
 
     document.addEventListener("visibilitychange", function () {
-        syncCallWindowMode();
+        if (document.visibilityState === "hidden" && isRealCallActive()) {
+            setCallPresentation("minimized");
+        } else if (document.visibilityState === "visible" && isRealCallActive()
+            && !frameLayer.classList.contains("is-open")) {
+            setCallPresentation("full");
+        }
         updateFloatingBar();
     });
 
@@ -976,6 +891,7 @@
     window.UnifiedAIHost = {
         openModule: openModule,
         showChat: showChat,
+        minimizeCall: minimizeCall,
         handleAction: handleAction,
         getCurrentContext: currentPageContext,
         startLocalTestSession: function () {
@@ -1003,7 +919,7 @@
     const bodyObserver = new MutationObserver(function () {
         const state = document.body.getAttribute("data-state");
         if (state === "connecting" || state === "connected") simulatedSession = false;
-        syncCallWindowMode();
+        else if (callPresentation === "minimized") setCallPresentation("full");
         updateFloatingBar();
         notifyTestContextChanged();
     });

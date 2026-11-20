@@ -1984,196 +1984,6 @@
             }
     }
 
-    body[data-call-window-mode="pip"] #interactiveCard,
-    body[data-call-window-mode="stashed"] #interactiveCard {
-        display: none !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer,
-    body[data-call-window-mode="stashed"] #callLayer {
-        position: fixed !important;
-        inset: auto 12px 12px auto !important;
-        z-index: 100010 !important;
-        width: min(360px, calc(100vw - 24px)) !important;
-        height: min(248px, calc(100dvh - 24px)) !important;
-        min-width: min(280px, calc(100vw - 24px)) !important;
-        min-height: min(190px, calc(100dvh - 24px)) !important;
-        max-width: calc(100vw - 24px) !important;
-        max-height: calc(100dvh - 24px) !important;
-        box-sizing: border-box !important;
-        padding: 10px 12px !important;
-        border: 1px solid rgba(148, 163, 184, .55) !important;
-        border-radius: 18px !important;
-        background: radial-gradient(120% 90% at 50% 0%, #1e2a44 0%, #0f1729 70%) !important;
-        box-shadow: 0 16px 48px rgba(0, 0, 0, .45) !important;
-        gap: 5px !important;
-        overflow: hidden !important;
-    }
-
-    body[data-call-window-mode="stashed"] #callLayer {
-        display: none !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-window-toolbar {
-        position: relative !important;
-        inset: auto !important;
-        width: 100% !important;
-        min-height: 32px !important;
-        justify-content: space-between !important;
-        flex: 0 0 32px !important;
-    }
-
-    #callLayer .call-window-toolbar {
-        position: absolute !important;
-        top: 10px !important;
-        right: 12px !important;
-        z-index: 20 !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-    }
-
-    #callLayer .call-window-toolbar button {
-        min-height: 32px !important;
-        padding: 5px 10px !important;
-        border: 1px solid rgba(255, 255, 255, .3) !important;
-        border-radius: 9px !important;
-        background: rgba(15, 23, 42, .78) !important;
-        color: #fff !important;
-        font-family: inherit !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        line-height: 1.2 !important;
-        cursor: pointer !important;
-        touch-action: manipulation;
-    }
-
-    #callLayer .call-window-toolbar button[hidden] {
-        display: none !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-pip-drag-handle {
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-        text-align: left !important;
-        cursor: grab !important;
-        touch-action: none !important;
-        user-select: none !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-rings {
-        flex: 0 0 48px !important;
-        width: 100% !important;
-        height: 48px !important;
-        min-height: 48px !important;
-        margin: 0 !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .ring,
-    body[data-call-window-mode="pip"] #callLayer .call-dots {
-        display: none !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-avatar {
-        position: absolute !important;
-        inset: 4px auto auto 50% !important;
-        width: 40px !important;
-        height: 40px !important;
-        transform: translateX(-50%) !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-title {
-        margin: 0 !important;
-        font-size: 14px !important;
-        line-height: 1.2 !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-status-row {
-        margin: 0 !important;
-        gap: 6px !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-status-text,
-    body[data-call-window-mode="pip"] #callLayer .control-label {
-        font-size: 11px !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-controls {
-        display: flex !important;
-        gap: 12px !important;
-        margin: 0 !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .control-btn {
-        width: 36px !important;
-        height: 36px !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .control-icon {
-        width: 22px !important;
-        height: 22px !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .hangup-btn {
-        display: flex !important;
-        position: absolute !important;
-        right: 14px !important;
-        bottom: 12px !important;
-        width: 40px !important;
-        height: 40px !important;
-    }
-
-    body[data-call-window-mode="pip"] #callLayer .call-controls {
-        padding-right: 54px !important;
-    }
-
-    #callPipStashedTab[hidden] {
-        display: none !important;
-    }
-
-    #callPipStashedTab:not([hidden]) {
-        position: fixed;
-        top: 50%;
-        right: 0;
-        z-index: 100011;
-        min-height: 48px;
-        padding: 9px 14px 9px 10px;
-        border: 1px solid rgba(148, 163, 184, .6);
-        border-right: 0;
-        border-radius: 12px 0 0 12px;
-        background: #0f1729;
-        color: #fff;
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: 600;
-        line-height: 1.2;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, .35);
-        transform: translateY(-50%);
-        cursor: pointer;
-    }
-
-    body[data-call-stash-side="left"] #callPipStashedTab:not([hidden]) {
-        right: auto;
-        left: 0;
-        padding: 9px 10px 9px 14px;
-        border-right: 1px solid rgba(148, 163, 184, .6);
-        border-left: 0;
-        border-radius: 0 12px 12px 0;
-    }
-
-    @@media (max-width: 480px) {
-        body[data-call-window-mode="pip"] #callLayer,
-        body[data-call-window-mode="stashed"] #callLayer {
-            inset: auto 8px 8px auto !important;
-            width: min(340px, calc(100vw - 16px)) !important;
-            height: min(230px, calc(100dvh - 16px)) !important;
-            min-width: min(260px, calc(100vw - 16px)) !important;
-            min-height: min(180px, calc(100dvh - 16px)) !important;
-            max-width: calc(100vw - 16px) !important;
-            max-height: calc(100dvh - 16px) !important;
-        }
-    }
-
     </style>
 <script>
     (function () {
@@ -2232,13 +2042,7 @@
                     </div>
                 </div>
 
-                <div class="call-layer" id="callLayer" data-status="dialing" data-window-mode="full">
-                    <div class="call-window-toolbar" id="callWindowToolbar" aria-label="Call window controls">
-                        <button type="button" id="callPipDragHandle" class="call-pip-drag-handle" aria-label="Move active call" hidden>Active call</button>
-                        <button type="button" id="callPipMinimizeButton" aria-label="Minimize call to picture in picture">Minimize</button>
-                        <button type="button" id="callPipStashButton" aria-label="Hide call to the side" hidden>Hide</button>
-                        <button type="button" id="callPipExpandButton" aria-label="Expand call to full screen" hidden>Expand</button>
-                    </div>
+                <div class="call-layer" id="callLayer" data-status="dialing">
                     <div class="call-rings">
                         <div class="ring ring--1"></div>
                         <div class="ring ring--2"></div>
@@ -2445,7 +2249,6 @@
     <div id="unifiedAiModuleLayer" aria-hidden="true">
         <iframe id="unifiedAiModuleFrame" title="Hospital services"></iframe>
     </div>
-    <button type="button" id="callPipStashedTab" aria-label="Restore minimized call" hidden>AI call</button>
     <div id="unifiedAiFloatingBar" aria-live="polite" aria-label="Persistent voice assistant" hidden>
         <button type="button" id="unifiedAiReturnButton" aria-label="Return to the AI screen">
             <img src="~/images/avatar.png" alt="" />
@@ -2537,8 +2340,8 @@
                 var state = document.body.getAttribute('data-state');
                 if (state === 'connecting' || state === 'connected') {
                     if (window.UnifiedAIHost
-                        && typeof window.UnifiedAIHost.showChat === 'function') {
-                        window.UnifiedAIHost.showChat();
+                        && typeof window.UnifiedAIHost.minimizeCall === 'function') {
+                        window.UnifiedAIHost.minimizeCall();
                     }
                     return;
                 }
