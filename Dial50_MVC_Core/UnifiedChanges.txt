@@ -19,8 +19,9 @@ indefinitely with exponential backoff capped at 15 seconds. A clean WebSocket
 close or server call_ended event does not end the user-started call; the client
 reconnects using the existing token. The voice service must accept that token
 for reconnects; the client will not request another token in the same call. It
-keeps the call timer running and reuses a live microphone stream, reacquiring
-it if the browser ended the track. Calls have no default time limit; a positive
+replies to JSON ping messages with pong, preserving the ping payload. It keeps
+the call timer running and reuses a live microphone stream, reacquiring it if
+the browser ended the track. Calls have no default time limit; a positive
 SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
 persistent assistant bar shows the same Connecting, Reconnecting, Listening,
 Thinking, or Speaking status as the Home call screen while the call is

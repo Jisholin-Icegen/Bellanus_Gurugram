@@ -898,12 +898,23 @@ async function connectToAvatarBackend() {
 
                 case "transcript_delta":
                 case "transcript_done":
-                case "ping":
-                case "pong":
                 case "session.created":
                 case "session.updated":
                 case "response.audio_transcript.delta":
                 case "response.audio_transcript.done":
+                    break;
+
+                case "ping":
+                    if (socket.readyState === WebSocket.OPEN) {
+                        try {
+                            socket.send(JSON.stringify(Object.assign({}, msg, { type: "pong" })));
+                        } catch (error) {
+                            console.warn("Could not reply to voice WebSocket ping:", error && error.message ? error.message : error);
+                        }
+                    }
+                    break;
+
+                case "pong":
                     break;
 
                 case "call_ended": {
