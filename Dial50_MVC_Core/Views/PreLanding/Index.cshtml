@@ -654,6 +654,12 @@
                         encodeURIComponent(TENANT_ID);
                 }
 
+                var testMode = new URLSearchParams(window.location.search).get("UnifiedAITest") === "1"
+                    && ["localhost", "127.0.0.1", "::1", "[::1]"].includes(window.location.hostname);
+                if (testMode) {
+                    url += "&UnifiedAITest=1";
+                }
+
                 setTimeout(function () {
 
                     window.location.replace(url);

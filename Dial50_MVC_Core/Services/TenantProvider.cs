@@ -86,7 +86,8 @@ namespace Dial50_MVC_Core.Services
                     string decryptedCode = protector.DecryptAES(fixedEncryptedId);
                     if (!string.IsNullOrWhiteSpace(decryptedCode))
                     {
-                        finalCode = decryptedCode;
+                        var separator = decryptedCode.IndexOf("$$", StringComparison.Ordinal);
+                        finalCode = separator >= 0 ? decryptedCode[..separator] : decryptedCode;
                     }
                 }
             }

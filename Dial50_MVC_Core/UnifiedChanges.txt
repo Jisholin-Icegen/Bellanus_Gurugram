@@ -148,6 +148,16 @@ it returns to the persistent Home voice assistant instead of creating another
 voice connection. The AI can navigate to service routes by voice without
 enabling the other three cards or changing the Home assistant layout.
 
+Active call window
+------------------
+The existing Home call screen is reused as the floating call window; no second
+call UI or voice connection is created. Navigating to another module or hiding
+the page moves the active call screen into a small docked window. Dragging it to
+either screen edge stashes it behind a side tab. Selecting that tab restores
+the window, and Expand returns it to full screen. The call stays active until
+the user selects End Call; if the voice service disconnects, the client
+reconnects while keeping the call interface open.
+
 Tenant and data handling
 ------------------------
 Unified navigation preserves BedInfo, XTenantID, and region. TenantProvider
