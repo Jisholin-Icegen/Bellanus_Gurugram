@@ -99,10 +99,15 @@
         const isVisible = function (element) {
             if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar")) return false;
             const style = window.getComputedStyle(element);
-            return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+            if (style.display === "none" || style.visibility === "hidden" || !element.getClientRects().length) return false;
+            for (let ancestor = element; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
+                const rect = ancestor.getBoundingClientRect();
+                if (rect.width && (rect.right <= 0 || rect.left >= window.innerWidth)) return false;
+            }
+            return true;
         };
         const actionElements = Array.from(document.querySelectorAll(
-            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .navBtn, .card, .service-card, .food-card, .order-card, .selection-card, .timing-card"
+            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .navBtn, .service-card, .food-card, .order-card, .selection-card, .timing-card"
         ))
             .filter(isVisible)
             .slice(0, 180);
@@ -355,6 +360,9 @@
 
     function openAppPage(page, extra) {
         const url = new URL(window.BedContext.url(page, extra), window.location.origin);
+        if (/^\/FoodDining(?:\/Index)?\/?$/i.test(url.pathname)) {
+            url.pathname = "/FoodDining/FoodDining";
+        }
         const bedContext = window.BedContext.get ? window.BedContext.get() : {};
         const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
         if (bedInfo) url.searchParams.set("BedInfo", bedInfo);
@@ -373,6 +381,9 @@
             return null;
         }
         if (targetUrl.origin !== window.location.origin || !targetUrl.pathname.startsWith("/")) return null;
+        if (/^\/FoodDining(?:\/Index)?\/?$/i.test(targetUrl.pathname)) {
+            targetUrl.pathname = "/FoodDining/FoodDining";
+        }
         if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
             showChat();
             return { target: "home" };
@@ -771,7 +782,11 @@
             ? "room_comfort"
             : route.indexOf("logisitics") >= 0 ? "logistics" : null;
         if (requestModule) {
-            (context.items || []).filter(function (item) { return item.categoryId && !item.disabled; }).forEach(function (item) {
+            (context.items || []).filter(function (item) {
+                const category = item.name || item.label || "";
+                return item.categoryId && !item.disabled
+                    && !(requestModule === "logistics" && /prepare guest pass/i.test(category));
+            }).forEach(function (item) {
                 const category = item.name || item.label;
                 const quantityMatch = queryText.match(/\b(?:quantity|qty|need|want|add)\s+(one|two|three|four|five|\d+)\b/);
                 add("Create " + category + " request", {

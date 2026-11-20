@@ -17,6 +17,9 @@
     function keepUnifiedRoute(url) {
         const target = new URL(url, window.location.href);
         if (target.origin !== window.location.origin) return null;
+        if (/^\/FoodDining(?:\/Index)?\/?$/i.test(target.pathname)) {
+            target.pathname = "/FoodDining/FoodDining";
+        }
         const bedInfo = target.searchParams.get("BedInfo") || sessionStorage.getItem("bedInfo");
         if (bedInfo) target.searchParams.set("BedInfo", bedInfo);
         target.searchParams.set("Unified", "1");
@@ -84,7 +87,12 @@
     function isVisible(element) {
         if (!(element instanceof Element) || element.closest("[hidden], [aria-hidden='true']")) return false;
         const style = window.getComputedStyle(element);
-        return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+        if (style.display === "none" || style.visibility === "hidden" || !element.getClientRects().length) return false;
+        for (let ancestor = element; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
+            const rect = ancestor.getBoundingClientRect();
+            if (rect.width && (rect.right <= 0 || rect.left >= window.innerWidth)) return false;
+        }
+        return true;
     }
 
     function safeRoute(element) {
@@ -220,7 +228,7 @@
             })
             .filter(function (item) { return item.label; });
         const actionElements = Array.from(document.querySelectorAll(
-            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .service-card, .order-card, .selection-card, .timing-card, .food-card, .card, .meal-select-pill, .meal-tab-box"
+            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .service-card, .order-card, .selection-card, .timing-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box"
         ))
             .filter(function (element) {
                 return !element.closest("#unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar");

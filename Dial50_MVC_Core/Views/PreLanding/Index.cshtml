@@ -591,6 +591,8 @@
             var BED_INFO = cfgEl.dataset.bedInfo || "";
             var REGION = cfgEl.dataset.region || "";
             var TENANT_ID = cfgEl.dataset.tenantId || "";
+            var ENABLE_LOCAL_AI_TEST = new URLSearchParams(window.location.search).get("UnifiedAITest") === "1"
+                && ["localhost", "127.0.0.1", "::1"].indexOf(window.location.hostname) >= 0;
 
             try {
                 var q = new URLSearchParams(window.location.search);
@@ -653,6 +655,10 @@
                     url +=
                         "&XTenantID=" +
                         encodeURIComponent(TENANT_ID);
+                }
+
+                if (ENABLE_LOCAL_AI_TEST) {
+                    url += "&UnifiedAITest=1";
                 }
 
 
