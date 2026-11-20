@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
 
 <link rel="stylesheet" href="~/css/DailyCare.css">
-<link rel="stylesheet" href="~/css/voice-agent/styles.css">
+<link rel="stylesheet" href="~/css/voice-agent/styles.css" asp-append-version="true">
 <link rel="stylesheet" href="~/css/unified-ai.css" asp-append-version="true">
 <script src="~/js/voice-agent/config.js" asp-append-version="true"></script>
 
@@ -152,7 +152,7 @@
         color: #374151;
     }
 
-    body[data-state="idle"] .app-wrapper {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .app-wrapper {
         position: relative !important;
         display: flex !important;
         flex-direction: column !important;
@@ -167,9 +167,9 @@
         padding: 0 !important;
     }
 
-    body[data-state="idle"] .content,
-    body[data-state="idle"] main,
-    body[data-state="idle"] #pageContent {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .content,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) main,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent {
         position: relative !important;
         top: auto !important;
         left: auto !important;
@@ -178,7 +178,7 @@
         margin: 0 !important;
     }
 
-    body[data-state="idle"] #pageNav {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageNav {
         position: relative !important;
         top: auto !important;
         margin: 0 !important;
@@ -201,7 +201,7 @@
         inset: auto !important;
     }
 
-    body[data-state="idle"] #interactiveCard {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) #interactiveCard {
         position: relative !important;
         top: auto !important;
         left: auto !important;
@@ -230,7 +230,7 @@
         inset: auto !important;
     }
 
-    body[data-state="idle"] .idle-layer {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .idle-layer {
         position: relative !important;
         top: auto !important;
         left: auto !important;
@@ -275,7 +275,7 @@
             box-sizing: border-box !important;
         }
 
-    body[data-state="idle"] .grace-idle {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .grace-idle {
         position: relative !important;
         top: auto !important;
         left: auto !important;
@@ -533,24 +533,24 @@
             font-weight: 600;
         }
 
-    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) {
+    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) {
         overflow: hidden !important;
     }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .content {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .content {
             min-height: 0 !important;
             overflow: hidden !important;
             flex: 1 1 auto !important;
             padding-bottom: 0 !important;
         }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) main {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) main {
             overflow: hidden !important;
             padding: 0 !important;
             gap: 0 !important;
         }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #interactiveCard {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #interactiveCard {
             position: relative !important;
             width: 100% !important;
             max-width: 100% !important;
@@ -565,7 +565,7 @@
             flex: 1 1 auto !important;
         }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #callLayer {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #callLayer {
             width: 100% !important;
             height: 100% !important;
             min-height: 0 !important;
@@ -579,19 +579,19 @@
             background: #0f172a !important;
         }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .patfeedback-card,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .bottom-card,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .idle-layer,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #pageNav,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .nav,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .nav-bar,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .bottom-nav,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .top-nav,
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) .app-nav {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .patfeedback-card,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .bottom-card,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .idle-layer,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #pageNav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .nav-bar,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .bottom-nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .top-nav,
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) .app-nav {
             display: none !important;
         }
 
-        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar {
+        body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #assistantTitlebar {
             display: flex !important;
             position: relative !important;
             top: auto !important;
@@ -604,11 +604,11 @@
             flex-shrink: 0 !important;
         }
 
-            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar .assistant-title {
+            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #assistantTitlebar .assistant-title {
                 color: #000000 !important;
             }
 
-            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #assistantTitlebar .back-arrow-icon {
+            body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #assistantTitlebar .back-arrow-icon {
                 filter: brightness(0) invert(1) !important;
             }
 
@@ -1245,10 +1245,10 @@
         opacity: 1 !important;
     }
 
-    body:is([data-state="connecting"], [data-state="connected"]) #callLayer,
-    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *,
-    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *::before,
-    body:is([data-state="connecting"], [data-state="connected"]) #callLayer *::after {
+    body:is([data-state="connecting"], [data-state="connected"]):not([data-call-presentation="minimized"]) #callLayer,
+    body:is([data-state="connecting"], [data-state="connected"]):not([data-call-presentation="minimized"]) #callLayer *,
+    body:is([data-state="connecting"], [data-state="connected"]):not([data-call-presentation="minimized"]) #callLayer *::before,
+    body:is([data-state="connecting"], [data-state="connected"]):not([data-call-presentation="minimized"]) #callLayer *::after {
         animation: none !important;
         text-shadow: none !important;
     }
@@ -1441,21 +1441,21 @@
 
     }
 
-    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]) #callLayer > * {
+    body:is([data-state="connecting"], [data-state="connected"], [data-state="ended"]):not([data-call-presentation="minimized"]) #callLayer > * {
         flex-shrink: 0 !important;
     }
 
-    body[data-state="idle"] .content,
-    body[data-state="idle"] main,
-    body[data-state="idle"] #pageContent {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .content,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) main,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent {
         padding-left: 16px !important;
         padding-right: 16px !important;
         box-sizing: border-box !important;
     }
 
-    body[data-state="idle"] .grace-idle,
-    body[data-state="idle"] .patfeedback-card,
-    body[data-state="idle"] .bottom-card {
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .grace-idle,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .patfeedback-card,
+    body:is([data-state="idle"], [data-call-presentation="minimized"]) .bottom-card {
         width: 100% !important;
         margin-left: auto !important;
         margin-right: auto !important;
@@ -1936,7 +1936,7 @@
     }
 
     @@media (min-width: 768px) {
-        html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) {
+        html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) {
             grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr) !important;
             grid-template-rows: minmax(clamp(180px, 20dvh, 260px), auto) minmax(clamp(240px, 28dvh, 360px), auto) !important;
             grid-auto-rows: auto !important;
@@ -1948,7 +1948,7 @@
             overflow-y: auto !important;
         }
 
-            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > #interactiveCard {
+            html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) > #interactiveCard {
                 grid-column: 1 !important;
                 grid-row: 1 / 3 !important;
                 height: auto !important;
@@ -1956,7 +1956,7 @@
                 max-height: none !important;
             }
 
-            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patient-status-card {
+            html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) > .patient-status-card {
                 grid-column: 2 !important;
                 grid-row: 1 !important;
                 height: auto !important;
@@ -1964,7 +1964,7 @@
                 margin: 0 !important;
             }
 
-            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card {
+            html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) > .patfeedback-card {
                 grid-column: 2 !important;
                 grid-row: 2 !important;
                 height: auto !important;
@@ -1972,140 +1972,16 @@
                 margin: 0 !important;
             }
 
-                html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card .card-pill {
+                html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) > .patfeedback-card .card-pill {
                     position: static !important;
                     align-self: flex-start !important;
                     margin: 0 0 8px 0 !important;
                 }
 
-            html body[data-state="idle"] #pageContent.content:has(> #interactiveCard) .grace-idle {
+            html body:is([data-state="idle"], [data-call-presentation="minimized"]) #pageContent.content:has(> #interactiveCard) .grace-idle {
                 background: transparent !important;
                 margin: 0 !important;
             }
-    }
-
-    html body[data-call-presentation="minimized"] .assistant-titlebar,
-    html body[data-call-presentation="minimized"] #assistantTitlebar {
-        display: none !important;
-    }
-
-    html body[data-call-presentation="minimized"] #pageNav {
-        display: block !important;
-        position: relative !important;
-        top: auto !important;
-        margin: 0 !important;
-    }
-
-    html body[data-call-presentation="minimized"] #pageNav .nav,
-    html body[data-call-presentation="minimized"] #pageNav .nav-bar,
-    html body[data-call-presentation="minimized"] #pageNav .bottom-nav,
-    html body[data-call-presentation="minimized"] #pageNav .top-nav,
-    html body[data-call-presentation="minimized"] #pageNav .app-nav {
-        display: flex !important;
-    }
-
-    html body[data-call-presentation="minimized"] #widgetPrompt {
-        display: block !important;
-    }
-
-    html body[data-call-presentation="minimized"] #pageContent.content {
-        display: flex !important;
-        flex-direction: column !important;
-        min-height: 0 !important;
-        max-height: 100% !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        padding: 16px !important;
-        background: transparent !important;
-    }
-
-    html body[data-call-presentation="minimized"] #interactiveCard {
-        display: flex !important;
-        position: relative !important;
-        inset: auto !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        height: 260px !important;
-        min-height: 260px !important;
-        max-height: 260px !important;
-        aspect-ratio: auto !important;
-        margin: 0 !important;
-        transform: none !important;
-        border-radius: 2rem !important;
-        overflow: hidden !important;
-        flex: 0 0 260px !important;
-    }
-
-    html body[data-call-presentation="minimized"][data-state="connecting"] #pageContent.content > #interactiveCard,
-    html body[data-call-presentation="minimized"][data-state="connected"] #pageContent.content > #interactiveCard {
-        background: linear-gradient(135deg, #6366f1, #7c3aed) !important;
-    }
-
-    html body[data-call-presentation="minimized"] .idle-layer {
-        display: block !important;
-        position: relative !important;
-        inset: auto !important;
-        transform: none !important;
-    }
-
-    html body[data-call-presentation="minimized"] #callLayer {
-        display: none !important;
-    }
-
-    html body[data-call-presentation="minimized"] #pageContent.content > .bottom-card,
-    html body[data-call-presentation="minimized"] #pageContent.content > .patfeedback-card {
-        display: flex !important;
-    }
-
-    html body[data-call-presentation="minimized"] #bottomCard {
-        display: block !important;
-    }
-
-    @@media (min-width: 768px) {
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) {
-            display: grid !important;
-            grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr) !important;
-            grid-template-rows: minmax(clamp(180px, 20dvh, 260px), auto) minmax(clamp(240px, 28dvh, 360px), auto) !important;
-            grid-auto-rows: auto !important;
-            align-items: stretch !important;
-            align-content: start !important;
-            flex: 1 1 auto !important;
-        }
-
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) > #interactiveCard {
-            grid-column: 1 !important;
-            grid-row: 1 / 3 !important;
-            height: auto !important;
-            min-height: 420px !important;
-            max-height: none !important;
-        }
-
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) > .bottom-card {
-            grid-column: 2 !important;
-            grid-row: 1 !important;
-            height: auto !important;
-            min-height: 170px !important;
-            margin: 0 !important;
-        }
-
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card {
-            grid-column: 2 !important;
-            grid-row: 2 !important;
-            height: auto !important;
-            min-height: 220px !important;
-            margin: 0 !important;
-        }
-
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) > .patfeedback-card .card-pill {
-            position: static !important;
-            align-self: flex-start !important;
-            margin: 0 0 8px 0 !important;
-        }
-
-        html body[data-call-presentation="minimized"] #pageContent.content:has(> #interactiveCard) .grace-idle {
-            background: transparent !important;
-            margin: 0 !important;
-        }
     }
 
     </style>

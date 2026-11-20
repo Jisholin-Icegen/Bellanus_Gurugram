@@ -72,16 +72,6 @@ var REGION_DIALECT = {
     AE: "UAE"
 };
 
-function retryAfterMilliseconds(value) {
-    if (!value) return null;
-    var seconds = Number(value);
-    if (Number.isFinite(seconds)) return Math.min(2147483000, Math.max(1000, seconds * 1000));
-    var timestamp = Date.parse(value);
-    return Number.isNaN(timestamp)
-        ? null
-        : Math.min(2147483000, Math.max(1000, timestamp - Date.now()));
-}
-
 var widgetParams = new URLSearchParams(window.location.search);
 
 function getWidgetUserId() {
@@ -261,9 +251,8 @@ async function fetchToken() {
     if (!res.ok) {
         var tokenError = new Error("/token returned " + res.status);
         tokenError.status = res.status;
-        tokenError.retryAfterMs = retryAfterMilliseconds(res.headers.get("Retry-After"))
-            || (res.status === 429 ? 60000 : null);
-        console.error(tokenError.message);
+        tokenError.retryAfter = res.headers.get("Retry-After");
+        console.error(tokenError.message, tokenError.retryAfter ? "Retry-After: " + tokenError.retryAfter : "");
         throw tokenError;
     }
 
@@ -284,6 +273,7 @@ var statusTransitionTimer = null;
 var serverEndTimer = null;
 var connectionInProgress = false;
 var callSessionActive = false;
+var callAccessToken = null;
 var callSessionGeneration = 0;
 var reconnectAttempts = 0;
 var maxReconnectBackoffStep = 5;
@@ -800,6 +790,7 @@ async function connectToAvatarBackend() {
         reconnectAttempts = 0;
         elapsedSeconds = 0;
     }
+    var tokenRequestAttempted = false;
     var sessionGeneration = callSessionGeneration;
     var sessionIsCurrent = function () {
         return callSessionActive && sessionGeneration === callSessionGeneration
@@ -818,9 +809,14 @@ async function connectToAvatarBackend() {
         if (!sessionIsCurrent()) return;
         setCallStatus(reconnectAttempts ? "reconnecting" : "ringing");
 
-        var token = await fetchToken();
+        var token = callAccessToken;
+        if (!token) {
+            tokenRequestAttempted = true;
+            token = await fetchToken();
+        }
         if (!sessionIsCurrent()) return;
         if (!token) throw new Error("No token — cannot open /voice-assistant.");
+        callAccessToken = token;
 
         var socket = new WebSocket(BACKEND_WS + "/voice-assistant?token=" + encodeURIComponent(token));
         socket.binaryType = "arraybuffer";
@@ -986,12 +982,19 @@ async function connectToAvatarBackend() {
             endChat();
             return;
         }
-        scheduleVoiceReconnect(err && err.retryAfterMs,
-            err && err.status === 429 ? "service-busy" : null);
+        if (tokenRequestAttempted && !callAccessToken) {
+            endChat(err && err.status === 429 ? "service-busy" : "token-unavailable");
+            return;
+        }
+        if (!callAccessToken) {
+            endChat("connection-failed");
+            return;
+        }
+        scheduleVoiceReconnect();
     }
 }
 
-function scheduleVoiceReconnect(minimumDelayMs, status) {
+function scheduleVoiceReconnect() {
     if (!callSessionActive || serverEnding || !body
         || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
         if (callSessionActive) endChat();
@@ -1000,8 +1003,7 @@ function scheduleVoiceReconnect(minimumDelayMs, status) {
 
     reconnectAttempts = Math.min(reconnectAttempts + 1, maxReconnectBackoffStep);
     var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
-    if (Number.isFinite(minimumDelayMs) && minimumDelayMs > delay) delay = minimumDelayMs;
-    setCallStatus(status || "reconnecting");
+    setCallStatus("reconnecting");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
         detail: { connected: false, reconnecting: true, attempt: reconnectAttempts, retryInMs: delay }
     }));
@@ -1048,7 +1050,9 @@ function setCallStatus(status) {
         ringing: "Connecting...",
         connecting: "Connecting...",
         reconnecting: "Reconnecting...",
-        "service-busy": "Voice service busy. Retrying shortly...",
+        "service-busy": "Voice service busy. Please try again later.",
+        "token-unavailable": "Could not start the voice call. Please try again.",
+        "connection-failed": "Voice connection failed. Please try again.",
         connected: "Connected...",
         listening: "Listening...",
         thinking: "Thinking...",
@@ -1066,8 +1070,9 @@ function setCallStatus(status) {
     }
 }
 
-function endChat() {
+function endChat(finalStatus) {
     callSessionActive = false;
+    callAccessToken = null;
     callSessionGeneration += 1;
     connectionInProgress = false;
     serverEnding = false;
@@ -1104,7 +1109,7 @@ function endChat() {
     }
 
     setState("ended");
-    setCallStatus("ended");
+    setCallStatus(finalStatus || "ended");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
         detail: { connected: false, reconnecting: false }
     }));
@@ -1195,7 +1200,11 @@ function initializeAvatarEvents() {
             }
 
             callSessionActive = false;
+            callAccessToken = null;
             reconnectAttempts = 0;
+            if (window.UnifiedAIHost && typeof window.UnifiedAIHost.showChat === "function") {
+                window.UnifiedAIHost.showChat();
+            }
             setState("connecting");
             setCallStatus("dialing");
 

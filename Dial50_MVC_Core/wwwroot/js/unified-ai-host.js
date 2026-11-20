@@ -935,7 +935,7 @@
             clearTimeout(endedStateTimer);
             endedStateTimer = null;
         } else {
-            if (callPresentation === "minimized") setCallPresentation("full");
+            if (state !== "ended" && callPresentation === "minimized") setCallPresentation("full");
             if (state === "ended") {
                 clearTimeout(endedStateTimer);
                 endedStateTimer = setTimeout(function () {
