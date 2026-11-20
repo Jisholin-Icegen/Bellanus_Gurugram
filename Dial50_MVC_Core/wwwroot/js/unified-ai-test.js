@@ -11,6 +11,7 @@
     if (!host || !host.isLocalTestMode || !launcher || !panel) return;
 
     let requestSequence = 0;
+    let riskyActionsConfirmed = false;
     launcher.hidden = false;
 
     function normalize(value) {
@@ -297,8 +298,10 @@
     }
 
     function runAction(action, label) {
-        if (isRiskyAction(action)
-            && !window.confirm("This test action may change app data. Continue only if this is a confirmed test database.")) return;
+        if (isRiskyAction(action) && !riskyActionsConfirmed) {
+            if (!window.confirm("This test action may change app data. Continue only if this is a confirmed test database.")) return;
+            riskyActionsConfirmed = true;
+        }
         action.request_id = "local-test-" + Date.now() + "-" + (++requestSequence);
         status.textContent = "Running";
         output.textContent = "Testing: " + label;

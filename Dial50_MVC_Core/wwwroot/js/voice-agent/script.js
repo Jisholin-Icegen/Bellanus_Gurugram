@@ -909,7 +909,7 @@ async function connectToAvatarBackend() {
                         : 0;
                     serverEndTimer = setTimeout(function () {
                         serverEndTimer = null;
-                        endChat("ended");
+                        endChat("remote-ended");
                     }, remainingMs + 300);
                     break;
                 }
@@ -930,7 +930,7 @@ async function connectToAvatarBackend() {
             }
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason");
             if (event.code === 1000) {
-                endChat("disconnected");
+                endChat("remote-ended");
                 return;
             }
             scheduleVoiceReconnect();
@@ -1037,6 +1037,7 @@ function setCallStatus(status) {
         thinking: "Thinking...",
         speaking: "Speaking...",
         ended: "Call ended.",
+        "remote-ended": "Voice service ended the call.",
         disconnected: "Connection lost. Please restart.",
         "microphone-required": "Allow microphone access to start."
     };

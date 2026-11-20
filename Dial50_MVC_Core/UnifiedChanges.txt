@@ -193,8 +193,9 @@ Home URL, for example:
 
 The test panel is available only on localhost and does not create a voice
 connection. Its simulated session exercises page context, navigation, and
-visible app actions. Actions that can change application data require an
-additional confirmation; only run them against a confirmed test database.
+visible app actions. The first action that can change application data requires
+confirmation once per page; only run those actions against a confirmed test
+database.
 Start Talk to AI separately to test the real voice service and speech round-trip.
 
 The supplied local tenant/database must be verified as test data before writes.
