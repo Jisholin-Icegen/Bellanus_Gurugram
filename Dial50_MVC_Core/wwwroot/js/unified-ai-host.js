@@ -838,8 +838,9 @@
             }
         });
         (context.items || []).forEach(function (item) {
-            if (item.route && !item.disabled) {
-                add("Open " + (item.name || item.label), { action: "navigate", path: item.route }, item.name || item.label);
+            const route = item.voiceRoute || (!item.disabled && item.route);
+            if (route) {
+                add("Open " + (item.name || item.label), { action: "navigate", path: route }, item.name || item.label);
             }
         });
 

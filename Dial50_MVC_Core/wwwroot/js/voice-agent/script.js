@@ -53,7 +53,10 @@ if (!window.APP_CONFIG) {
 
 var CFG = window.APP_CONFIG || {};
 
-var SESSION_SECONDS = Number(CFG.SESSION_SECONDS) || 180;
+var configuredSessionSeconds = Number(CFG.SESSION_SECONDS);
+var SESSION_SECONDS = Number.isFinite(configuredSessionSeconds) && configuredSessionSeconds > 0
+    ? configuredSessionSeconds
+    : 0;
 var SAMPLE_RATE = 24000;
 var MIC_FRAME_SAMPLES = 480;
 
@@ -88,6 +91,7 @@ function getWidgetUserId() {
 var body = null;
 var countdownTimer = null;
 var timeLeft = SESSION_SECONDS;
+var elapsedSeconds = 0;
 
 var idleBtn = null;
 var endChatBtn = null;
@@ -131,7 +135,7 @@ function formatTime(s) {
     return m + ":" + (s % 60).toString().padStart(2, "0");
 }
 function renderTimer() {
-    if (timerEl) timerEl.textContent = formatTime(Math.max(timeLeft, 0));
+    if (timerEl) timerEl.textContent = formatTime(SESSION_SECONDS > 0 ? Math.max(timeLeft, 0) : elapsedSeconds);
 }
 
 async function fetchProfileLanguage(id) {
@@ -267,7 +271,7 @@ var statusTransitionTimer = null;
 var connectionInProgress = false;
 var callSessionActive = false;
 var reconnectAttempts = 0;
-var maxReconnectAttempts = 5;
+var maxReconnectBackoffStep = 5;
 var audioContext = null;
 var mediaStream = null;
 var micNode = null;
@@ -683,7 +687,10 @@ function flushPlayback() {
 }
 
 async function startMicrophone() {
-    if (audioContext && mediaStream && micNode) {
+    var hasLiveMicrophone = mediaStream && mediaStream.getAudioTracks().some(function (track) {
+        return track.readyState === "live" && track.enabled;
+    });
+    if (audioContext && audioContext.state !== "closed" && hasLiveMicrophone && micNode) {
         if (audioContext.state === "suspended") await audioContext.resume();
         return;
     }
@@ -776,6 +783,7 @@ async function connectToAvatarBackend() {
         serverEnding = false;
         reconnectAttempts = 0;
         timeLeft = SESSION_SECONDS;
+        elapsedSeconds = 0;
     }
     connectionInProgress = true;
     clearTimeout(reconnectTimer);
@@ -938,13 +946,7 @@ function scheduleVoiceReconnect() {
         return;
     }
 
-    if (reconnectAttempts >= maxReconnectAttempts) {
-        setCallStatus("disconnected");
-        endChat();
-        return;
-    }
-
-    reconnectAttempts += 1;
+    reconnectAttempts = Math.min(reconnectAttempts + 1, maxReconnectBackoffStep);
     var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
     setCallStatus("reconnecting");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
@@ -976,9 +978,10 @@ function goConnected() {
 function startCountdown() {
     clearInterval(countdownTimer);
     countdownTimer = setInterval(function () {
-        timeLeft -= 1;
+        if (SESSION_SECONDS > 0) timeLeft -= 1;
+        else elapsedSeconds += 1;
         renderTimer();
-        if (timeLeft <= 0) endChat();
+        if (SESSION_SECONDS > 0 && timeLeft <= 0) endChat();
     }, 1000);
 }
 
@@ -1026,6 +1029,7 @@ function endChat() {
     stableConnectionTimer = null;
     statusTransitionTimer = null;
     reconnectAttempts = 0;
+    elapsedSeconds = 0;
     pendingVoiceMessages = [];
 
     micMuted = false;

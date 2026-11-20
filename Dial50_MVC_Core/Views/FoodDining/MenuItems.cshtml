@@ -154,9 +154,9 @@
         <div class="nutrition-modal-content">
             <button class="modal-close" onclick="closeNutritionModal()">✕</button>
             <div id="modalContent"></div>
-            <div class="auto-close-bar">
+            <div class="auto-close-bar" role="group" aria-label="Close nutrition information">
                 <span>⏱️ Auto-dismisses in <strong id="countdownText">20</strong>s</span>
-                <button class="btn-done-blue" onclick="closeNutritionModal()">Done</button>
+                <button type="button" class="btn-done-blue" id="nutritionDoneButton" aria-label="Done and close nutrition information">Done</button>
             </div>
         </div>
     </div>
@@ -443,6 +443,8 @@
             clearTimeout(nutritionTimer);
             clearInterval(countdownInterval);
         }
+
+        document.getElementById("nutritionDoneButton").addEventListener("click", closeNutritionModal);
 
         $("#nutritionModal").on("click", function(e) {
             if (e.target === this) closeNutritionModal();

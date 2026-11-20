@@ -38,26 +38,38 @@ document.addEventListener("DOMContentLoaded", function () {
         || "";
 
     function openDailyCareItem(item) {
+        const page = item.onclick_URL.split("?")[0].replace(/^\/+/, "");
         if (unifiedAI && window.UnifiedAIChild) {
-            window.UnifiedAIChild.navigate(item.onclick_URL + encodeURIComponent(bedInfo));
+            window.UnifiedAIChild.navigate(window.BedContext && window.BedContext.url
+                ? window.BedContext.url(page)
+                : item.onclick_URL + encodeURIComponent(bedInfo));
             return;
         }
         if (unifiedAI) {
-            const target = new URL(item.onclick_URL + encodeURIComponent(bedInfo), window.location.origin);
+            const target = new URL(window.BedContext && window.BedContext.url
+                ? window.BedContext.url(page)
+                : item.onclick_URL + encodeURIComponent(bedInfo), window.location.origin);
             target.searchParams.set("Unified", "1");
             target.searchParams.set("UnifiedAI", "1");
             window.location.href = target.toString();
             return;
         }
-        if (item.title === "My Library") GoToChat();
+        if (window.BedContext && typeof window.BedContext.go === "function") {
+            window.BedContext.go(page);
+            return;
+        }
+        window.location.href = item.onclick_URL + encodeURIComponent(bedInfo);
     }
 
     container.innerHTML = "";
 
     data.forEach(function (item) {
         const card = document.createElement("div");
-        card.className = unifiedAI || item.title === "My Library" ? "card focused" : "card faded";
+        const isAvailable = item.title === "My Library";
+        card.className = isAvailable ? "card focused" : "card faded";
         card.dataset.route = item.onclick_URL.split("?")[0];
+        card.dataset.voiceRoute = card.dataset.route;
+        if (!isAvailable) card.setAttribute("aria-disabled", "true");
         card.innerHTML = `
             <div class="icon-box">
                 <img src="${item.icon}" alt="${item.title}">
@@ -65,7 +77,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <h3>${item.title}</h3>
             <p>${item.description}</p>
         `;
-        if (unifiedAI || item.title === "My Library") {
+        if (isAvailable) {
             card.addEventListener("click", function () {
                 openDailyCareItem(item);
             });

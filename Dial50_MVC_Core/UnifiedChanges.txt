@@ -12,12 +12,13 @@ hardcode patient, tenant, category, menu, or notification values in the AI.
 Connection and status
 ---------------------
 The voice client queues current page context and action results during a
-temporary WebSocket outage, then retries a dropped connection with exponential
-backoff (up to five attempts). It preserves the call timer and microphone stream
-while reconnecting, and only ends the call when the patient ends it, the server
-ends it, the call timer expires, or retries are exhausted. The assistant bar
-and local test panel display the same Connecting, Reconnecting, Listening,
-Thinking, or Speaking status.
+temporary WebSocket outage, then retries with exponential backoff capped at
+15 seconds until the patient or server ends the call. It keeps the call timer
+running and reuses a live microphone stream, reacquiring it if the browser ended
+the track. Calls have no default time limit; a positive SESSION_SECONDS value
+in APP_CONFIG can still set an explicit limit. The assistant bar and local test
+panel display the same Connecting, Reconnecting, Listening, Thinking, or
+Speaking status.
 
 This client-side retry does not replace a healthy voice backend. The AI team
 must keep its server-side voice session valid, accept a fresh token during a
@@ -119,6 +120,24 @@ Feedback:
 
 Feedback questions and choices are loaded from the current tenant. The app
 rejects incomplete or invalid submissions.
+
+Notification permission prompt
+------------------------------
+Supported browsers show one app prompt with Allow Notifications and Maybe
+Later. Allow requests browser permission from the user's click and saves a
+push subscription for that browser. Browser permission is inherently per
+browser/device. Maybe Later is stored server-side for 12 hours and is shared
+across the room's pages and browsers; local storage also prevents repeated
+prompts across tabs in the same browser. Unsupported browsers and browsers
+whose notification permission is already denied do not show a prompt. The app
+does not ask users to install the site or add it to the home screen.
+
+My Daily Care
+-------------
+The page keeps its four existing cards: My Library is the only touch-enabled
+card and opens the actual library page; the other three remain visibly disabled.
+The AI can still navigate to their routes by voice without enabling those cards
+or changing the Home assistant layout.
 
 Tenant and data handling
 ------------------------

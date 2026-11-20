@@ -236,11 +236,13 @@
                 const categoryId = item.getAttribute("data-category-id");
                 const foodId = item.getAttribute("data-food-id");
                 const route = item.getAttribute("data-route");
+                const voiceRoute = item.getAttribute("data-voice-route");
                 if (categoryId) row.categoryId = categoryId;
                 if (foodId) row.foodId = foodId;
                 const meal = item.getAttribute("data-meal-type") || item.getAttribute("data-mealname");
                 if (meal) row.meal = redactPatientIdentifiers(meal);
                 if (route && route.startsWith("/")) row.route = route.split("?")[0];
+                if (voiceRoute && voiceRoute.startsWith("/")) row.voiceRoute = voiceRoute.split("?")[0];
                 const orderType = item.getAttribute("data-order-type");
                 if (orderType) row.orderType = orderType;
                 const orderMode = item.getAttribute("data-order-mode");
