@@ -1947,6 +1947,7 @@ textarea {
     position: absolute;
     top: 16px;
     right: 16px;
+    z-index: 3;
     background: #f1f5f9;
     border: none;
     width: 32px;
@@ -7040,6 +7041,9 @@ html[dir="rtl"] .lang-custom-menu {
 .nutrition-modal-content {
     border-radius: 22px;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .modal-meal-pill {
@@ -7744,13 +7748,20 @@ select#dietFilter.diet-filter-select {
 }
 
 .nutrition-modal-content .auto-close-bar {
-    position: sticky;
-    bottom: 0;
+    position: relative;
+    flex: 0 0 auto;
     z-index: 2;
     margin: 20px 0 0;
     padding: 14px 0 12px;
     background: #fff;
     box-shadow: 0 -8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.nutrition-modal-content #modalContent {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .nutrition-modal-content .btn-done-blue {
@@ -7773,7 +7784,6 @@ select#dietFilter.diet-filter-select {
     }
 
     .nutrition-modal-content .auto-close-bar {
-        bottom: 0;
         flex-wrap: wrap;
         gap: 10px;
         margin: 16px 0 0;
