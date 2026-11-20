@@ -12,24 +12,26 @@ hardcode patient, tenant, category, menu, or notification values in the AI.
 Connection and status
 ---------------------
 The voice client requests one access token per explicit call start. A failed
-token request, including HTTP 429, ends that attempt and is never retried
-automatically; the user must explicitly start another call to request a new
-token. WebSocket reconnects reuse the call's existing token and use exponential
-backoff capped at 15 seconds for at most five retries per call. A clean
-WebSocket close or server call_ended event ends the session instead of opening
-another socket. The voice service must accept the existing token for a
-reconnect; the client will not request another token in the same call. It keeps
-the call timer running and reuses a live microphone stream, reacquiring it if
-the browser ended the track. Calls have no default time limit; a positive
+token request, including HTTP 429, leaves the call pending and is never retried
+automatically; only an explicit End Call followed by a new start requests a
+new token. WebSocket reconnects reuse the call's existing token and retry
+indefinitely with exponential backoff capped at 15 seconds. A clean WebSocket
+close or server call_ended event does not end the user-started call; the client
+reconnects using the existing token. The voice service must accept that token
+for reconnects; the client will not request another token in the same call. It
+keeps the call timer running and reuses a live microphone stream, reacquiring
+it if the browser ended the track. Calls have no default time limit; a positive
 SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
 persistent assistant bar shows the same Connecting, Reconnecting, Listening,
 Thinking, or Speaking status as the Home call screen while the call is
 connecting or connected.
 The assistant bar remains above the unified page frame. Go to Chat only hides
 that frame and returns to the Home call screen; it must not end or recreate the
-voice socket. The explicit End Call control, a clean server WebSocket close, a
-valid server call_ended event, or an exhausted connection-retry limit ends the
-session.
+voice socket. Only the explicit End Call control ends the client call session.
+Ending from the floating bar preserves an open service page instead of
+navigating back to the full call screen. Internal service navigation and Home
+return keep the Home document, microphone, and socket owner alive; a full
+document reload or browser shutdown cannot preserve a page-owned WebSocket.
 
 This client-side reconnect does not replace a healthy voice backend. The AI
 team must keep its server-side voice session valid, accept the existing token
@@ -165,10 +167,11 @@ same Home layout used before the call, and shows the popup while the call stays
 active. Ending or failing a call while minimized does not restore the full call
 screen over Home. The Home AI card and the popup's return/chat control both
 restore the full call screen and hide the popup. A voice route to Home returns
-to the Home layout with the popup still active. Hiding the page also minimizes
-the screen. Abnormal voice disconnects reuse the current token for at most
-five reconnect attempts. A clean server close or valid call_ended event ends
-the session without reopening the WebSocket.
+to the Home layout with the popup still active, and ending from the popup leaves
+the current service page open. Hiding the page also minimizes the screen.
+Unexpected voice disconnects and server call_ended events reuse the current
+token and reconnect indefinitely with backoff; only the End Call control ends
+the client session.
 
 Tenant and data handling
 ------------------------

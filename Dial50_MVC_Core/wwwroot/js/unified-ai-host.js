@@ -769,6 +769,8 @@
             notifyTestContextChanged();
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
+        } else if (event.data.type === "unified_ai_show_home") {
+            showHomeWithCallPopup();
         }
     });
 
@@ -776,13 +778,11 @@
         barEndButton.addEventListener("click", function () {
             if (simulatedSession) {
                 simulatedSession = false;
-                showChat();
                 updateFloatingBar();
                 notifyTestContextChanged();
                 return;
             }
             if (typeof window.endChat === "function") window.endChat();
-            showChat();
             updateFloatingBar();
         });
     }
@@ -885,7 +885,7 @@
         if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            showChat();
+            showHomeWithCallPopup();
             return;
         }
 
@@ -935,7 +935,6 @@
             clearTimeout(endedStateTimer);
             endedStateTimer = null;
         } else {
-            if (state !== "ended" && callPresentation === "minimized") setCallPresentation("full");
             if (state === "ended") {
                 clearTimeout(endedStateTimer);
                 endedStateTimer = setTimeout(function () {
@@ -947,6 +946,10 @@
             } else {
                 clearTimeout(endedStateTimer);
                 endedStateTimer = null;
+                if (state === "idle" && callPresentation === "minimized"
+                    && !frameLayer.classList.contains("is-open")) {
+                    setCallPresentation("full");
+                }
             }
         }
         updateFloatingBar();
@@ -976,7 +979,7 @@
             const normalized = String(page || "").replace(/^\/+/, "").toLowerCase();
             if (isCallActive()) {
                 if (normalized === "home" || normalized === "home/index" || normalized === "ai" || normalized === "ai/chat") {
-                    showChat();
+                    showHomeWithCallPopup();
                     return;
                 }
                 openAppPage(page, extra);

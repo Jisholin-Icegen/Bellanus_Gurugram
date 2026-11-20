@@ -466,11 +466,14 @@
         showChat: function () {
             window.parent.postMessage({ type: "unified_ai_show_chat" }, window.location.origin);
         },
+        showHome: function () {
+            window.parent.postMessage({ type: "unified_ai_show_home" }, window.location.origin);
+        },
         navigate: function (url) {
             const target = keepUnifiedRoute(url);
             if (!target) throw new Error("Unified AI navigation must stay on this site.");
             if (isUnifiedHomePath(target.pathname)) {
-                window.UnifiedAIChild.showChat();
+                window.UnifiedAIChild.showHome();
                 return;
             }
             window.location.href = target.toString();
@@ -491,7 +494,7 @@
         if (!target) return;
         if (isUnifiedHomePath(target.pathname)) {
             event.preventDefault();
-            window.UnifiedAIChild.showChat();
+            window.UnifiedAIChild.showHome();
             return;
         }
         link.href = target.toString();

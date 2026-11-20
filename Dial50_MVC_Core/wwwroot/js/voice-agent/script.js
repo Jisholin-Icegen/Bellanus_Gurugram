@@ -273,9 +273,9 @@ var serverEndTimer = null;
 var connectionInProgress = false;
 var callSessionActive = false;
 var callAccessToken = null;
+var tokenRequestAttemptedForSession = false;
 var callSessionGeneration = 0;
 var reconnectAttempts = 0;
-var maxReconnectAttempts = 5;
 var audioContext = null;
 var mediaStream = null;
 var micNode = null;
@@ -284,7 +284,6 @@ var highPassNode = null;
 var micMuted = false;
 var speakerMuted = false;
 var speakerGainNode = null;
-var serverEnding = false;
 
 var nextPlayTime = 0;
 var activeSources = [];
@@ -785,9 +784,9 @@ async function connectToAvatarBackend() {
     if (!callSessionActive) {
         callSessionActive = true;
         callSessionGeneration += 1;
-        serverEnding = false;
         reconnectAttempts = 0;
         elapsedSeconds = 0;
+        tokenRequestAttemptedForSession = false;
     }
     var tokenRequestAttempted = false;
     var sessionGeneration = callSessionGeneration;
@@ -810,7 +809,13 @@ async function connectToAvatarBackend() {
 
         var token = callAccessToken;
         if (!token) {
+            if (tokenRequestAttemptedForSession) {
+                connectionInProgress = false;
+                setCallStatus("token-unavailable");
+                return;
+            }
             tokenRequestAttempted = true;
+            tokenRequestAttemptedForSession = true;
             token = await fetchToken();
         }
         if (!sessionIsCurrent()) return;
@@ -902,14 +907,16 @@ async function connectToAvatarBackend() {
                     break;
 
                 case "call_ended": {
-                    serverEnding = true;
                     clearTimeout(serverEndTimer);
                     var remainingMs = audioContext
                         ? Math.max(0, (nextPlayTime - audioContext.currentTime) * 1000)
                         : 0;
                     serverEndTimer = setTimeout(function () {
                         serverEndTimer = null;
-                        endChat("remote-ended");
+                        if (ws === socket && socket.readyState === WebSocket.OPEN) {
+                            setCallStatus("reconnecting");
+                            socket.close(4001, "Voice service ended; preserving active call");
+                        }
                     }, remainingMs + 300);
                     break;
                 }
@@ -925,14 +932,7 @@ async function connectToAvatarBackend() {
             connectionTimeoutTimer = null;
             connectionInProgress = false;
             ws = null;
-            if (serverEnding) {
-                return;
-            }
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason");
-            if (event.code === 1000) {
-                endChat("remote-ended");
-                return;
-            }
             scheduleVoiceReconnect();
         };
 
@@ -953,15 +953,14 @@ async function connectToAvatarBackend() {
         console.error("Could not connect the voice call:", err);
         if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")) {
             setCallStatus("microphone-required");
-            endChat();
             return;
         }
         if (tokenRequestAttempted && !callAccessToken) {
-            endChat(err && err.status === 429 ? "service-busy" : "token-unavailable");
+            setCallStatus(err && err.status === 429 ? "service-busy" : "token-unavailable");
             return;
         }
         if (!callAccessToken) {
-            endChat("connection-failed");
+            setCallStatus("connection-failed");
             return;
         }
         scheduleVoiceReconnect();
@@ -969,19 +968,17 @@ async function connectToAvatarBackend() {
 }
 
 function scheduleVoiceReconnect() {
-    if (!callSessionActive || serverEnding || !body
-        || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
-        if (callSessionActive) endChat();
-        return;
+    if (!callSessionActive || !body) return;
+    if (!["connecting", "connected"].includes(body.getAttribute("data-state"))) {
+        setState("connecting");
     }
-
-    if (reconnectAttempts >= maxReconnectAttempts) {
-        endChat("disconnected");
+    if (!callAccessToken) {
+        setCallStatus(tokenRequestAttemptedForSession ? "token-unavailable" : "connection-failed");
         return;
     }
 
     reconnectAttempts += 1;
-    var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
+    var delay = Math.min(15000, 1000 * Math.pow(2, Math.min(reconnectAttempts - 1, 4)));
     setCallStatus("reconnecting");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
         detail: { connected: false, reconnecting: true, attempt: reconnectAttempts, retryInMs: delay }
@@ -1053,9 +1050,9 @@ function setCallStatus(status) {
 function endChat(finalStatus) {
     callSessionActive = false;
     callAccessToken = null;
+    tokenRequestAttemptedForSession = false;
     callSessionGeneration += 1;
     connectionInProgress = false;
-    serverEnding = false;
     clearInterval(countdownTimer);
     countdownTimer = null;
     clearTimeout(drainTimer);
@@ -1120,6 +1117,14 @@ function initializeAvatarEvents() {
     if (homeBtn) {
         homeBtn.addEventListener("click", function () {
             console.log("Dial50: Home clicked");
+            if (callSessionActive) {
+                if (window.UnifiedAIHost && typeof window.UnifiedAIHost.minimizeCall === "function") {
+                    window.UnifiedAIHost.minimizeCall();
+                } else {
+                    console.warn("Unified AI call popup is unavailable; the active call will continue.");
+                }
+                return;
+            }
             setState("idle");
         });
     }
@@ -1171,6 +1176,11 @@ function initializeAvatarEvents() {
             var state = body.getAttribute("data-state");
 
             if (state === "connecting" || state === "connected") {
+                if (state === "connecting" && callSessionActive && !connectionInProgress
+                    && !reconnectTimer && !ws && !tokenRequestAttemptedForSession) {
+                    connectToAvatarBackend();
+                    return;
+                }
                 if (window.UnifiedAIHost && typeof window.UnifiedAIHost.showChat === "function") {
                     window.UnifiedAIHost.showChat();
                 }
