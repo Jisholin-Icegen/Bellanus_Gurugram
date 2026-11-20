@@ -169,6 +169,14 @@
     gap: 8px;
 }
 
+#unifiedAiTestStatus {
+    margin-left: auto;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
 #unifiedAiTestPanel p {
     margin: 8px 0;
     font-size: 12px;

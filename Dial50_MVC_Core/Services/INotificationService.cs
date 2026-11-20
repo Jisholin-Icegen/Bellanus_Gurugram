@@ -6,7 +6,7 @@ namespace Dial50_MVC_Core.Services
     {
         Task<List<NotificationModel>> GetNotificationsByRoomAsync(string roomNo, int maxCount);
         Task<int> GetUnreadCountByRoomAsync(string roomNo);
-        Task<bool> MarkNotificationAsReadAsync(string notificationId);
+        Task<bool> MarkNotificationAsReadAsync(string roomNo, string notificationId);
 
         Task<bool> MarkAllNotificationsAsReadByRoomAsync(string roomNo);
         Task<int> GetTotalCountByRoomAsync(string roomNo);

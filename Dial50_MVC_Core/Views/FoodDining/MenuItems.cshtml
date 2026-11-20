@@ -622,6 +622,18 @@
             const respond = function (success, result, error) {
                 if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, success, result, error);
             };
+            const instructionValue = action.specialInstructions != null ? action.specialInstructions
+                : action.remarks != null ? action.remarks : action.instructions;
+            if (instructionValue != null) {
+                const instruction = String(instructionValue).slice(0, 1000);
+                localStorage.setItem("SpecialInstruction", instruction);
+                const input = document.getElementById("menuInstructions");
+                if (input) {
+                    input.value = instruction;
+                    input.dispatchEvent(new Event("input", { bubbles: true }));
+                    input.dispatchEvent(new Event("change", { bubbles: true }));
+                }
+            }
 
             const dropdownControls = {
                 "food.select_vendor": { controlId: "vendorSelector", optionValue: action.vendor || action.value },
@@ -654,7 +666,7 @@
                 return;
             }
 
-            const supportedActions = ["food.list_menu", "food.add_item", "food.set_quantity", "food.remove_item", "food.review_order"];
+            const supportedActions = ["food.list_menu", "food.add_item", "food.set_quantity", "food.remove_item", "food.review_order", "food.submit_order"];
             if (supportedActions.indexOf(action.action) < 0) return;
 
             try {
@@ -674,14 +686,17 @@
                     meal: $("#hdnMealType").val(),
                     vendor: $("#vendorSelector").val() || "",
                     items: uniqueItems.map(function (item) {
-                        return {
+                        const itemData = {
                             id: item.id,
                             name: item.foodName,
                             meal: item.mealTiming || $("#hdnMealType").val(),
                             dietaryType: item.dietaryType || "",
-                            price: item.price == null ? null : item.price,
                             calories: item.calories == null ? null : item.calories
                         };
+                        if ($("#hdnOrderType").val().toLowerCase() === "visitor") {
+                            return Object.assign(itemData, { price: item.price == null ? null : item.price });
+                        }
+                        return itemData;
                     })
                 });
                 return;
@@ -745,6 +760,26 @@
                     quantity: currentCart[cartKey] ? currentCart[cartKey].qty : 0,
                     meal: mealType
                 });
+                return;
+            }
+
+            if (action.action === "food.submit_order") {
+                if (!currentCart || !Object.keys(currentCart).some(function (key) {
+                    return Number(currentCart[key] && currentCart[key].qty) > 0;
+                })) {
+                    respond(false, null, "The cart is empty.");
+                    return;
+                }
+                if (window.__foodReviewPreparing) {
+                    respond(false, null, "The order review is already being prepared.");
+                    return;
+                }
+                sessionStorage.setItem("UnifiedAIPendingFoodSubmit", JSON.stringify({
+                    request_id: action.request_id,
+                    action: "food.submit_order"
+                }));
+                window.__unifiedAIFoodAction = action;
+                submitReviewWithAJAX(true);
                 return;
             }
 

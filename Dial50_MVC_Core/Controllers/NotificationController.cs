@@ -21,7 +21,8 @@ namespace Dial50_MVC_Core.Controllers
             if (string.IsNullOrEmpty(request.RoomNo))
                 return Ok(new List<NotificationModel>());
 
-            var result = await _notificationService.GetNotificationsByRoomAsync(request.RoomNo, 1000);
+            var maxCount = request.MaxCount > 0 ? Math.Min(request.MaxCount, 1000) : 100;
+            var result = await _notificationService.GetNotificationsByRoomAsync(request.RoomNo, maxCount);
             return Ok(result);
         }
 
@@ -65,10 +66,10 @@ namespace Dial50_MVC_Core.Controllers
         [HttpPost("MarkAsRead")]
         public async Task<IActionResult> MarkAsRead([FromBody] NotificationRequestModel request)
         {
-            if (string.IsNullOrEmpty(request.NotificationId))
-                return Ok(new { success = false });
+            if (string.IsNullOrWhiteSpace(request.RoomNo) || string.IsNullOrWhiteSpace(request.NotificationId))
+                return Ok(new { success = false, message = "RoomNo and NotificationId are required." });
 
-            var success = await _notificationService.MarkNotificationAsReadAsync(request.NotificationId);
+            var success = await _notificationService.MarkNotificationAsReadAsync(request.RoomNo, request.NotificationId);
             return Ok(new { success });
         }
     }
@@ -77,5 +78,6 @@ namespace Dial50_MVC_Core.Controllers
     {
         public string RoomNo { get; set; }
         public string NotificationId { get; set; }
+        public int MaxCount { get; set; }
     }
 }

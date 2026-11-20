@@ -59,6 +59,10 @@
 
         url: function (page, extra) {
             var u = '/' + String(page).replace(/^\//, '') + '?BedInfo=' + encodeURIComponent(ctx.bedInfo);
+            var tenantId = ctx.tenantId || sessionStorage.getItem('XTenantID') || '';
+            var region = ctx.region || sessionStorage.getItem('region') || '';
+            if (tenantId) u += '&XTenantID=' + encodeURIComponent(tenantId);
+            if (region) u += '&region=' + encodeURIComponent(region);
             if (params.get('UnifiedAI') === '1' || params.get('Unified') === '1') {
                 u += '&Unified=1&UnifiedAI=1';
             }

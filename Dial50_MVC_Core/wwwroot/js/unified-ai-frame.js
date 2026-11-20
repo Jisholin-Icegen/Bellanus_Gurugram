@@ -20,8 +20,13 @@
         if (/^\/FoodDining(?:\/Index)?\/?$/i.test(target.pathname)) {
             target.pathname = "/FoodDining/FoodDining";
         }
-        const bedInfo = target.searchParams.get("BedInfo") || sessionStorage.getItem("bedInfo");
+        const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
+        const bedInfo = target.searchParams.get("BedInfo") || bedContext.bedInfo || sessionStorage.getItem("bedInfo");
+        const tenantId = target.searchParams.get("XTenantID") || bedContext.tenantId || sessionStorage.getItem("XTenantID");
+        const region = target.searchParams.get("region") || bedContext.region || sessionStorage.getItem("region");
         if (bedInfo) target.searchParams.set("BedInfo", bedInfo);
+        if (tenantId) target.searchParams.set("XTenantID", tenantId);
+        if (region) target.searchParams.set("region", region);
         target.searchParams.set("Unified", "1");
         target.searchParams.set("UnifiedAI", "1");
         return target;
@@ -184,7 +189,35 @@
                         placeholder: redactPatientIdentifiers(field.getAttribute("placeholder") || "")
                     };
                 });
-        const itemSelector = ".service-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .timing-card, .feedback-question, .card, [data-category-id], [data-food-id], [data-order-type], [data-order-mode]";
+        const choices = Array.from(document.querySelectorAll(
+            "input[type='checkbox'], input[type='radio'], [role='checkbox'], [role='radio']"
+        ))
+            .map(function (choice, index) {
+                const labelElement = choice.labels && choice.labels.length
+                    ? choice.labels[0]
+                    : choice.closest("label") || Array.from(document.querySelectorAll("label[for]"))
+                        .find(function (label) { return choice.id && label.htmlFor === choice.id; });
+                const target = isVisible(choice) ? choice : labelElement && isVisible(labelElement) ? labelElement : null;
+                if (!target || !isSafeField(choice)) return null;
+                const targetId = "unified-choice-" + index;
+                if (target.getAttribute("data-unified-ai-choice") !== targetId) {
+                    target.setAttribute("data-unified-ai-choice", targetId);
+                }
+                const label = normalizeText(labelElement && labelElement.textContent
+                    || choice.getAttribute("aria-label") || choice.value || choice.getAttribute("data-label"));
+                return {
+                    targetId: targetId,
+                    label: redactPatientIdentifiers(label || "Choice"),
+                    type: choice.type || choice.getAttribute("role"),
+                    name: redactPatientIdentifiers(choice.name || choice.getAttribute("name") || ""),
+                    value: redactPatientIdentifiers(choice.value || choice.getAttribute("data-value") || ""),
+                    checked: choice.checked === true || choice.getAttribute("aria-checked") === "true",
+                    disabled: isDisabled(choice)
+                };
+            })
+            .filter(Boolean)
+            .slice(0, 100);
+        const itemSelector = ".service-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .timing-card, .feedback-question, .order-card, .card, [data-category-id], [data-food-id], [data-order-type], [data-order-mode]";
         const items = Array.from(document.querySelectorAll(itemSelector))
             .filter(isVisible)
             .filter(function (item) { return !item.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]"); })
@@ -212,6 +245,15 @@
                 if (orderType) row.orderType = orderType;
                 const orderMode = item.getAttribute("data-order-mode");
                 if (orderMode) row.orderMode = orderMode;
+                if (item.classList.contains("order-card")) {
+                    row.notificationId = item.getAttribute("data-notification-id") || "";
+                    row.orderId = item.getAttribute("data-order-id") || "";
+                    row.notificationRead = item.classList.contains("read");
+                    row.notificationService = item.getAttribute("data-service") || "";
+                    row.status = redactPatientIdentifiers(
+                        item.querySelector(".status-badge") && item.querySelector(".status-badge").textContent
+                    );
+                }
                 if (item.classList.contains("feedback-question")) {
                     if (item.dataset.questionId) row.feedbackQuestionId = item.dataset.questionId;
                     if (item.dataset.departmentId) row.feedbackDepartmentId = item.dataset.departmentId;
@@ -266,6 +308,7 @@
                 .filter(Boolean),
             controls: controls,
             fields: fields,
+            choices: choices,
             items: items,
             actions: actions
         };
@@ -375,6 +418,42 @@
         }
     }
 
+    function setVisibleChoice(action) {
+        const target = findUiTarget("data-unified-ai-choice", action.targetId);
+        if (!target || isDisabled(target)) {
+            respond(action, false, null, "The selected visible choice is no longer available.");
+            return;
+        }
+        const input = target instanceof HTMLInputElement ? target : target.control;
+        if (typeof action.checked !== "boolean" && action.checked !== "true" && action.checked !== "false") {
+            respond(action, false, null, "A checked state is required for this choice.");
+            return;
+        }
+        const requested = action.checked === true || action.checked === "true";
+        const role = target.getAttribute("role");
+        const type = input instanceof HTMLInputElement ? input.type : role;
+        if (type === "radio" && !requested) {
+            respond(action, false, null, "A radio choice can only be selected, not cleared.");
+            return;
+        }
+        const isChecked = function () {
+            return input instanceof HTMLInputElement
+                ? input.checked
+                : target.getAttribute("aria-checked") === "true";
+        };
+        if (isChecked() !== requested) target.click();
+        if (isChecked() !== requested) {
+            respond(action, false, null, "The page did not accept the requested choice.");
+            return;
+        }
+        schedulePageContext();
+        respond(action, true, {
+            name: input instanceof HTMLInputElement ? input.name || "" : "",
+            value: input instanceof HTMLInputElement ? input.value || "" : target.getAttribute("data-value") || "",
+            checked: isChecked()
+        });
+    }
+
     window.UnifiedAIChild = {
         respond: respond,
         resolveRequestCategory: resolveRequestCategory,
@@ -450,6 +529,7 @@
         const action = event.detail;
         if (!action) return;
         if (action.action === "ui.select") selectVisibleOption(action);
+        else if (action.action === "ui.set_choice") setVisibleChoice(action);
         else if (action.action === "ui.click" || action.action === "ui.fill") executeVisibleUIAction(action);
     });
 

@@ -9,7 +9,7 @@
     {
         Task<List<NotificationModel>> GetNotificationsByRoom(string roomNo, int maxCount);
         Task<int> GetUnreadCountByRoom(string roomNo);
-        Task<bool> MarkNotificationAsRead(string notificationId);
+        Task<bool> MarkNotificationAsRead(string roomNo, string notificationId);
         Task<bool> MarkAllAsReadByRoomAsync(string roomNo);
         Task<int> GetTotalCountByRoom(string roomNo);
     }

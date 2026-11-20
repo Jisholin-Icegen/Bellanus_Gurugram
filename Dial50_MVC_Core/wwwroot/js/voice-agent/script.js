@@ -260,6 +260,14 @@ async function fetchToken() {
 // =========================================================
 var ws = null;
 var pendingVoiceMessages = [];
+var reconnectTimer = null;
+var connectionTimeoutTimer = null;
+var stableConnectionTimer = null;
+var statusTransitionTimer = null;
+var connectionInProgress = false;
+var callSessionActive = false;
+var reconnectAttempts = 0;
+var maxReconnectAttempts = 5;
 var audioContext = null;
 var mediaStream = null;
 var micNode = null;
@@ -675,6 +683,12 @@ function flushPlayback() {
 }
 
 async function startMicrophone() {
+    if (audioContext && mediaStream && micNode) {
+        if (audioContext.state === "suspended") await audioContext.resume();
+        return;
+    }
+
+    stopMicrophone();
     audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: SAMPLE_RATE });
     if (audioContext.state === "suspended") await audioContext.resume();
 
@@ -718,7 +732,13 @@ async function startMicrophone() {
     micNode.port.postMessage({ muted: micMuted });
     micNode.port.onmessage = function (e) {
         processLocalVADFrame(e.data);
-        if (ws && ws.readyState === WebSocket.OPEN) ws.send(e.data);
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            try {
+                ws.send(e.data);
+            } catch (error) {
+                console.warn("Voice audio frame could not be sent:", error && error.message ? error.message : error);
+            }
+        }
     };
 
     highPassNode = audioContext.createBiquadFilter();
@@ -747,12 +767,25 @@ function stopMicrophone() {
 // BACKEND CONNECTION
 // =========================================================
 async function connectToAvatarBackend() {
-    serverEnding = false;
+    if (!body) body = document.body;
+    if (!body || !["connecting", "connected"].includes(body.getAttribute("data-state"))
+        || connectionInProgress || ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
+
+    if (!callSessionActive) {
+        callSessionActive = true;
+        serverEnding = false;
+        reconnectAttempts = 0;
+        timeLeft = SESSION_SECONDS;
+    }
+    connectionInProgress = true;
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+
     try {
         await languageReady;
         await localVad.load();
         await startMicrophone();
-        setCallStatus("ringing");
+        setCallStatus(reconnectAttempts ? "reconnecting" : "ringing");
 
         var token = await fetchToken();
         if (!token) throw new Error("No token — cannot open /voice-assistant.");
@@ -760,10 +793,25 @@ async function connectToAvatarBackend() {
         var socket = new WebSocket(BACKEND_WS + "/voice-assistant?token=" + encodeURIComponent(token));
         socket.binaryType = "arraybuffer";
         ws = socket;
+        connectionTimeoutTimer = setTimeout(function () {
+            if (ws === socket && socket.readyState === WebSocket.CONNECTING) {
+                socket.close(4000, "Connection timed out");
+            }
+        }, 15000);
 
         socket.onopen = function () {
             if (ws !== socket) return;
+            clearTimeout(connectionTimeoutTimer);
+            connectionTimeoutTimer = null;
+            connectionInProgress = false;
+            clearTimeout(stableConnectionTimer);
+            stableConnectionTimer = setTimeout(function () {
+                if (ws === socket && socket.readyState === WebSocket.OPEN) reconnectAttempts = 0;
+            }, 15000);
             goConnected();
+            window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
+                detail: { connected: true, reconnecting: reconnectAttempts > 0 }
+            }));
             while (pendingVoiceMessages.length && ws === socket && socket.readyState === WebSocket.OPEN) {
                 try {
                     socket.send(JSON.stringify(pendingVoiceMessages.shift()));
@@ -844,42 +892,85 @@ async function connectToAvatarBackend() {
             }
         };
 
-        socket.onclose = function () {
+        socket.onclose = function (event) {
             if (ws !== socket) return;
-
-            var state = body ? body.getAttribute("data-state") : null;
-
-            if (serverEnding) return;
-
-            stopMicrophone();
-
-            if (state === "connected" || state === "connecting") {
+            clearTimeout(connectionTimeoutTimer);
+            connectionTimeoutTimer = null;
+            clearTimeout(stableConnectionTimer);
+            stableConnectionTimer = null;
+            connectionInProgress = false;
+            ws = null;
+            if (serverEnding) {
                 endChat();
+                return;
             }
+            console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason");
+            scheduleVoiceReconnect();
         };
 
         socket.onerror = function () {
             if (ws !== socket) return;
-            stopMicrophone();
-            endChat();
+            setCallStatus("reconnecting");
+            try {
+                if (socket.readyState === WebSocket.CONNECTING || socket.readyState === WebSocket.OPEN) {
+                    socket.close();
+                }
+            } catch (error) {
+                console.warn("Could not close the failed voice WebSocket:", error && error.message ? error.message : error);
+            }
         };
     } catch (err) {
-        console.error("Could not start call:", err);
-        stopMicrophone();
-        endChat();
+        connectionInProgress = false;
+        console.error("Could not connect the voice call:", err);
+        if (err && (err.name === "NotAllowedError" || err.name === "SecurityError")) {
+            setCallStatus("microphone-required");
+            endChat();
+            return;
+        }
+        scheduleVoiceReconnect();
     }
 }
 
+function scheduleVoiceReconnect() {
+    if (!callSessionActive || serverEnding || !body
+        || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
+        if (callSessionActive) endChat();
+        return;
+    }
+
+    if (reconnectAttempts >= maxReconnectAttempts) {
+        setCallStatus("disconnected");
+        endChat();
+        return;
+    }
+
+    reconnectAttempts += 1;
+    var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
+    setCallStatus("reconnecting");
+    window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
+        detail: { connected: false, reconnecting: true, attempt: reconnectAttempts }
+    }));
+    reconnectTimer = setTimeout(function () {
+        if (callSessionActive) connectToAvatarBackend();
+    }, delay);
+}
+
 function goConnected() {
-    timeLeft = SESSION_SECONDS;
-    renderTimer();
+    if (!countdownTimer) {
+        timeLeft = SESSION_SECONDS;
+        renderTimer();
+        startCountdown();
+    }
     setState("connected");
     setCallStatus("connecting");
+    clearTimeout(statusTransitionTimer);
     setTimeout(function () {
+        if (!ws || ws.readyState !== WebSocket.OPEN) return;
         setCallStatus("connected");
-        setTimeout(function () { setCallStatus("listening"); }, 700);
+        statusTransitionTimer = setTimeout(function () {
+            if (ws && ws.readyState === WebSocket.OPEN) setCallStatus("listening");
+        }, 700);
     }, 700);
-    startCountdown();
 }
 
 function startCountdown() {
@@ -903,10 +994,13 @@ function setCallStatus(status) {
         dialing: "Connecting voice / audio...",
         ringing: "Connecting...",
         connecting: "Connecting...",
+        reconnecting: "Reconnecting...",
         connected: "Connected...",
         listening: "Listening...",
         thinking: "Thinking...",
-        speaking: "Speaking..."
+        speaking: "Speaking...",
+        disconnected: "Connection lost. Please restart.",
+        "microphone-required": "Allow microphone access to start."
     };
     callStatus.textContent = labels[status] || "Listening...";
 
@@ -918,8 +1012,20 @@ function setCallStatus(status) {
 }
 
 function endChat() {
+    callSessionActive = false;
+    connectionInProgress = false;
     clearInterval(countdownTimer);
+    countdownTimer = null;
     clearTimeout(drainTimer);
+    clearTimeout(reconnectTimer);
+    clearTimeout(connectionTimeoutTimer);
+    clearTimeout(stableConnectionTimer);
+    clearTimeout(statusTransitionTimer);
+    reconnectTimer = null;
+    connectionTimeoutTimer = null;
+    stableConnectionTimer = null;
+    statusTransitionTimer = null;
+    reconnectAttempts = 0;
     pendingVoiceMessages = [];
 
     micMuted = false;
@@ -938,6 +1044,9 @@ function endChat() {
     }
 
     setState("ended");
+    window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
+        detail: { connected: false, reconnecting: false }
+    }));
 
     if (typeof window.flushPendingPopups === "function") {
         try { window.flushPendingPopups(); } catch (e) { }
@@ -1019,6 +1128,8 @@ function initializeAvatarEvents() {
                 return;
             }
 
+            callSessionActive = false;
+            reconnectAttempts = 0;
             setState("connecting");
             setCallStatus("dialing");
 
@@ -1068,7 +1179,8 @@ window.endChat = endChat;
 window.sendVoiceAgentMessage = function (message) {
     var socket = ws;
     if (!socket) {
-        return false;
+        if (!callSessionActive) return false;
+        return queueVoiceAgentMessage(message);
     }
 
     if (socket.readyState === WebSocket.CONNECTING) {
@@ -1077,11 +1189,12 @@ window.sendVoiceAgentMessage = function (message) {
                 return pending.type !== "app_context";
             });
         }
-        if (pendingVoiceMessages.length >= 50) pendingVoiceMessages.shift();
-        pendingVoiceMessages.push(message);
-        return true;
+        return queueVoiceAgentMessage(message);
     }
-    if (socket.readyState !== WebSocket.OPEN) return false;
+    if (socket.readyState !== WebSocket.OPEN) {
+        if (!callSessionActive) return false;
+        return queueVoiceAgentMessage(message);
+    }
 
     try {
         socket.send(JSON.stringify(message));
@@ -1093,6 +1206,21 @@ window.sendVoiceAgentMessage = function (message) {
         return false;
     }
 };
+
+function queueVoiceAgentMessage(message) {
+    if (!message || typeof message !== "object" || !callSessionActive) return false;
+    if (message.type === "app_context") {
+        pendingVoiceMessages = pendingVoiceMessages.filter(function (pending) {
+            return pending.type !== "app_context";
+        });
+    }
+    if (pendingVoiceMessages.length >= 100) {
+        console.error("Voice message queue is full; refusing to discard a pending action result.");
+        return false;
+    }
+    pendingVoiceMessages.push(message);
+    return true;
+}
 window.Dial50VAD = {
     Detector: SileroVoiceActivityDetector,
     instance: localVad,

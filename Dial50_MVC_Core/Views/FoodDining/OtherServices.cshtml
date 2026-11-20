@@ -530,9 +530,10 @@
     var allTasks         = [];
     var currentTaskIdx   = 0;
     var currentRequestId = 0;
+    var servicesLoadPromise = null;
 
     document.addEventListener("DOMContentLoaded", function () {
-        fetchServices();
+        servicesLoadPromise = fetchServices();
 
         currentRequestId = parseInt(sessionStorage.getItem('lastRequestId') || '0', 10);
 
@@ -558,22 +559,48 @@
 
         window.addEventListener("unified-ai:action", function (event) {
             var action = event.detail;
-            if (!action || action.action !== "food.other_service") return;
+            if (!action || !["food.other_service", "request.options", "request.create"].includes(action.action)) return;
+            if (action.action !== "food.other_service" && action.module !== "food_other_services") return;
 
-            var service = allServices.find(function (item) {
-                return String(item.categoryId) === String(action.categoryId);
-            });
-            if (!service) {
-                if (window.UnifiedAIChild) {
-                    window.UnifiedAIChild.respond(action, false, null, "The selected service is no longer available.");
+            var load = servicesLoadPromise || fetchServices();
+            servicesLoadPromise = load;
+            load.done(function (data) {
+                var services = Array.isArray(data) ? data : allServices;
+                allServices = services;
+                if (action.action === "request.options") {
+                    window.UnifiedAIChild.respond(action, true, {
+                        categories: services.map(function (item) {
+                            return { id: item.categoryId, name: item.categoryDescription };
+                        })
+                    });
+                    return;
                 }
-                return;
-            }
 
-            openServiceModal(service.categoryDescription, service.categoryId, service.categoryImage);
-            $("#modalRemarks").val(String(action.remarks || "").slice(0, 1000));
-            document.getElementById("modalOverlay").scrollIntoView({ behavior: "smooth", block: "center" });
-            submitTaskRequest(action);
+                var categoryName = action.category || action.categoryName || action.serviceName || "";
+                var service = services.find(function (item) {
+                    return action.categoryId != null && String(item.categoryId) === String(action.categoryId);
+                });
+                if (!service && categoryName && window.UnifiedAIChild.resolveRequestCategory) {
+                    service = window.UnifiedAIChild.resolveRequestCategory(services.map(function (item) {
+                        return { CategoryId: item.categoryId, CategoryDescription: item.categoryDescription };
+                    }), categoryName);
+                }
+                if (!service) {
+                    window.UnifiedAIChild.respond(action, false, {
+                        categories: services.map(function (item) { return item.categoryDescription; })
+                    }, "Could not uniquely match the requested service. Ask the patient to clarify.");
+                    return;
+                }
+
+                openServiceModal(service.categoryDescription, service.categoryId, service.categoryImage);
+                var remarks = action.remarks || action.details || action.description || action.userRequest
+                    || action.transcript || "";
+                $("#modalRemarks").val(String(remarks).slice(0, 1000));
+                document.getElementById("modalOverlay").scrollIntoView({ behavior: "smooth", block: "center" });
+                submitTaskRequest(action);
+            }).fail(function () {
+                window.UnifiedAIChild.respond(action, false, null, "Could not load the current service list.");
+            });
         });
     });
 
@@ -585,7 +612,7 @@
             </div>
         `);
 
-        $.ajax({
+        return $.ajax({
             url: '/FoodDining/GetFoodServices',
             type: 'GET',
             dataType: 'json',
@@ -690,7 +717,11 @@
         const actualRoom = bc.roomBed || bc.roomNumber || '';
 
         if (!actualRoom) {
-            alert("Session expired. Please re-login.");
+            if (unifiedAction && window.UnifiedAIChild) {
+                window.UnifiedAIChild.respond(unifiedAction, false, null, "Room information is unavailable. Please reconnect with the patient session.");
+            } else {
+                alert("Session expired. Please re-login.");
+            }
             return;
         }
 

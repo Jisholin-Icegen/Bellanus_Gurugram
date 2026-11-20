@@ -178,10 +178,34 @@
         document.addEventListener("DOMContentLoaded", async function () {
             await (window.i18nReady || Promise.resolve());
             if (typeof renderReviewItems !== 'function') { console.error('Food.js did not load'); return; }
-            renderReviewItems();
+            var reviewItemsPromise = renderReviewItems();
             updateDynamicHeader();
             loadSpecialInstruction();
 
+            var pendingSubmit = null;
+            try {
+                var pendingSubmitJson = sessionStorage.getItem("UnifiedAIPendingFoodSubmit");
+                if (pendingSubmitJson) pendingSubmit = JSON.parse(pendingSubmitJson);
+            } catch (error) {
+                sessionStorage.removeItem("UnifiedAIPendingFoodSubmit");
+                console.error("Could not restore the pending unified food order action:", error);
+            }
+            if (pendingSubmit && pendingSubmit.action === "food.submit_order") {
+                window.__unifiedAIFoodAction = pendingSubmit;
+                try {
+                    if (reviewItemsPromise && typeof reviewItemsPromise.then === "function") await reviewItemsPromise;
+                    if (!window.currentCart || !Object.keys(window.currentCart).some(function (key) {
+                        return Number(window.currentCart[key] && window.currentCart[key].qty) > 0;
+                    })) {
+                        finishUnifiedFoodAction(false, null, "The cart is empty.");
+                        return;
+                    }
+                    submitFinalOrder();
+                } catch (error) {
+                    finishUnifiedFoodAction(false, null, "Could not load the current order for submission.");
+                    console.error("Could not load the current order before unified submission:", error);
+                }
+            }
 
             function loadSpecialInstruction() {
                 let note = localStorage.getItem("SpecialInstruction");
@@ -284,8 +308,19 @@
     window.addEventListener("unified-ai:action", function (event) {
         var action = event.detail;
         if (!action || action.action !== "food.submit_order") return;
+        if (window.__foodOrderSubmitting) {
+            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, false, null, "Order submission is already in progress.");
+            return;
+        }
         if (action.specialInstructions != null) {
             localStorage.setItem("SpecialInstruction", String(action.specialInstructions).slice(0, 1000));
+        } else if (action.remarks != null || action.instructions != null) {
+            localStorage.setItem("SpecialInstruction", String(action.remarks || action.instructions).slice(0, 1000));
+        }
+        var instruction = localStorage.getItem("SpecialInstruction") || "";
+        if (instruction.trim()) {
+            $("#reviewSpecialInstruction").text('"' + instruction + '"');
+            $("#reviewSpecialInstructionBox").show();
         }
         window.__unifiedAIFoodAction = action;
         submitFinalOrder();

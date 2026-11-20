@@ -203,10 +203,13 @@ namespace Dial50_MVC_Core.Services
                 if (!string.IsNullOrWhiteSpace(tenantId))
                 {
                     httpContext.Session.SetString("XTenantID", tenantId);
+                    httpContext.Session.SetString("XTenentID", tenantId);
                 }
                 else
                 {
-                    tenantId = httpContext.Session.GetString("XTenantID") ?? "";
+                    tenantId = httpContext.Session.GetString("XTenantID")
+                        ?? httpContext.Session.GetString("XTenentID")
+                        ?? "";
                 }
             }
 

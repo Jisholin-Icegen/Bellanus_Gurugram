@@ -9,20 +9,14 @@ namespace Dial50_MVC_Core.Repositories
 {
     public class NotificationRepository : INotificationRepository
     {
-        private readonly IConfiguration _configuration;
         private readonly TenantProvider _tenantProvider;
-        private readonly ILogService _logService;
-        private readonly ILogger<IFoodRepository> _logger;
+        private readonly ILogger<NotificationRepository> _logger;
 
         public NotificationRepository(
-            IConfiguration configuration,
             TenantProvider tenantProvider,
-            ILogService logService,
-            ILogger<IFoodRepository> logger)
+            ILogger<NotificationRepository> logger)
         {
-            _configuration = configuration;
             _tenantProvider = tenantProvider;
-            _logService = logService;
             _logger = logger;
         }
 
@@ -80,7 +74,6 @@ namespace Dial50_MVC_Core.Repositories
 
         public async Task<int> GetUnreadCountByRoom(string roomNo)
         {
-            int count = 0;
             try
             {
                 using SqlConnection con = new SqlConnection(GetCs());
@@ -96,15 +89,17 @@ namespace Dial50_MVC_Core.Repositories
 
                 if (await reader.ReadAsync())
                 {
-                    count = reader["UNREAD_COUNT"] != DBNull.Value ? Convert.ToInt32(reader["UNREAD_COUNT"]) : 0;
+                    return reader["UNREAD_COUNT"] != DBNull.Value
+                        ? Convert.ToInt32(reader["UNREAD_COUNT"])
+                        : 0;
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetUnreadCountByRoom");
-                await _logService.LogAsync(ex.Message, "SP_MOB_NOTIFICATION");
+                throw;
             }
-            return count;
+            return 0;
         }
 
         public async Task<int> GetTotalCountByRoom(string roomNo)
@@ -129,13 +124,13 @@ namespace Dial50_MVC_Core.Repositories
             return count;
         }
 
-        public async Task<bool> MarkNotificationAsRead(string notificationId)
+        public async Task<bool> MarkNotificationAsRead(string roomNo, string notificationId)
         {
             using SqlConnection con = new SqlConnection(GetCs());
             using SqlCommand cmd = new SqlCommand("SP_MOB_NOTIFICATION", con);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@Process", "MARK_READ");
-            cmd.Parameters.AddWithValue("@RoomNo", DBNull.Value);
+            cmd.Parameters.AddWithValue("@RoomNo", roomNo);
             cmd.Parameters.AddWithValue("@NotificationID", notificationId);
             cmd.Parameters.AddWithValue("@MaxCount", 1);
 

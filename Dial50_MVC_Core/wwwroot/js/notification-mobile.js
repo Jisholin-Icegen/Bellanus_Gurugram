@@ -4,6 +4,7 @@
     var notificationRequest = null;
     var unreadCountRequest = null;
     var currentRoomNo = '';
+    var currentNotifications = [];
 
     function escapeHtml(value) {
         if (!value) return '';
@@ -66,11 +67,23 @@
 
     function showEmptyState() {
         lastNotificationsSig = null;
+        currentNotifications = [];
         $('#mobileNotificationList').html(
             '<div class="drawer-empty">' +
             '<img src="../images/notification/empty.png" class="empty-icon" alt="Empty">' +
             '<div class="empty-text">No orders found</div>' +
             '<div class="empty-sub">You\'re all caught up!</div>' +
+            '</div>'
+        );
+        refreshMarkAllReadState();
+    }
+
+    function showNotificationError() {
+        lastNotificationsSig = null;
+        $('#mobileNotificationList').html(
+            '<div class="drawer-empty">' +
+            '<div class="empty-text">Notifications could not be loaded</div>' +
+            '<div class="empty-sub">Check the connection and try again.</div>' +
             '</div>'
         );
         refreshMarkAllReadState();
@@ -170,6 +183,7 @@
         var sig = JSON.stringify(notifications);
         if (sig === lastNotificationsSig) return;
         lastNotificationsSig = sig;
+        currentNotifications = Array.isArray(notifications) ? notifications : [];
 
         if (!Array.isArray(notifications) || notifications.length === 0) {
             showEmptyState();
@@ -178,7 +192,7 @@
 
         var html = [];
 
-        notifications.forEach(function (item) {
+        notifications.forEach(function (item, index) {
             var read = isNotificationRead(item.iS_READ || item.IS_READ);
             var notificationId = item.ID || item.id;
             var id = item.ordeR_ID || item.ORDER_ID || '';
@@ -202,7 +216,7 @@
                 : '';
 
             html.push(
-                '<div class="order-card ' + (read ? 'read' : 'unread') + '" data-notification-id="' + escapeHtml(notificationId) + '" data-order-id="' + escapeHtml(id) + '" data-service="' + escapeHtml(serviceType) + '" data-navigable="' + (showArrow ? '1' : '0') + '">' +
+                '<div class="order-card ' + (read ? 'read' : 'unread') + '" data-unified-ai-target="notification-action-' + index + '" data-notification-id="' + escapeHtml(notificationId) + '" data-order-id="' + escapeHtml(id) + '" data-service="' + escapeHtml(serviceType) + '" data-navigable="' + (showArrow ? '1' : '0') + '">' +
                 '<div class="order-avatar">' +
                 '<img src="' + escapeHtml(icon) + '" alt="' + escapeHtml(serviceType) + '">' +
                 '</div>' +
@@ -223,14 +237,15 @@
     }
 
     function loadMobileNotifications() {
+        currentRoomNo = currentRoomNo || resolveRoomNo();
         if (!currentRoomNo) {
             showEmptyState();
-            return;
+            return $.Deferred().reject(new Error('Room information is unavailable.')).promise();
         }
 
         if (notificationRequest) notificationRequest.abort();
 
-        notificationRequest = $.ajax({
+        var request = $.ajax({
             url: '/api/Notification/GetNotifications',
             type: 'POST',
             contentType: 'application/json',
@@ -238,22 +253,25 @@
             timeout: 10000
         }).done(function (response) {
             renderMobileNotifications(Array.isArray(response) ? response : []);
-        }).fail(function () {
-            showEmptyState();
+        }).fail(function (xhr, status) {
+            if (status !== 'abort') showNotificationError();
         }).always(function () {
-            notificationRequest = null;
+            if (notificationRequest === request) notificationRequest = null;
         });
+        notificationRequest = request;
+        return request;
     }
 
     function getMobileUnreadCount() {
+        currentRoomNo = currentRoomNo || resolveRoomNo();
         if (!currentRoomNo) {
             updateUnreadBadges(0);
-            return;
+            return $.Deferred().reject(new Error('Room information is unavailable.')).promise();
         }
 
         if (unreadCountRequest) unreadCountRequest.abort();
 
-        unreadCountRequest = $.ajax({
+        var request = $.ajax({
             url: '/api/Notification/GetUnreadCount',
             type: 'POST',
             contentType: 'application/json',
@@ -270,21 +288,31 @@
             }
             updateUnreadBadges(count);
         }).fail(function () {
-            updateUnreadBadges(0);
+            console.warn('Could not refresh notification unread count.');
         }).always(function () {
-            unreadCountRequest = null;
+            if (unreadCountRequest === request) unreadCountRequest = null;
         });
+        unreadCountRequest = request;
+        return request;
     }
 
     function markNotificationAsRead(notificationId) {
-        if (!notificationId) return;
-        $.ajax({
+        if (!notificationId || !currentRoomNo) {
+            return $.Deferred().reject(new Error('A notification and room are required.')).promise();
+        }
+        return $.ajax({
             url: '/api/Notification/MarkAsRead',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ NotificationId: String(notificationId) }),
+            data: JSON.stringify({ RoomNo: currentRoomNo, NotificationId: String(notificationId) }),
             timeout: 5000
-        }).done(function () {
+        }).done(function (response) {
+            if (!response || !response.success) {
+                console.warn('Mark notification as read was not confirmed by the server.');
+                loadMobileNotifications();
+                getMobileUnreadCount();
+                return;
+            }
             getMobileUnreadCount();
         }).fail(function () {
             loadMobileNotifications();
@@ -293,25 +321,38 @@
     }
 
     function markAllNotificationsAsRead() {
-        if (!currentRoomNo) return;
+        currentRoomNo = currentRoomNo || resolveRoomNo();
+        if (!currentRoomNo) return $.Deferred().reject(new Error('Room information is unavailable.')).promise();
 
         var $btn = $('#markAllReadBtn');
 
-        if ($btn.hasClass('loading') || $btn.prop('disabled')) return;
+        if ($btn.hasClass('loading') || $btn.prop('disabled')) {
+            return $.Deferred().reject(new Error('Notification updates are already in progress.')).promise();
+        }
 
         $btn.addClass('loading').prop('disabled', true);
 
-        $.ajax({
+        return $.ajax({
             url: '/api/Notification/MarkAllAsRead',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo }),
             timeout: 10000
-        }).done(function () {
+        }).done(function (response) {
+            if (!response || !response.success) {
+                console.warn('Mark all notifications as read was not confirmed by the server.');
+                $btn.removeClass('loading');
+                refreshMarkAllReadState();
+                return;
+            }
             $('#mobileNotificationList .order-card.unread')
                 .removeClass('unread')
                 .addClass('read');
 
+            currentNotifications.forEach(function (item) {
+                item.iS_READ = true;
+                item.IS_READ = true;
+            });
             updateUnreadBadges(0);
             $btn.removeClass('loading is-done').addClass('is-empty');
             refreshMarkAllReadState();
@@ -320,6 +361,170 @@
             $btn.removeClass('loading');
             refreshMarkAllReadState();
         });
+    }
+
+    function normalizeNotification(item) {
+        return {
+            id: item.ID || item.id || '',
+            orderId: item.ordeR_ID || item.ORDER_ID || '',
+            orderCode: item.ordeR_CODE || item.ORDER_CODE || '',
+            title: item.ordeR_TYPE || item.ORDER_TYPE || 'Notification',
+            status: item.status || item.STATUS || '',
+            service: item.service || item.SERVICE || 'SYSTEM',
+            summary: item.iteM_SUMMARY || item.ITEM_SUMMARY || '',
+            read: isNotificationRead(item.iS_READ !== undefined ? item.iS_READ : item.IS_READ),
+            createdDate: item.createD_DATE || item.CREATED_DATE || '',
+            navigable: isNavigableNotification(
+                item.status || item.STATUS,
+                item.service || item.SERVICE,
+                item.ordeR_TYPE || item.ORDER_TYPE
+            )
+        };
+    }
+
+    function redactNotificationText(value) {
+        var text = String(value || '').replace(/\s+/g, ' ').trim();
+        if (window.BedContext) {
+            var context = window.BedContext.get();
+            ['bedInfo', 'bedId', 'patientName', 'roomNumber', 'roomBed', 'bedNumber', 'uhid', 'userId']
+                .map(function (key) { return String(context[key] || '').trim(); })
+                .filter(function (identifier) { return identifier.length >= 3; })
+                .forEach(function (identifier) {
+                    var escaped = identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    text = text.replace(new RegExp(escaped, 'ig'), '[redacted]');
+                });
+        }
+        return text.slice(0, 240);
+    }
+
+    function setNotificationReadInUi(notificationId) {
+        var item = currentNotifications.find(function (entry) {
+            return String(entry.ID || entry.id) === String(notificationId);
+        });
+        if (item) {
+            item.IS_READ = true;
+            item.iS_READ = true;
+        }
+        $('#mobileNotificationList .order-card').filter(function () {
+            return String($(this).data('notification-id')) === String(notificationId);
+        }).removeClass('unread').addClass('read');
+        getMobileUnreadCount();
+        refreshMarkAllReadState();
+    }
+
+    function handleUnifiedNotificationAction(action, respond) {
+        var finish = function (success, result, error) {
+            if (typeof respond === 'function') {
+                respond(success, result, error);
+            } else if (window.UnifiedAIChild) {
+                window.UnifiedAIChild.respond(action, success, result, error);
+            }
+        };
+        if (!action || typeof action.action !== 'string') return;
+
+        currentRoomNo = currentRoomNo || resolveRoomNo();
+        if (action.action === 'notification.list') {
+            openMobileDrawer(true);
+            loadMobileNotifications().done(function () {
+                finish(true, {
+                    unreadCount: parseInt($('#mobileBadgeCount').text(), 10) || 0,
+                    notifications: currentNotifications.map(function (item) {
+                        var notification = normalizeNotification(item);
+                        notification.title = redactNotificationText(notification.title);
+                        notification.summary = redactNotificationText(notification.summary);
+                        return notification;
+                    })
+                });
+            }).fail(function () {
+                finish(false, null, 'Could not load notifications for this room.');
+            });
+            return;
+        }
+
+        if (action.action === 'notification.mark_read') {
+            var readId = action.notificationId || action.id;
+            if (!readId) {
+                finish(false, null, 'A notification ID from the latest notification list is required.');
+                return;
+            }
+            markNotificationAsRead(readId).done(function (response) {
+                if (!response || !response.success) {
+                    finish(false, null, 'The notification could not be marked as read.');
+                    return;
+                }
+                setNotificationReadInUi(readId);
+                finish(true, { notificationId: String(readId), read: true });
+            }).fail(function () {
+                finish(false, null, 'The notification update failed.');
+            });
+            return;
+        }
+
+        if (action.action === 'notification.mark_all_read') {
+            getMobileUnreadCount().done(function (response) {
+                var unread = Number(response && (
+                    response.unreaD_COUNT !== undefined ? response.unreaD_COUNT : response.UNREAD_COUNT
+                )) || 0;
+                if (unread === 0) {
+                    finish(true, { updated: 0, unreadCount: 0 });
+                    return;
+                }
+                markAllNotificationsAsRead().done(function (result) {
+                    if (!result || !result.success) {
+                        finish(false, null, 'The notifications could not be marked as read.');
+                        return;
+                    }
+                    finish(true, { updated: true, unreadCount: 0 });
+                }).fail(function () {
+                    finish(false, null, 'The notification update failed.');
+                });
+            }).fail(function () {
+                finish(false, null, 'Could not check the current unread notification count.');
+            });
+            return;
+        }
+
+        if (action.action === 'notification.open') {
+            var selected = currentNotifications.find(function (item) {
+                return String(item.ID || item.id) === String(action.notificationId || action.id || '');
+            });
+            if (!selected) {
+                finish(false, null, 'The notification is not in the latest list. Refresh notifications first.');
+                return;
+            }
+            var notification = normalizeNotification(selected);
+            if (!notification.navigable || !notification.orderId) {
+                finish(false, null, 'This notification does not have a page to open.');
+                return;
+            }
+            var open = function () {
+                finish(true, { notificationId: notification.id, opened: true });
+                window.setTimeout(function () {
+                    if (notification.service.toUpperCase().indexOf('FOOD') !== -1) {
+                        BedContext.go('FoodDining/OrderSuccess', { orderIds: notification.orderId });
+                    } else {
+                        BedContext.go('Tracking', { RequestID: notification.orderId });
+                    }
+                }, 0);
+            };
+            if (notification.read) {
+                open();
+            } else {
+                markNotificationAsRead(notification.id).done(function (response) {
+                    if (!response || !response.success) {
+                        finish(false, null, 'The notification could not be marked as read.');
+                        return;
+                    }
+                    setNotificationReadInUi(notification.id);
+                    open();
+                }).fail(function () {
+                    finish(false, null, 'The notification update failed.');
+                });
+            }
+            return;
+        }
+
+        finish(false, null, 'Unsupported notification action.');
     }
 
     function showBrowserNotification(notification) {
@@ -356,15 +561,17 @@
         }
     }
 
-    function openMobileDrawer() {
+    function openMobileDrawer(skipRefresh) {
         $('#mobileDrawerOverlay').addClass('active');
         $('#mobileDrawer').addClass('open');
         $('body').css('overflow', 'hidden');
 
         $('#markAllReadBtn').removeClass('loading is-done');
 
-        loadMobileNotifications();
-        getMobileUnreadCount();
+        if (!skipRefresh) {
+            loadMobileNotifications();
+            getMobileUnreadCount();
+        }
     }
 
     function closeMobileDrawer() {
@@ -498,5 +705,18 @@
     window.loadMobileNotifications = loadMobileNotifications;
     window.getActiveCount = getActiveCount;
     window.showBrowserNotification = showBrowserNotification;
+    window.UnifiedNotifications = {
+        handleAction: handleUnifiedNotificationAction,
+        getContext: function () { return currentNotifications.map(normalizeNotification); },
+        load: loadMobileNotifications
+    };
+
+    window.addEventListener('unified-ai:action', function (event) {
+        var action = event.detail;
+        if (!action || !action.action || action.action.indexOf('notification.') !== 0) return;
+        handleUnifiedNotificationAction(action, function (success, result, error) {
+            if (window.UnifiedAIChild) window.UnifiedAIChild.respond(action, success, result, error);
+        });
+    });
 
 })(jQuery);

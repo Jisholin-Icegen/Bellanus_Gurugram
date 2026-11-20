@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Data;
@@ -13,12 +14,18 @@ namespace Dial50_MVC_Core.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _config;
         private readonly ILogger<TenantProvider> _logger;
+        private readonly IMemoryCache _cache;
 
-        public TenantProvider(IHttpContextAccessor httpContextAccessor, IConfiguration config, ILogger<TenantProvider> logger)
+        public TenantProvider(
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration config,
+            ILogger<TenantProvider> logger,
+            IMemoryCache cache)
         {
             _httpContextAccessor = httpContextAccessor;
             _config = config;
             _logger = logger;
+            _cache = cache;
         }
 
         public string GetConnectionString()
@@ -29,7 +36,12 @@ namespace Dial50_MVC_Core.Services
             string centralConn = _config.GetConnectionString("CentralDB") ?? _config.GetConnectionString("Dial50");
             if (string.IsNullOrEmpty(centralConn)) return GetFallbackConnectionString();
 
-            if (!IsMultiTenantApp(centralConn))
+            bool multiTenant = _cache.GetOrCreate("TenantProvider:MultiTenantMode", entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return IsMultiTenantApp(centralConn);
+            });
+            if (!multiTenant)
             {
                 _logger.LogInformation("TenantProvider: App is in single-tenant mode (qr_app=0). Using Dial50.");
                 return GetFallbackConnectionString();
@@ -40,16 +52,26 @@ namespace Dial50_MVC_Core.Services
             if (context.Request.QueryString.HasValue)
             {
                 var queryParams = System.Web.HttpUtility.ParseQueryString(context.Request.QueryString.Value);
-                tenantId = queryParams["XTenentID"];
+                tenantId = queryParams["XTenantID"];
+                if (string.IsNullOrWhiteSpace(tenantId))
+                {
+                    tenantId = queryParams["XTenentID"];
+                }
             }
 
             if (string.IsNullOrEmpty(tenantId))
             {
-                tenantId = context.Session.GetString("XTenentID");
-                if (string.IsNullOrEmpty(tenantId)) return GetFallbackConnectionString();
+                tenantId = context.Session.GetString("XTenantID")
+                    ?? context.Session.GetString("XTenentID");
+                if (string.IsNullOrWhiteSpace(tenantId))
+                {
+                    throw new InvalidOperationException(
+                        "A tenant ID is required while multi-tenant mode is enabled.");
+                }
             }
             else
             {
+                context.Session.SetString("XTenantID", tenantId);
                 context.Session.SetString("XTenentID", tenantId);
             }
 
@@ -68,44 +90,53 @@ namespace Dial50_MVC_Core.Services
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning(ex, "TenantProvider: Tenant ID could not be decrypted; trying it as a plain ID.");
             }
 
             if (int.TryParse(finalCode, out int hospitalId))
             {
-                try
+                string cacheKey = "TenantProvider:Connection:" + hospitalId;
+                return _cache.GetOrCreate(cacheKey, entry =>
                 {
-                    using (var conn = new SqlConnection(centralConn))
-                    using (var cmd = new SqlCommand("dbo.SP_GET_HOSPITAL_BY_ID", conn))
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                    try
                     {
-                        cmd.CommandType = CommandType.StoredProcedure;
-                        cmd.Parameters.AddWithValue("@HospitalId", hospitalId);
-                        conn.Open();
-                        var result = cmd.ExecuteScalar();
+                        using (var conn = new SqlConnection(centralConn))
+                        using (var cmd = new SqlCommand("dbo.SP_GET_HOSPITAL_BY_ID", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@HospitalId", hospitalId);
+                            conn.Open();
+                            var result = cmd.ExecuteScalar();
 
-                        if (result != null && result != DBNull.Value)
-                        {
-                            _logger.LogInformation($"TenantProvider: Found DB for HospitalId {hospitalId}.");
-                            return result.ToString();
-                        }
-                        else
-                        {
-                            _logger.LogError($"TenantProvider: SP returned NULL for HospitalId {hospitalId}.");
+                            if (result != null && result != DBNull.Value
+                                && !string.IsNullOrWhiteSpace(result.ToString()))
+                            {
+                                _logger.LogInformation("TenantProvider: Resolved database for HospitalId {HospitalId}.", hospitalId);
+                                return result.ToString();
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"TenantProvider: Error calling SP - {ex.Message}");
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "TenantProvider: Failed to resolve the database for HospitalId {HospitalId}.", hospitalId);
+                        throw new InvalidOperationException(
+                            $"Could not resolve the database for tenant {hospitalId}.", ex);
+                    }
+
+                    throw new InvalidOperationException(
+                        $"The requested tenant {hospitalId} could not be resolved. Refusing to use the default database.");
+                });
             }
             else
             {
-                _logger.LogError($"TenantProvider: Could not parse '{finalCode}' to an integer ID.");
+                _logger.LogError("TenantProvider: Could not parse tenant ID to an integer.");
             }
 
-            return GetFallbackConnectionString();
+            throw new InvalidOperationException(
+                "The requested tenant could not be resolved. Refusing to use the default database.");
         }
 
         private bool IsMultiTenantApp(string centralConn)
@@ -128,7 +159,9 @@ namespace Dial50_MVC_Core.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"TenantProvider: Failed to read APP_CONFIG - {ex.Message}");
+                _logger.LogError(ex, "TenantProvider: Failed to read APP_CONFIG.");
+                throw new InvalidOperationException(
+                    "Could not determine whether multi-tenant mode is enabled.", ex);
             }
             return false;
         }

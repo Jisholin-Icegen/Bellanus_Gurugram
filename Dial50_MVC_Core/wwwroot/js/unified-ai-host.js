@@ -9,6 +9,7 @@
     const testLauncher = document.getElementById("unifiedAiTestLauncher");
     const testCloseButton = document.getElementById("unifiedAiTestCloseButton");
     const testPanel = document.getElementById("unifiedAiTestPanel");
+    const testStatus = document.getElementById("unifiedAiTestStatus");
     const testActionInput = document.getElementById("unifiedAiTestAction");
     const testSuggestions = document.getElementById("unifiedAiTestSuggestions");
     const testOutput = document.getElementById("unifiedAiTestOutput");
@@ -29,6 +30,7 @@
         my_library: "/MyLibrary/Index",
         discharge: "/Discharge/Index",
         food_explore: "/FoodDining/FoodDining",
+        food_other_services: "/FoodDining/OtherServices",
         food_order: "/FoodDining/FoodOrdering",
         feedback: "/OverAllFeedback/Index"
     };
@@ -276,6 +278,11 @@
             const callStatus = document.getElementById("callStatus");
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
+            if (testStatus) {
+                testStatus.textContent = simulatedSession
+                    ? "Test simulation"
+                    : callStatus && callStatus.textContent.trim() || "Idle";
+            }
             if (statusText) {
                 statusText.textContent = simulatedSession
                     ? "Test simulation"
@@ -352,6 +359,10 @@
             : {};
         const bedInfo = bedContext.bedInfo || new URLSearchParams(window.location.search).get("BedInfo");
         if (bedInfo) targetUrl.searchParams.set("BedInfo", bedInfo);
+        const tenantId = bedContext.tenantId || pageParams.get("XTenantID") || sessionStorage.getItem("XTenantID");
+        const region = bedContext.region || pageParams.get("region") || sessionStorage.getItem("region");
+        if (tenantId) targetUrl.searchParams.set("XTenantID", tenantId);
+        if (region) targetUrl.searchParams.set("region", region);
         targetUrl.searchParams.set("Unified", "1");
         targetUrl.searchParams.set("UnifiedAI", "1");
 
@@ -366,6 +377,10 @@
         const bedContext = window.BedContext.get ? window.BedContext.get() : {};
         const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
         if (bedInfo) url.searchParams.set("BedInfo", bedInfo);
+        const tenantId = bedContext.tenantId || pageParams.get("XTenantID") || sessionStorage.getItem("XTenantID");
+        const region = bedContext.region || pageParams.get("region") || sessionStorage.getItem("region");
+        if (tenantId) url.searchParams.set("XTenantID", tenantId);
+        if (region) url.searchParams.set("region", region);
         url.searchParams.set("Unified", "1");
         url.searchParams.set("UnifiedAI", "1");
         return loadFrameUrl(url, routeTargetForPath(url.pathname), null);
@@ -393,6 +408,10 @@
         const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
         targetUrl.searchParams.delete("BedInfo");
         if (bedInfo) targetUrl.searchParams.set("BedInfo", bedInfo);
+        const tenantId = bedContext.tenantId || pageParams.get("XTenantID") || sessionStorage.getItem("XTenantID");
+        const region = bedContext.region || pageParams.get("region") || sessionStorage.getItem("region");
+        if (tenantId) targetUrl.searchParams.set("XTenantID", tenantId);
+        if (region) targetUrl.searchParams.set("region", region);
         targetUrl.searchParams.set("Unified", "1");
         targetUrl.searchParams.set("UnifiedAI", "1");
         loadFrameUrl(targetUrl, routeTargetForPath(targetUrl.pathname), null);
@@ -418,7 +437,7 @@
             "discharge/index": "discharge",
             "fooddining": "food_explore",
             "fooddining/fooddining": "food_explore",
-            "fooddining/otherservices": "food_explore",
+            "fooddining/otherservices": "food_other_services",
             "fooddining/foodordering": "food_order",
             "fooddining/patientordermode": "food_order",
             "fooddining/menuitems": "food_order",
@@ -474,6 +493,34 @@
             target.dispatchEvent(new Event("change", { bubbles: true }));
             reportResult(action, true, { filled: action.label || target.getAttribute("aria-label") || target.name || target.id });
         }
+    }
+
+    function executeHostChoiceAction(action) {
+        const target = findUiTarget("data-unified-ai-choice", action.targetId);
+        const input = target instanceof HTMLInputElement ? target : target && target.control;
+        if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") {
+            reportResult(action, false, null, "The selected visible choice is no longer available.");
+            return;
+        }
+        if (!(input instanceof HTMLInputElement)) {
+            reportResult(action, false, null, "The selected choice is not a supported checkbox or radio control.");
+            return;
+        }
+        if (typeof action.checked !== "boolean" && action.checked !== "true" && action.checked !== "false") {
+            reportResult(action, false, null, "A checked state is required for this choice.");
+            return;
+        }
+        const requested = action.checked === true || action.checked === "true";
+        if (input.type === "radio" && !requested) {
+            reportResult(action, false, null, "A radio choice can only be selected, not cleared.");
+            return;
+        }
+        if (input.checked !== requested) target.click();
+        if (input.checked !== requested) {
+            reportResult(action, false, null, "The page did not accept the requested choice.");
+            return;
+        }
+        reportResult(action, true, { name: input.name || "", value: input.value || "", checked: input.checked });
     }
 
     function selectHostOption(action) {
@@ -578,18 +625,38 @@
             return;
         }
 
-        if (action.action === "ui.click" || action.action === "ui.fill") {
+        if (action.action === "ui.click" || action.action === "ui.fill" || action.action === "ui.set_choice") {
             if (frameLayer.classList.contains("is-open")) sendActionToFrame(action);
+            else if (action.action === "ui.set_choice") executeHostChoiceAction(action);
             else executeHostUIAction(action);
             return;
         }
 
         if (action.action === "request.options" || action.action === "request.create") {
-            if (action.module !== "room_comfort" && action.module !== "logistics") {
-                reportResult(action, false, null, "Request module must be room_comfort or logistics.");
+            const requestTargets = {
+                room_comfort: "room_comfort",
+                logistics: "logistics",
+                food_other_services: "food_other_services"
+            };
+            const target = requestTargets[action.module];
+            if (!target) {
+                reportResult(action, false, null, "Request module is not supported on this page.");
                 return;
             }
-            dispatchToModule(action.module, action);
+            dispatchToModule(target, action);
+            return;
+        }
+
+        if (action.action.indexOf("notification.") === 0) {
+            if (frameLayer.classList.contains("is-open")) {
+                sendActionToFrame(action);
+            } else if (window.UnifiedNotifications && window.UnifiedNotifications.handleAction) {
+                window.UnifiedNotifications.handleAction(action, function (success, result, error) {
+                    reportResult(action, success, result, error);
+                });
+            } else {
+                reportResult(action, false, null, "The notification service is not available on this page.");
+            }
             return;
         }
 
@@ -604,12 +671,44 @@
         }
 
         if (action.action.indexOf("food.") === 0) {
-            const target = action.target === "food_explore" ? "food_explore" : "food_order";
             const currentRoute = String(latestFrameContext && latestFrameContext.route || "");
-            if (frameLayer.classList.contains("is-open") && /\/FoodDining\//i.test(currentRoute)) {
+            const foodActionRoutes = {
+                "food.other_service": "/FoodDining/OtherServices",
+                "food.select_order_type": "/FoodDining/FoodOrdering",
+                "food.select_mode": "/FoodDining/PatientOrderMode",
+                "food.select_meal": "/FoodDining/MenuItems",
+                "food.select_vendor": "/FoodDining/MenuItems",
+                "food.select_diet": "/FoodDining/MenuItems",
+                "food.select_language": "/FoodDining/MenuItems",
+                "food.list_menu": "/FoodDining/MenuItems",
+                "food.add_item": "/FoodDining/MenuItems",
+                "food.set_quantity": "/FoodDining/MenuItems",
+                "food.remove_item": "/FoodDining/MenuItems",
+                "food.review_order": "/FoodDining/MenuItems",
+                "food.submit_order": "/FoodDining/MenuItems"
+            };
+            const targetPath = action.action === "food.submit_order" && /\/FoodDining\/ReviewOrder\/?$/i.test(currentRoute)
+                ? "/FoodDining/ReviewOrder"
+                : foodActionRoutes[action.action];
+            if (!targetPath) {
+                reportResult(action, false, null, "Unsupported food action.");
+                return;
+            }
+            if (frameLayer.classList.contains("is-open")
+                && currentRoute.toLowerCase() === targetPath.toLowerCase()) {
                 sendActionToFrame(action);
             } else {
-                dispatchToModule(target, action);
+                const targetUrl = new URL(targetPath, window.location.origin);
+                const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
+                const bedInfo = bedContext.bedInfo || pageParams.get("BedInfo");
+                const tenantId = bedContext.tenantId || pageParams.get("XTenantID") || sessionStorage.getItem("XTenantID");
+                const region = bedContext.region || pageParams.get("region") || sessionStorage.getItem("region");
+                if (bedInfo) targetUrl.searchParams.set("BedInfo", bedInfo);
+                if (tenantId) targetUrl.searchParams.set("XTenantID", tenantId);
+                if (region) targetUrl.searchParams.set("region", region);
+                targetUrl.searchParams.set("Unified", "1");
+                targetUrl.searchParams.set("UnifiedAI", "1");
+                loadFrameUrl(targetUrl, routeTargetForPath(targetPath), action);
             }
             return;
         }
@@ -631,6 +730,12 @@
 
     window.addEventListener("voice-agent:app-action", function (event) {
         handleAction(event.detail);
+    });
+    window.addEventListener("voice-agent:connection-state", function (event) {
+        const detail = event.detail || {};
+        if (!detail.connected) lastSentContext = "";
+        updateFloatingBar();
+        if (detail.connected) sendCurrentPageContext();
     });
 
     window.addEventListener("message", function (event) {
@@ -749,6 +854,17 @@
             });
         });
 
+        (context.choices || []).forEach(function (choice) {
+            if (!choice.targetId || choice.disabled) return;
+            const shouldCheck = choice.type === "radio" || !choice.checked;
+            const label = choice.label || choice.value || "choice";
+            add((shouldCheck ? "Select " : "Clear ") + label, {
+                action: "ui.set_choice",
+                targetId: choice.targetId,
+                checked: shouldCheck
+            }, label + " " + choice.name);
+        });
+
         if (query) {
             (context.fields || []).forEach(function (field) {
                 if (!field.targetId) return;
@@ -805,14 +921,37 @@
                 return item.categoryId && !item.disabled;
             }).forEach(function (item) {
                 const category = item.name || item.label;
-                add("Request " + category, {
-                    action: "food.other_service",
-                    target: "food_explore",
+                add("Submit " + category + " request", {
+                    action: "request.create",
+                    module: "food_other_services",
                     categoryId: item.categoryId,
                     category: category,
                     remarks: query
                 }, category);
             });
+        }
+
+        const notificationItems = (context.items || []).filter(function (item) {
+            return item.notificationId;
+        });
+        if (queryText.includes("notification") || queryText.includes("alert")) {
+            add("Load latest notifications", { action: "notification.list" }, "notification alert unread");
+        }
+        notificationItems.forEach(function (item) {
+            const label = item.name || item.label || "notification";
+            add("Open notification: " + label, {
+                action: "notification.open",
+                notificationId: item.notificationId
+            }, label + " " + item.status);
+            if (!item.notificationRead) {
+                add("Mark notification as read: " + label, {
+                    action: "notification.mark_read",
+                    notificationId: item.notificationId
+                }, "mark read " + label);
+            }
+        });
+        if (queryText.includes("mark all")) {
+            add("Mark all notifications as read", { action: "notification.mark_all_read" }, "mark all notifications read");
         }
 
         if (route.indexOf("/overallfeedback/") >= 0) {
@@ -896,6 +1035,10 @@
                 return !item.disabled && /review order|checkout|view cart/i.test(item.label);
             })) {
                 add("Review the current order", { action: "food.review_order" }, "review order checkout cart");
+            }
+            if (route.indexOf("/fooddining/menuitems") >= 0
+                && menuItems.some(function (item) { return Number(item.quantity) > 0; })) {
+                add("Submit the current order", { action: "food.submit_order" }, "submit confirm place order");
             }
         }
 

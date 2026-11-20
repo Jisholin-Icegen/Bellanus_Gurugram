@@ -27,9 +27,9 @@ namespace Dial50_MVC_Core.Services
             return await _repository.GetUnreadCountByRoom(roomNo);
         }
 
-        public async Task<bool> MarkNotificationAsReadAsync(string notificationId)
+        public async Task<bool> MarkNotificationAsReadAsync(string roomNo, string notificationId)
         {
-            return await _repository.MarkNotificationAsRead(notificationId);
+            return await _repository.MarkNotificationAsRead(roomNo, notificationId);
         }
 
         public async Task<int> GetTotalCountByRoomAsync(string roomNo)

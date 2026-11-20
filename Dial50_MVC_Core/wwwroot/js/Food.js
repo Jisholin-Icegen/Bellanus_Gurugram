@@ -116,6 +116,7 @@ function finishUnifiedFoodAction(success, result, error) {
     var action = window.__unifiedAIFoodAction;
     if (!action || !window.UnifiedAIChild) return;
     window.__unifiedAIFoodAction = null;
+    sessionStorage.removeItem("UnifiedAIPendingFoodSubmit");
     window.UnifiedAIChild.respond(action, success, result, error);
 }
 
@@ -377,9 +378,9 @@ function renderReviewItems() {
     const roomNo = getRoomBed();
     const mode = $("#hdnMealOrderType").val();
 
-    if (!roomNo) return;
+    if (!roomNo) return $.Deferred().reject(new Error("Room information is unavailable.")).promise();
 
-    $.ajax({
+    return $.ajax({
         url: '/FoodDining/GetCartItems',
         type: 'GET',
         data: { roomNo: roomNo },
@@ -425,6 +426,9 @@ function renderReviewItems() {
             else {
                 showEmptyCartUI();
             }
+        },
+        error: function () {
+            showEmptyCartUI();
         }
     });
 }
@@ -631,7 +635,9 @@ function parseOrderDate(value) {
 
     return formatIsoDate(new Date());
 }
-function submitReviewWithAJAX() {
+function submitReviewWithAJAX(deferUnifiedActionResult) {
+    if (window.__foodReviewPreparing) return;
+    window.__foodReviewPreparing = true;
     var reviewData = {
         orderType: $("#hdnOrderType").val(),
         mode: $("#hdnMealOrderType").val(),
@@ -645,7 +651,7 @@ function submitReviewWithAJAX() {
         data: reviewData,
         success: function (response) {
             if (response.success) {
-                finishUnifiedFoodAction(true, { reviewReady: true });
+                if (!deferUnifiedActionResult) finishUnifiedFoodAction(true, { reviewReady: true });
                 window.location.href = preserveUnifiedAI(response.redirectUrl);
             } else {
                 finishUnifiedFoodAction(false, null, "Could not prepare the order review.");
@@ -654,11 +660,22 @@ function submitReviewWithAJAX() {
         error: function () {
             finishUnifiedFoodAction(false, null, "Could not prepare the order review.");
             alert("Error preparing order review.");
+        },
+        complete: function () {
+            window.__foodReviewPreparing = false;
         }
     });
 }
 
 function submitFinalOrder() {
+    if (window.__foodOrderSubmitting) return;
+    if (!currentCart || !Object.keys(currentCart).some(function (key) {
+        return Number(currentCart[key] && currentCart[key].qty) > 0;
+    })) {
+        finishUnifiedFoodAction(false, null, "The cart is empty.");
+        return;
+    }
+
     let roomNo = getRoomBed();
     let specialInstruction = localStorage.getItem("SpecialInstruction") || "";
     let mealType = $("#hdnMealType").val();
@@ -679,6 +696,7 @@ function submitFinalOrder() {
         return;
     }
 
+    window.__foodOrderSubmitting = true;
     let isPreorder = (mode === "preorder") ? 1 : 0;
     let totalCalories = 0;
     if (typeof currentCart !== 'undefined' && currentCart) {
@@ -686,7 +704,9 @@ function submitFinalOrder() {
             totalCalories += (parseInt(item.calories) || 0) * (parseInt(item.qty) || 0);
         });
     }
-    $("#reviewOrderBar").find("button").html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...');
+    $("#confirmOrderBar, #reviewOrderBar").find("button")
+        .prop("disabled", true)
+        .html('<i class="fa-solid fa-spinner fa-spin"></i> Processing...');
 
     $.ajax({
         url: "/FoodDining/SubmitOrder",
@@ -699,6 +719,7 @@ function submitFinalOrder() {
             Calories: totalCalories
         },
         success: function (res) {
+            window.__foodOrderSubmitting = false;
             if (res.success) {
                 localStorage.removeItem("SpecialInstruction");
                 localStorage.setItem("ShowOrderSuccessToast", "true");
@@ -710,11 +731,14 @@ function submitFinalOrder() {
                 finishUnifiedFoodAction(true, { orderIds: res.orderIds });
                 window.location.href = preserveUnifiedAI(url);
             } else {
+                $("#confirmOrderBar, #reviewOrderBar").find("button").prop("disabled", false);
                 finishUnifiedFoodAction(false, null, res.message || "Order failed.");
                 alert(res.message || "Order failed");
             }
         },
         error: function () {
+            window.__foodOrderSubmitting = false;
+            $("#confirmOrderBar, #reviewOrderBar").find("button").prop("disabled", false);
             finishUnifiedFoodAction(false, null, "Order submission failed.");
             alert("Order submission failed.");
         }

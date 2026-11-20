@@ -1,0 +1,149 @@
+Unified AI changes and AI-team integration
+==========================================
+
+Purpose
+-------
+The Home page owns the voice WebSocket. Unified service pages load in an iframe
+and reuse that Home connection; navigating between service pages must not open
+another socket. Page controls, service categories, menu items, and notification
+records are read from the current page or the existing tenant database. Do not
+hardcode patient, tenant, category, menu, or notification values in the AI.
+
+Connection and status
+---------------------
+The voice client queues current page context and action results during a
+temporary WebSocket outage, then retries a dropped connection with exponential
+backoff (up to five attempts). It preserves the call timer and microphone stream
+while reconnecting, and only ends the call when the patient ends it, the server
+ends it, the call timer expires, or retries are exhausted. The assistant bar
+and local test panel display the same Connecting, Reconnecting, Listening,
+Thinking, or Speaking status.
+
+This client-side retry does not replace a healthy voice backend. The AI team
+must keep its server-side voice session valid, accept a fresh token during a
+reconnect, and send/receive the JSON action messages below over the existing
+socket. A successful connection and full speech round-trip must be verified
+against the configured voice service.
+
+WebSocket contract
+------------------
+The app sends:
+
+  {"type":"app_context","context":{...}}
+
+Context is refreshed as the visible page and its dynamic content change. It
+includes the current route/title/headings, visible buttons/actions, form fields,
+dropdown controls and options, checkboxes/radio choices, and relevant dynamic
+page items. Action/field/choice target IDs are temporary: use them only from the
+latest context. Patient identifiers are redacted from context text where
+recognized. Tenant IDs and database connection strings are not AI context.
+
+The AI sends one flat action envelope (do not nest the action object):
+
+  {"type":"app_action","action":"navigate","target":"room_comfort","request_id":"r1"}
+
+The app returns:
+
+  {"type":"app_action_result","request_id":"r1","success":true,"result":{},"error":null}
+
+Always include a unique request_id and wait for the corresponding result before
+claiming a write succeeded. An error result means the app did not confirm the
+requested action.
+
+Actions
+-------
+Generic visible controls:
+
+  ui.click       targetId from latest context
+  ui.fill        targetId, value
+  ui.select      controlId, optionValue
+  ui.set_choice  targetId, checked (boolean)
+  navigate       target or same-site path
+
+Requests:
+
+  {"type":"app_action","action":"request.options","module":"room_comfort","request_id":"r2"}
+  {"type":"app_action","action":"request.create","module":"room_comfort","categoryId":"<live id>","category":"<live name>","quantity":1,"remarks":"<spoken details>","request_id":"r3"}
+
+Supported request modules are room_comfort, logistics, and food_other_services.
+Call request.options first and use its current category ID/name; ask the patient
+to clarify if a request does not match exactly one live category. The app maps
+request.create to its existing page/controller flow, fills the remarks and
+quantity fields, submits, and reports the resulting request number. Use the
+same request actions for Room Comfort, Logistics, and Food Dining > Other
+Services. Do not call another site's RequestcreationAPIReq endpoint from the
+browser or voice service.
+
+Food ordering:
+
+  food.intent             intent: explore or order
+  food.select_order_type  orderType: patient or visitor
+  food.select_mode        mode: now or preorder
+  food.select_meal        meal from the live meal list
+  food.select_vendor      vendor from the live dropdown
+  food.select_diet        diet from the live dropdown
+  food.select_language    language from the live dropdown
+  food.list_menu          returns current menu items
+  food.add_item           itemId (or exact unique itemName), meal, quantity
+  food.set_quantity       itemId, meal, quantity (0 through 20)
+  food.remove_item        itemId, meal
+  food.review_order       prepares the review page
+  food.submit_order       submits the current cart
+  food.other_service      legacy categoryId/remarks action for Other Services
+
+The AI must choose menu IDs and meal/vendor/diet/language options from the
+latest live context or list response. It may send spoken food instructions as
+specialInstructions or remarks; those are placed into the menu instructions
+field and included with order submission. If food.submit_order arrives on the
+menu page, the app prepares Review Order, restores the action request ID, and
+submits the current cart there. If there is no cart, the app returns an error.
+Patient menu responses omit item prices; visitor responses may include them.
+The patient-facing review screen hides visitor-only costs.
+
+Notifications:
+
+  notification.list          loads the current room's live notifications
+  notification.mark_read     notificationId from the latest list
+  notification.mark_all_read
+  notification.open          notificationId from the latest list
+
+Opening a notification marks it read when necessary and navigates to its
+associated order/request page. Mark-read actions change app data; only perform
+them when requested by the patient.
+
+Feedback:
+
+  feedback.start
+  feedback.answer  questionId/departmentId and value (optional remarks)
+  feedback.submit
+
+Feedback questions and choices are loaded from the current tenant. The app
+rejects incomplete or invalid submissions.
+
+Tenant and data handling
+------------------------
+Unified navigation preserves BedInfo, XTenantID, and region. TenantProvider
+accepts the correctly spelled XTenantID parameter and the legacy XTenentID
+alias. In multi-tenant mode, a missing or unresolved tenant now fails instead
+of silently falling back to the default tenant database. Tenant-mode and
+tenant-connection lookups are cached for five minutes to avoid repeating the
+central-database lookup on each request. Do not put tenant IDs, database
+connection strings, or patient identifiers into AI prompts or logs.
+
+Local test procedure
+--------------------
+Use:
+
+  https://localhost:7116/PreLanding?BedInfo=9330&region=SA&XTenantID=2&UnifiedAITest=1
+
+The Test tools panel can simulate page actions without connecting the external
+voice service. Read-only checks include notification.list, request.options,
+food.list_menu, and feedback.start. The test panel uses the application's
+configured backend; request.create, food.add_item, food.submit_order,
+notification mark-read actions, feedback.submit, and generic submit buttons
+can change real data. Only run those against a confirmed test database.
+
+The supplied local tenant/database must be verified as test data before writes.
+Exercise each configured tenant and the voice service separately; a local build
+cannot establish that every production tenant database or external AI service
+is healthy.

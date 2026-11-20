@@ -957,9 +957,14 @@ window.addEventListener("unified-ai:action", function (event) {
         card.scrollIntoView({ behavior: "smooth", block: "center" });
         card.click();
         var remarksInput = document.getElementById("modalRemarks");
-        var remarks = action.remarks || action.details || action.description || action.userRequest
-            || action.transcript || action.categoryName || action.category || "";
-        if (remarksInput) remarksInput.value = String(remarks).slice(0, 1000);
+        var remarks = action.remarks || action.patientRemarks || action.details || action.description
+            || action.comment || action.userRequest || action.transcript || action.message
+            || action.categoryName || action.category || "";
+        if (remarksInput) {
+            remarksInput.value = String(remarks).slice(0, 1000);
+            remarksInput.dispatchEvent(new Event("input", { bubbles: true }));
+            remarksInput.dispatchEvent(new Event("change", { bubbles: true }));
+        }
         var quantityInput = document.getElementById("txtQuantity");
         if (quantityInput && Number.isInteger(Number(action.quantity))) {
             quantityInput.value = String(Math.max(1, Math.min(20, Number(action.quantity))));
