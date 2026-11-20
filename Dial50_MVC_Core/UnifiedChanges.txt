@@ -3,11 +3,13 @@ Unified AI changes and AI-team integration
 
 Purpose
 -------
-The Home page owns the voice WebSocket. Unified service pages load in an iframe
-and reuse that Home connection; navigating between service pages must not open
-another socket. Page controls, service categories, menu items, and notification
-records are read from the current page or the existing tenant database. Do not
-hardcode patient, tenant, category, menu, or notification values in the AI.
+The named Home call window owns the voice WebSocket and microphone. Starting a
+call from Home or the app's AI shortcut opens or focuses that same window;
+ordinary app pages can navigate without owning or replacing the voice socket.
+Unified service pages load in an iframe when used from the Home shell. Page
+controls, service categories, menu items, and notification records are read
+from the current page or the existing tenant database. Do not hardcode patient,
+tenant, category, menu, or notification values in the AI.
 
 Connection and status
 ---------------------
@@ -26,13 +28,12 @@ SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
 persistent assistant bar shows the same Connecting, Reconnecting, Listening,
 Thinking, or Speaking status as the Home call screen while the call is
 connecting or connected.
-The assistant bar remains above the unified page frame. Go to Chat only hides
-that frame and returns to the Home call screen; it must not end or recreate the
-voice socket. Only the explicit End Call control ends the client call session.
-Ending from the floating bar preserves an open service page instead of
-navigating back to the full call screen. Internal service navigation and Home
-return keep the Home document, microphone, and socket owner alive; a full
-document reload or browser shutdown cannot preserve a page-owned WebSocket.
+The Home call window stays open as app pages navigate or reload. The
+cross-page assistant bar can focus that window or send its explicit End Call
+command; only End Call ends the client call session. A close/reload attempt on
+the active call window asks for confirmation. The call window must remain open:
+closing it or shutting down the browser ends the page-owned microphone and
+WebSocket.
 
 This client-side reconnect does not replace a healthy voice backend. The AI
 team must keep its server-side voice session valid, accept the existing token

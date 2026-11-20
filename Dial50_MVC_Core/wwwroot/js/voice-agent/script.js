@@ -773,6 +773,15 @@ function stopMicrophone() {
     if (audioContext) { audioContext.close().catch(function () { }); audioContext = null; }
 }
 
+document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState !== "visible" || !callSessionActive
+        || !audioContext || audioContext.state !== "suspended") return;
+
+    audioContext.resume().catch(function (error) {
+        console.warn("Voice audio could not resume after returning to the call tab:", error && error.message ? error.message : error);
+    });
+});
+
 // =========================================================
 // BACKEND CONNECTION
 // =========================================================

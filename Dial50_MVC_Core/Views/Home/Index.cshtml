@@ -1,6 +1,7 @@
 @model BedInfo
 @{
-    ViewData["Title"] = ":: Chat AI ::";
+    var isUnifiedVoiceCallOwner = Context.Request.Query["UnifiedVoiceCallOwner"] == "1";
+    ViewData["Title"] = isUnifiedVoiceCallOwner ? "Thara AI Call" : ":: Chat AI ::";
     ViewData["UseCustomVoiceAgent"] = true;
 }
 
@@ -1994,14 +1995,14 @@
         var autoStart = params.get("autoStartCall") === "1"
                      || sessionStorage.getItem("autoStartCall") === "1";
 
-        if (autoStart) {
+        if (autoStart && params.get("UnifiedVoiceCallOwner") !== "1") {
             document.documentElement.setAttribute("data-autostart", "pending");
         }
     })();
 
 </script>
 
-<div class="app-wrapper">
+<div class="app-wrapper" data-unified-voice-call-owner="@(isUnifiedVoiceCallOwner ? "true" : "false")">
     <partial name="_header"></partial>
 
     <partial name="_BedContext" />
@@ -2059,6 +2060,10 @@
                         <span class="status-dot"></span>
                         <span class="call-status-text" id="callStatus">Connecting voice / audio...</span>
                     </div>
+                    @if (isUnifiedVoiceCallOwner)
+                    {
+                        <p class="unified-voice-owner-note">Keep this window open while you navigate through the app.</p>
+                    }
                     <div class="call-controls">
                         <div class="control-btn-wrap">
                             <button type="button" class="control-btn" id="micBtn" aria-label="Mute microphone">

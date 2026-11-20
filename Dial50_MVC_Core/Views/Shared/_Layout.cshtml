@@ -6,6 +6,7 @@
     <title>@ViewData["Title"]</title>
 
     <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/unified-ai-call-window.css" asp-append-version="true" />
     <script src="~/js/jquery-3.7.1.min.js"></script>
 
     <link rel="manifest" href='@Url.Content("~/manifest.json")' />
@@ -272,6 +273,16 @@
 
     @RenderBody()
 
+    <div id="unifiedVoiceCallBar" role="status" aria-live="polite" hidden>
+        <span class="unified-voice-call-copy">
+            <strong>Thara AI call</strong>
+            <span id="unifiedVoiceCallBarStatus">Call in progress</span>
+        </span>
+        <button type="button" id="unifiedVoiceCallBarFocus">Return</button>
+        <button type="button" id="unifiedVoiceCallBarEnd">End call</button>
+    </div>
+    <div id="unifiedVoiceCallNotice" role="status" aria-live="polite" hidden></div>
+
     <div id="sessionKickedOverlay" role="dialog" aria-modal="true">
         <div class="kicked-modal">
             <div class="kicked-icon-wrap">
@@ -301,6 +312,7 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     <script src="~/js/unified-ai-frame.js" asp-append-version="true"></script>
+    <script src="~/js/unified-ai-call-window.js" asp-append-version="true"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
