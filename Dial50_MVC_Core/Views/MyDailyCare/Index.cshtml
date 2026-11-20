@@ -2557,7 +2557,9 @@
             if (pendingVLinks) {
                 sessionStorage.removeItem('pendingVideoLinks_' + bedKey);
                 sessionStorage.removeItem('pendingVideoTitle_' + bedKey);
-                if (!isCallActive()) {
+                if (isUnifiedAIFrame) {
+                    pendingVideoData = null;
+                } else if (!isCallActive()) {
                     openVideoOverlay(pendingVLinks, pendingVTitle);
                 } else {
                     pendingVideoData = { links: pendingVLinks, title: pendingVTitle };

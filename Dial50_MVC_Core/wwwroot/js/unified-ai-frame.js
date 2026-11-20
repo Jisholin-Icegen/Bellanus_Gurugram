@@ -75,6 +75,12 @@
         ) && !select.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]");
     }
 
+    function isSafeField(field) {
+        return !/bed|patient|room|uhid|user|token|password|doctor|physician|provider|name|email|phone|mobile|address|birth|age/i.test(
+            [field.id, field.name, field.getAttribute("aria-label"), field.getAttribute("placeholder")].join(" ")
+        ) && !field.closest("#headerPatientInfo, .patient-info, .patient-details, [data-patient-info]");
+    }
+
     function isVisible(element) {
         if (!(element instanceof Element) || element.closest("[hidden], [aria-hidden='true']")) return false;
         const style = window.getComputedStyle(element);
@@ -82,9 +88,50 @@
     }
 
     function safeRoute(element) {
-        if (!element || !element.href) return "";
-        const url = new URL(element.href, window.location.href);
-        return url.origin === window.location.origin ? url.pathname : "";
+        if (!element) return "";
+        const href = element.getAttribute("href");
+        const route = href && href.trim() !== "#" ? href : element.getAttribute("data-route");
+        if (!route) return "";
+        try {
+            const url = new URL(route, window.location.href);
+            if (url.origin !== window.location.origin) return "";
+            ["BedInfo", "Unified", "UnifiedAI", "token", "patient", "user", "email", "uhid"]
+                .forEach(function (name) { url.searchParams.delete(name); });
+            return url.pathname + url.search;
+        } catch (error) {
+            return "";
+        }
+    }
+
+    function isDisabled(element) {
+        return !!element.disabled || element.getAttribute("aria-disabled") === "true"
+            || element.closest("[inert]") !== null;
+    }
+
+    function interactiveLabel(element) {
+        const directLabel = element.getAttribute("aria-label")
+            || element.getAttribute("title")
+            || element.getAttribute("data-action")
+            || element.value
+            || element.innerText
+            || element.textContent
+            || "";
+        let label = normalizeText(directLabel);
+        const parent = element.closest(".menu-card-v2, .rec-card, .service-card, .food-card, .selection-card, .timing-card, .feedback-question, .order-card");
+        if (parent) {
+            const parentName = parent.querySelector(".food-title, .rec-title, .service-title, .question-text, h3, h4");
+            const name = normalizeText(parentName && parentName.textContent);
+            if (name && label && label.length < 20 && !label.toLowerCase().includes(name.toLowerCase())) {
+                label += " " + name;
+            } else if (name && !label) {
+                label = name;
+            }
+        }
+        if (!label) {
+            const image = element.querySelector("img[alt]");
+            label = normalizeText(image && image.getAttribute("alt"));
+        }
+        return redactPatientIdentifiers(label).slice(0, 180);
     }
 
     function pageContext() {
@@ -109,6 +156,26 @@
                     })
                 };
             });
+            const fields = Array.from(document.querySelectorAll(
+                "input:not([type='hidden']):not([type='password']):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']), textarea, [contenteditable='true']"
+            ))
+                .filter(isVisible)
+                .filter(isSafeField)
+                .slice(0, 50)
+                .map(function (field, index) {
+                    const labels = Array.from(field.labels || []).map(function (label) { return label.textContent; });
+                    const targetId = "unified-field-" + index;
+                    if (field.getAttribute("data-unified-ai-field") !== targetId) {
+                        field.setAttribute("data-unified-ai-field", targetId);
+                    }
+                    return {
+                        targetId: targetId,
+                        type: field.type || (field.isContentEditable ? "contenteditable" : "textarea"),
+                        label: redactPatientIdentifiers(field.getAttribute("aria-label") || labels.join(" ")
+                            || field.getAttribute("placeholder") || field.name || field.id || "Text field"),
+                        placeholder: redactPatientIdentifiers(field.getAttribute("placeholder") || "")
+                    };
+                });
         const itemSelector = ".service-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box, .selection-card, .timing-card, .feedback-question, .card, [data-category-id], [data-food-id], [data-order-type], [data-order-mode]";
         const items = Array.from(document.querySelectorAll(itemSelector))
             .filter(isVisible)
@@ -152,23 +219,32 @@
                 return row;
             })
             .filter(function (item) { return item.label; });
-        const actions = Array.from(document.querySelectorAll("button, a[href], [role='button']"))
+        const actionElements = Array.from(document.querySelectorAll(
+            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .service-card, .order-card, .selection-card, .timing-card, .food-card, .card, .meal-select-pill, .meal-tab-box"
+        ))
+            .filter(function (element) {
+                return !element.closest("#unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar");
+            })
             .filter(isVisible)
-            .slice(0, 100)
-            .map(function (element) {
-                const label = redactPatientIdentifiers(element.getAttribute("aria-label")
-                    || element.getAttribute("title")
-                    || element.innerText
-                    || element.textContent);
+            .slice(0, 150);
+        const actions = actionElements
+            .map(function (element, index) {
+                const label = interactiveLabel(element);
                 const route = safeRoute(element);
                 const action = element.getAttribute("data-action");
-                return label ? {
+                if (!label) return null;
+                const targetId = "unified-action-" + index;
+                if (element.getAttribute("data-unified-ai-target") !== targetId) {
+                    element.setAttribute("data-unified-ai-target", targetId);
+                }
+                return {
                     label: label,
-                    disabled: !!element.disabled || element.getAttribute("aria-disabled") === "true",
+                    disabled: isDisabled(element),
+                    targetId: targetId,
                     id: element.id || undefined,
                     action: action || undefined,
                     route: route || undefined
-                } : null;
+                };
             })
             .filter(Boolean);
 
@@ -181,6 +257,7 @@
                 .map(function (heading) { return redactPatientIdentifiers(heading.innerText || heading.textContent); })
                 .filter(Boolean),
             controls: controls,
+            fields: fields,
             items: items,
             actions: actions
         };
@@ -251,6 +328,43 @@
             controlId: select.id || select.name,
             selected: redactPatientIdentifiers(matchingOptions[0].textContent)
         });
+    }
+
+    function findUiTarget(attribute, targetId) {
+        return Array.from(document.querySelectorAll("[" + attribute + "]")).find(function (element) {
+            return element.getAttribute(attribute) === targetId && isVisible(element);
+        });
+    }
+
+    function executeVisibleUIAction(action) {
+        if (action.action === "ui.click") {
+            const target = findUiTarget("data-unified-ai-target", action.targetId);
+            if (!target || isDisabled(target)) {
+                respond(action, false, null, "The selected visible action is no longer available.");
+                return;
+            }
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            respond(action, true, { clicked: interactiveLabel(target) });
+            window.setTimeout(function () { target.click(); }, 25);
+            return;
+        }
+
+        if (action.action === "ui.fill") {
+            const target = findUiTarget("data-unified-ai-field", action.targetId);
+            if (!target || target.disabled || target.readOnly) {
+                respond(action, false, null, "The selected visible field is no longer available.");
+                return;
+            }
+            const value = String(action.value == null ? "" : action.value).slice(0, 2000);
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.focus({ preventScroll: true });
+            if (target.isContentEditable) target.textContent = value;
+            else target.value = value;
+            target.dispatchEvent(new Event("input", { bubbles: true }));
+            target.dispatchEvent(new Event("change", { bubbles: true }));
+            schedulePageContext();
+            respond(action, true, { field: action.label || target.getAttribute("aria-label") || target.name || target.id });
+        }
     }
 
     window.UnifiedAIChild = {
@@ -326,7 +440,9 @@
 
     window.addEventListener("unified-ai:action", function (event) {
         const action = event.detail;
-        if (action && action.action === "ui.select") selectVisibleOption(action);
+        if (!action) return;
+        if (action.action === "ui.select") selectVisibleOption(action);
+        else if (action.action === "ui.click" || action.action === "ui.fill") executeVisibleUIAction(action);
     });
 
     document.addEventListener("change", schedulePageContext, true);

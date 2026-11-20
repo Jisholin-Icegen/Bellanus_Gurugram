@@ -39,6 +39,10 @@
     let latestFrameContext = null;
     let lastSentContext = "";
     let simulatedSession = false;
+    let screenWakeLock = null;
+    let wakeLockRequestPending = false;
+    let suppressReturnClickUntil = 0;
+    let dragState = null;
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
@@ -59,8 +63,7 @@
         const simulationButton = document.getElementById("unifiedAiTestSessionButton");
         if (simulationButton) simulationButton.hidden = realCall || simulatedSession;
         if (!onModule) {
-            if (realCall || simulatedSession) testPanel.hidden = true;
-            testLauncher.hidden = realCall || simulatedSession || !testPanel.hidden;
+            testLauncher.hidden = !testPanel.hidden;
             testLauncher.setAttribute("aria-expanded", String(!testPanel.hidden));
             return;
         }
@@ -80,7 +83,9 @@
     function homePageContext() {
         const bedContext = window.BedContext && window.BedContext.get ? window.BedContext.get() : {};
         const text = function (element) {
-            let value = String(element.getAttribute("aria-label") || element.innerText || element.textContent || "")
+            let value = String(typeof element === "string" ? element : element && (
+                element.getAttribute("aria-label") || element.getAttribute("title")
+                || element.value || element.innerText || element.textContent) || "")
                 .replace(/\s+/g, " ").trim();
             ["bedInfo", "bedId", "patientName", "roomNumber", "roomBed", "bedNumber", "uhid", "userId", "ward"]
                 .map(function (key) { return String(bedContext[key] || "").trim(); })
@@ -91,31 +96,120 @@
                 });
             return value.slice(0, 180);
         };
-        const actions = Array.from(document.querySelectorAll(".navBtn, #pageContent button, #pageContent a[href]"))
-            .filter(function (element) {
-                const style = window.getComputedStyle(element);
-                return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length;
-            })
-            .slice(0, 80)
-            .map(function (element) {
-                const label = text(element);
-                const action = { label: label, disabled: !!element.disabled };
-                if (element instanceof HTMLAnchorElement) {
-                    const url = new URL(element.href, window.location.href);
-                    if (url.origin === window.location.origin) action.route = url.pathname;
-                } else if (element.dataset && element.dataset.page) {
-                    action.route = "/" + element.dataset.page;
+        const isVisible = function (element) {
+            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar")) return false;
+            const style = window.getComputedStyle(element);
+            return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+        };
+        const actionElements = Array.from(document.querySelectorAll(
+            "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .navBtn, .card, .service-card, .food-card, .order-card, .selection-card, .timing-card"
+        ))
+            .filter(isVisible)
+            .slice(0, 180);
+        const actions = actionElements
+            .map(function (element, index) {
+                let label = text(element);
+                const parent = element.closest(".card, .service-card, .food-card, .order-card, .selection-card, .timing-card");
+                const parentName = parent && parent.querySelector("h3, h4, .service-title, .food-title");
+                const name = parentName && text(parentName);
+                if (name && label.length < 20 && !label.toLowerCase().includes(name.toLowerCase())) label += " " + name;
+                if (!label) {
+                    const image = element.querySelector("img[alt]");
+                    label = image ? text(image) : "";
                 }
-                return label ? action : null;
+                if (!label) return null;
+
+                const targetId = "home-action-" + index;
+                if (element.getAttribute("data-unified-ai-target") !== targetId) {
+                    element.setAttribute("data-unified-ai-target", targetId);
+                }
+                const action = {
+                    label: label,
+                    disabled: !!element.disabled || element.getAttribute("aria-disabled") === "true",
+                    targetId: targetId
+                };
+                const routeValue = element.getAttribute("href") || element.getAttribute("data-route")
+                    || (element.dataset && element.dataset.page ? "/" + element.dataset.page : "");
+                if (routeValue && routeValue.trim() !== "#") {
+                    try {
+                        const url = new URL(routeValue, window.location.href);
+                        if (url.origin === window.location.origin) {
+                            ["BedInfo", "Unified", "UnifiedAI", "token", "patient", "user", "email", "uhid"]
+                                .forEach(function (name) { url.searchParams.delete(name); });
+                            action.route = text(url.pathname + url.search);
+                        }
+                    } catch (error) { }
+                }
+                return action;
             })
             .filter(Boolean);
+        const fields = Array.from(document.querySelectorAll(
+            "input:not([type='hidden']):not([type='password']):not([type='button']):not([type='submit']):not([type='reset']):not([type='checkbox']):not([type='radio']):not([type='file']), textarea, [contenteditable='true']"
+        ))
+            .filter(function (element) {
+                const identity = [element.id, element.name, element.getAttribute("aria-label"), element.getAttribute("placeholder")].join(" ");
+                return isVisible(element)
+                    && !/bed|patient|room|uhid|user|token|password|doctor|physician|provider|name|email|phone|mobile|address|birth|age/i.test(identity)
+                    && !element.closest(".patient-info, .patient-details, [data-patient-info]");
+            })
+            .slice(0, 50)
+            .map(function (field, index) {
+                const labels = Array.from(field.labels || []).map(function (label) { return label.textContent; });
+                const targetId = "home-field-" + index;
+                if (field.getAttribute("data-unified-ai-field") !== targetId) {
+                    field.setAttribute("data-unified-ai-field", targetId);
+                }
+                return {
+                    targetId: targetId,
+                    label: text(field.getAttribute("aria-label") || labels.join(" ")
+                        || field.getAttribute("placeholder") || field.name || field.id || "Text field"),
+                    placeholder: text(field.getAttribute("placeholder") || "")
+                };
+            });
         return {
             route: "/Home/Index",
             title: document.title,
             headings: Array.from(document.querySelectorAll("#pageContent h1, #pageContent h2, #pageContent h3"))
                 .map(text).filter(Boolean).slice(0, 20),
-            controls: [],
-            items: [],
+            controls: Array.from(document.querySelectorAll("select"))
+                .filter(isVisible)
+                .filter(function (select) {
+                    return !/bed|patient|room|uhid|user|token|password|doctor|physician|provider/i.test(
+                        [select.id, select.name, select.getAttribute("aria-label")].join(" ")
+                    );
+                })
+                .slice(0, 20)
+                .map(function (select) {
+                    const labels = Array.from(select.labels || []).map(function (label) { return label.textContent; });
+                    return {
+                        id: select.id || "",
+                        label: text(select.getAttribute("aria-label") || labels.join(" ") || select.name || select.id),
+                        selected: select.options[select.selectedIndex]
+                            ? { value: text(select.value), label: text(select.options[select.selectedIndex].textContent) }
+                            : null,
+                        options: Array.from(select.options).slice(0, 60).map(function (option) {
+                            return { value: text(option.value), label: text(option.textContent), disabled: option.disabled };
+                        })
+                    };
+                }),
+            fields: fields,
+            items: Array.from(document.querySelectorAll("#pageContent .card, #pageContent [data-route], #pageContent [data-page]"))
+                .filter(isVisible)
+                .slice(0, 100)
+                .map(function (item) {
+                    const name = text(item.querySelector("h1, h2, h3, h4, .card-title") || item);
+                    const route = item.getAttribute("data-route")
+                        || (item.dataset && item.dataset.page ? "/" + item.dataset.page : "");
+                    const result = { name: name, label: name, disabled: !!item.disabled };
+                    if (route) {
+                        try {
+                            const url = new URL(route, window.location.href);
+                            if (url.origin === window.location.origin) result.route = text(url.pathname);
+                        } catch (error) { }
+                    }
+                    return result;
+                })
+                .filter(function (item) { return item.label; }),
             actions: actions
         };
     }
@@ -139,9 +233,38 @@
         }
     }
 
+    async function acquireScreenWakeLock() {
+        if (!navigator.wakeLock || document.visibilityState !== "visible"
+            || wakeLockRequestPending || screenWakeLock && !screenWakeLock.released) return;
+        wakeLockRequestPending = true;
+        try {
+            screenWakeLock = await navigator.wakeLock.request("screen");
+            screenWakeLock.addEventListener("release", function () {
+                screenWakeLock = null;
+            }, { once: true });
+        } catch (error) {
+            console.info("Screen wake lock is unavailable:", error && error.message ? error.message : error);
+        } finally {
+            wakeLockRequestPending = false;
+        }
+    }
+
+    function syncScreenWakeLock(active) {
+        if (active) {
+            acquireScreenWakeLock();
+            return;
+        }
+        const lock = screenWakeLock;
+        screenWakeLock = null;
+        if (lock && !lock.released) lock.release().catch(function (error) {
+            console.info("Could not release screen wake lock:", error && error.message ? error.message : error);
+        });
+    }
+
     function updateFloatingBar() {
         const realConnection = document.body.getAttribute("data-state") === "connected";
         const connected = realConnection || simulatedSession;
+        syncScreenWakeLock(connected);
         if (!realConnection) lastSentContext = "";
         if (floatingBar) {
             floatingBar.hidden = !connected;
@@ -304,6 +427,84 @@
         }
     }
 
+    function findUiTarget(attribute, targetId) {
+        return Array.from(document.querySelectorAll("[" + attribute + "]")).find(function (element) {
+            if (element.getAttribute(attribute) !== targetId || element.closest("#unifiedAiModuleLayer")) return false;
+            const style = window.getComputedStyle(element);
+            return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
+        });
+    }
+
+    function executeHostUIAction(action) {
+        if (action.action === "ui.click") {
+            const target = findUiTarget("data-unified-ai-target", action.targetId);
+            if (!target || target.disabled || target.getAttribute("aria-disabled") === "true") {
+                reportResult(action, false, null, "The selected visible action is no longer available.");
+                return;
+            }
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.click();
+            reportResult(action, true, { clicked: target.getAttribute("aria-label") || target.innerText || target.textContent });
+            return;
+        }
+
+        if (action.action === "ui.fill") {
+            const target = findUiTarget("data-unified-ai-field", action.targetId);
+            if (!target || target.disabled || target.readOnly) {
+                reportResult(action, false, null, "The selected visible field is no longer available.");
+                return;
+            }
+            const value = String(action.value == null ? "" : action.value).slice(0, 2000);
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+            target.focus({ preventScroll: true });
+            if (target.isContentEditable) target.textContent = value;
+            else target.value = value;
+            target.dispatchEvent(new Event("input", { bubbles: true }));
+            target.dispatchEvent(new Event("change", { bubbles: true }));
+            reportResult(action, true, { filled: action.label || target.getAttribute("aria-label") || target.name || target.id });
+        }
+    }
+
+    function selectHostOption(action) {
+        const key = String(action.controlId || action.control || action.controlName || "").trim().toLowerCase();
+        const requested = String(action.optionValue !== undefined ? action.optionValue
+            : action.option !== undefined ? action.option : action.value == null ? "" : action.value).trim().toLowerCase();
+        if (!key || !requested) {
+            reportResult(action, false, null, "A visible dropdown and option are required.");
+            return;
+        }
+        const matches = Array.from(document.querySelectorAll("select")).filter(function (select) {
+            const style = window.getComputedStyle(select);
+            if (style.display === "none" || style.visibility === "hidden" || !select.getClientRects().length
+                || /bed|patient|room|uhid|user|token|password|doctor|physician|provider/i.test(
+                    [select.id, select.name, select.getAttribute("aria-label")].join(" ")
+                )) return false;
+            const labels = Array.from(select.labels || []).map(function (label) { return label.textContent; });
+            return [select.id, select.name, select.getAttribute("aria-label")].concat(labels)
+                .some(function (label) { return String(label || "").trim().toLowerCase() === key; });
+        });
+        if (matches.length !== 1) {
+            reportResult(action, false, null, matches.length ? "Dropdown name is ambiguous." : "Visible dropdown was not found.");
+            return;
+        }
+        const select = matches[0];
+        const options = Array.from(select.options).filter(function (option) {
+            return !option.disabled && (String(option.value).trim().toLowerCase() === requested
+                || String(option.textContent).trim().toLowerCase() === requested);
+        });
+        if (options.length !== 1) {
+            reportResult(action, false, { options: Array.from(select.options).filter(function (option) {
+                return !option.disabled;
+            }).map(function (option) { return { value: option.value, label: option.textContent.trim() }; }) },
+                options.length ? "Dropdown option is ambiguous." : "Dropdown option was not found.");
+            return;
+        }
+        select.value = options[0].value;
+        select.dispatchEvent(new Event("input", { bubbles: true }));
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        reportResult(action, true, { controlId: select.id || select.name, selected: options[0].textContent.trim() });
+    }
+
     function sendActionToFrame(action) {
         if (!frame.contentWindow || !frameReady) {
             pendingActions.push(action);
@@ -359,10 +560,16 @@
 
         if (action.action === "ui.select") {
             if (!frameLayer.classList.contains("is-open")) {
-                reportResult(action, false, null, "Open the requested module before changing a dropdown.");
+                selectHostOption(action);
                 return;
             }
             sendActionToFrame(action);
+            return;
+        }
+
+        if (action.action === "ui.click" || action.action === "ui.fill") {
+            if (frameLayer.classList.contains("is-open")) sendActionToFrame(action);
+            else executeHostUIAction(action);
             return;
         }
 
@@ -448,7 +655,10 @@
     }
 
     if (barChatButton) barChatButton.addEventListener("click", showChat);
-    if (returnButton) returnButton.addEventListener("click", showChat);
+    if (returnButton) returnButton.addEventListener("click", function () {
+        if (Date.now() < suppressReturnClickUntil) return;
+        showChat();
+    });
     if (barMicButton) {
         barMicButton.addEventListener("click", function (event) {
             event.stopPropagation();
@@ -507,6 +717,8 @@
         (context.actions || []).forEach(function (item) {
             if (item.route && !item.disabled) {
                 add("Open " + item.label, { action: "navigate", path: item.route }, item.label + " " + item.route);
+            } else if (item.targetId && !item.disabled) {
+                add("Click " + item.label, { action: "ui.click", targetId: item.targetId, label: item.label }, item.label);
             }
         });
         (context.items || []).forEach(function (item) {
@@ -526,7 +738,35 @@
             });
         });
 
+        if (query) {
+            (context.fields || []).forEach(function (field) {
+                if (!field.targetId) return;
+                const label = field.label || "the visible field";
+                const fieldMatchesQuery = normalizeTestText(label + " " + (field.placeholder || ""))
+                    .split(/\s+/).some(function (word) { return tokens.includes(word); });
+                const isFreeTextField = /remark|comment|description|feedback|message|reason|note/i.test(label + " " + (field.placeholder || ""));
+                if (!fieldMatchesQuery && !isFreeTextField) return;
+                add("Enter your text in " + (field.label || "the visible field"), {
+                    action: "ui.fill",
+                    targetId: field.targetId,
+                    label: field.label,
+                    value: query
+                }, (field.label || "") + " " + (field.placeholder || "") + " " + query);
+            });
+        }
+
         const route = String(context.route || "").toLowerCase();
+        if (/\/home(?:\/index)?$/.test(route)
+            && (context.actions || []).some(function (item) { return /food|dining/i.test(item.label); })) {
+            add("Explore Food & Dining", {
+                action: "food.intent",
+                intent: "explore"
+            }, "food dining explore");
+            add("Place a food order", {
+                action: "food.intent",
+                intent: "order"
+            }, "food dining order");
+        }
         const requestModule = route.indexOf("roomcomfort") >= 0
             ? "room_comfort"
             : route.indexOf("logisitics") >= 0 ? "logistics" : null;
@@ -666,18 +906,13 @@
             }
         });
 
-        return suggestions.sort(function (left, right) { return right.score - left.score; }).slice(0, 24);
+        return suggestions.sort(function (left, right) { return right.score - left.score; }).slice(0, 200);
     }
 
     function runTestAction(action, label) {
         if (!isLocalTestMode || !action) return;
         action.request_id = "local-test-" + Date.now();
-        const writesData = [
-            "request.create", "food.add_item", "food.set_quantity", "food.remove_item",
-            "food.other_service", "food.review_order", "food.submit_order", "feedback.submit"
-        ].includes(action.action);
-        if (writesData && !window.confirm("This test can change app data. Continue only with a test database?")) return;
-        if (testOutput) testOutput.textContent = "Testing: " + label;
+        if (testOutput) testOutput.textContent = "Testing: " + label + "\nThe current app backend will handle this action.";
         handleAction(action);
     }
 
@@ -745,23 +980,76 @@
         });
     }
 
+    if (floatingBar && returnButton) {
+        returnButton.addEventListener("pointerdown", function (event) {
+            if (!event.isPrimary || event.button !== 0) return;
+            const rect = floatingBar.getBoundingClientRect();
+            dragState = {
+                pointerId: event.pointerId,
+                startX: event.clientX,
+                startY: event.clientY,
+                left: rect.left,
+                top: rect.top,
+                moved: false
+            };
+            returnButton.setPointerCapture(event.pointerId);
+        });
+        returnButton.addEventListener("pointermove", function (event) {
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+            const dx = event.clientX - dragState.startX;
+            const dy = event.clientY - dragState.startY;
+            if (!dragState.moved && Math.abs(dx) + Math.abs(dy) < 8) return;
+            dragState.moved = true;
+            const maxLeft = Math.max(0, window.innerWidth - floatingBar.offsetWidth);
+            const maxTop = Math.max(0, window.innerHeight - floatingBar.offsetHeight);
+            floatingBar.style.left = Math.max(0, Math.min(maxLeft, dragState.left + dx)) + "px";
+            floatingBar.style.top = Math.max(0, Math.min(maxTop, dragState.top + dy)) + "px";
+            floatingBar.style.right = "auto";
+            floatingBar.style.bottom = "auto";
+            floatingBar.style.transform = "none";
+        });
+        const finishDrag = function (event) {
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+            if (dragState.moved) suppressReturnClickUntil = Date.now() + 350;
+            dragState = null;
+        };
+        returnButton.addEventListener("pointerup", finishDrag);
+        returnButton.addEventListener("pointercancel", finishDrag);
+    }
+
+    document.addEventListener("visibilitychange", function () {
+        updateFloatingBar();
+    });
+
     let homeContextTimer = null;
-    const homeContextObserver = new MutationObserver(function () {
+    const homeContextObserver = new MutationObserver(function (records) {
         if (frameLayer.classList.contains("is-open")) return;
+        const relevantChanges = records.some(function (record) {
+            const target = record.target instanceof Element ? record.target : record.target.parentElement;
+            if (target && target.closest("#unifiedAiTestPanel, #unifiedAiTestLauncher, #unifiedAiFloatingBar")) return false;
+            return record.type !== "attributes"
+                || !["data-unified-ai-target", "data-unified-ai-field"].includes(record.attributeName);
+        });
+        if (!relevantChanges) return;
         if (homeContextTimer) clearTimeout(homeContextTimer);
         homeContextTimer = setTimeout(function () {
             lastSentContext = "";
             sendCurrentPageContext();
+            if (isLocalTestMode) renderTestSuggestions();
         }, 250);
     });
-    const pageContent = document.getElementById("pageContent");
-    if (pageContent) {
-        homeContextObserver.observe(pageContent, { childList: true, subtree: true, characterData: true, attributes: true });
-    }
+    homeContextObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
 
     document.addEventListener("click", function (event) {
         if (!isCallActive()) return;
         const element = event.target instanceof Element ? event.target : null;
+        const navButton = element && element.closest(".navBtn[data-page]");
+        if (navButton) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            openAppPage(navButton.getAttribute("data-page"));
+            return;
+        }
         const link = element && element.closest("a[href]");
         if (!link || link.hasAttribute("download") || link.target === "_blank") return;
 

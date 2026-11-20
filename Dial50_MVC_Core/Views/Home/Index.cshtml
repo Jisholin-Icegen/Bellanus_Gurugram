@@ -2275,7 +2275,7 @@
             <button type="button" id="unifiedAiTestCloseButton" aria-label="Hide local AI test tools">Hide</button>
         </div>
         <button type="button" id="unifiedAiTestSessionButton">Start simulated assistant session</button>
-        <p>Local simulation only. Suggestions come from the current page; request, cart, order, and feedback actions can write to the configured database.</p>
+        <p>Suggestions use visible page data. Test actions use this app's configured backend and can create requests, update the cart, place orders, or submit feedback.</p>
         <label class="unified-ai-test-label" for="unifiedAiTestAction">Describe an action to test</label>
         <input id="unifiedAiTestAction" type="text" autocomplete="off" placeholder="Type a visible item, request, or dropdown value" />
         <div id="unifiedAiTestSuggestions" aria-label="Available actions for this screen"></div>

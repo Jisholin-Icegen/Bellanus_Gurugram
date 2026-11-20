@@ -259,6 +259,7 @@ async function fetchToken() {
 // AUDIO
 // =========================================================
 var ws = null;
+var pendingVoiceMessages = [];
 var audioContext = null;
 var mediaStream = null;
 var micNode = null;
@@ -761,7 +762,16 @@ async function connectToAvatarBackend() {
         ws = socket;
 
         socket.onopen = function () {
-            if (ws === socket) goConnected();
+            if (ws !== socket) return;
+            goConnected();
+            while (pendingVoiceMessages.length && ws === socket && socket.readyState === WebSocket.OPEN) {
+                try {
+                    socket.send(JSON.stringify(pendingVoiceMessages.shift()));
+                } catch (error) {
+                    if (socket.readyState !== WebSocket.OPEN) break;
+                    console.error("Could not send queued voice-agent message:", error);
+                }
+            }
         };
 
         socket.onmessage = function (event) {
@@ -910,6 +920,7 @@ function setCallStatus(status) {
 function endChat() {
     clearInterval(countdownTimer);
     clearTimeout(drainTimer);
+    pendingVoiceMessages = [];
 
     micMuted = false;
     speakerMuted = false;
@@ -1055,15 +1066,30 @@ window.setCallStatus = setCallStatus;
 window.connectToAvatarBackend = connectToAvatarBackend;
 window.endChat = endChat;
 window.sendVoiceAgentMessage = function (message) {
-    if (!ws || ws.readyState !== WebSocket.OPEN) {
+    var socket = ws;
+    if (!socket) {
         return false;
     }
 
+    if (socket.readyState === WebSocket.CONNECTING) {
+        if (message && message.type === "app_context") {
+            pendingVoiceMessages = pendingVoiceMessages.filter(function (pending) {
+                return pending.type !== "app_context";
+            });
+        }
+        if (pendingVoiceMessages.length >= 50) pendingVoiceMessages.shift();
+        pendingVoiceMessages.push(message);
+        return true;
+    }
+    if (socket.readyState !== WebSocket.OPEN) return false;
+
     try {
-        ws.send(JSON.stringify(message));
+        socket.send(JSON.stringify(message));
         return true;
     } catch (error) {
-        console.error("Voice-agent action result could not be sent:", error);
+        if (socket.readyState === WebSocket.OPEN) {
+            console.error("Voice-agent action result could not be sent:", error);
+        }
         return false;
     }
 };
