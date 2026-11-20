@@ -1145,7 +1145,7 @@ function initializeAvatarEvents() {
                 if (window.UnifiedAIHost && typeof window.UnifiedAIHost.minimizeCall === "function") {
                     window.UnifiedAIHost.minimizeCall();
                 } else {
-                    console.warn("Unified AI call popup is unavailable; the active call will continue.");
+                    console.warn("Unified AI in-page assistant bar is unavailable; the active call will continue.");
                 }
                 return;
             }
@@ -1184,7 +1184,7 @@ function initializeAvatarEvents() {
                 if (window.UnifiedAIHost && typeof window.UnifiedAIHost.minimizeCall === "function") {
                     window.UnifiedAIHost.minimizeCall();
                 } else {
-                    console.warn("Unified AI call popup is unavailable; the active call will continue.");
+                    console.warn("Unified AI in-page assistant bar is unavailable; the active call will continue.");
                 }
                 return;
             }

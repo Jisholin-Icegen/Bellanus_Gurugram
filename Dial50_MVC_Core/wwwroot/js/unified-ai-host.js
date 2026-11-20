@@ -313,7 +313,7 @@
         updateFloatingBar();
     }
 
-    function showHomeWithCallPopup() {
+    function showHomePreservingCall() {
         frameLayer.classList.remove("is-open");
         frameLayer.setAttribute("aria-hidden", "true");
         setCallPresentation(isRealCallActive() ? "minimized" : "full");
@@ -383,8 +383,9 @@
 
     function openAppPage(page, extra) {
         const url = new URL(window.BedContext.url(page, extra), window.location.origin);
+        if (!normalizeAppOrigin(url)) return false;
         if (/^\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(url.pathname)) {
-            showHomeWithCallPopup();
+            showHomePreservingCall();
             return true;
         }
         if (/^\/FoodDining(?:\/Index)?\/?$/i.test(url.pathname)) {
@@ -411,12 +412,12 @@
         } catch (error) {
             return null;
         }
-        if (targetUrl.origin !== window.location.origin || !targetUrl.pathname.startsWith("/")) return null;
+        if (!normalizeAppOrigin(targetUrl) || !targetUrl.pathname.startsWith("/")) return null;
         if (/^\/FoodDining(?:\/Index)?\/?$/i.test(targetUrl.pathname)) {
             targetUrl.pathname = "/FoodDining/FoodDining";
         }
         if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
-            showHomeWithCallPopup();
+            showHomePreservingCall();
             return { target: "home" };
         }
 
@@ -463,6 +464,12 @@
             "overallfeedback/index": "feedback"
         };
         return routeTargets[normalized] || ("page:" + normalized);
+    }
+
+    function normalizeAppOrigin(url) {
+        if (url.protocol !== window.location.protocol || url.hostname !== window.location.hostname) return false;
+        if (url.port !== window.location.port) url.port = window.location.port;
+        return url.origin === window.location.origin;
     }
 
     function dispatchToModule(target, action) {
@@ -770,7 +777,7 @@
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
         } else if (event.data.type === "unified_ai_show_home") {
-            showHomeWithCallPopup();
+            showHomePreservingCall();
         }
     });
 
@@ -881,11 +888,12 @@
         if (!link || link.hasAttribute("download") || link.target === "_blank") return;
 
         const targetUrl = new URL(link.href, window.location.href);
-        if (targetUrl.origin !== window.location.origin || targetUrl.hash && targetUrl.pathname === window.location.pathname) return;
+        if (!normalizeAppOrigin(targetUrl)
+            || targetUrl.hash && targetUrl.pathname === window.location.pathname) return;
         if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
             event.preventDefault();
             event.stopImmediatePropagation();
-            showHomeWithCallPopup();
+            showHomePreservingCall();
             return;
         }
 
@@ -979,7 +987,7 @@
             const normalized = String(page || "").replace(/^\/+/, "").toLowerCase();
             if (isCallActive()) {
                 if (normalized === "home" || normalized === "home/index" || normalized === "ai" || normalized === "ai/chat") {
-                    showHomeWithCallPopup();
+                    showHomePreservingCall();
                     return;
                 }
                 openAppPage(page, extra);

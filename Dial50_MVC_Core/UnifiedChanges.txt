@@ -3,10 +3,11 @@ Unified AI changes and AI-team integration
 
 Purpose
 -------
-The named Home call window owns the voice WebSocket and microphone. Starting a
-call from Home or the app's AI shortcut opens or focuses that same window;
-ordinary app pages can navigate without owning or replacing the voice socket.
-Unified service pages load in an iframe when used from the Home shell. Page
+The Home page owns the voice WebSocket and microphone. The call stays in the
+existing app page; it does not open a popup or separate window. While a call is
+active, app routes load in the Home shell's iframe so route changes do not
+unload the call owner. Same-host links that use a different local development
+port are normalized to the Home shell's origin before navigation. Page
 controls, service categories, menu items, and notification records are read
 from the current page or the existing tenant database. Do not hardcode patient,
 tenant, category, menu, or notification values in the AI.
@@ -29,15 +30,14 @@ preserving the ping payload. It keeps the call timer running and reuses a live
 microphone stream, reacquiring it if the browser ended the track. Calls have no
 default time limit; a positive
 SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
-persistent assistant bar shows the same Connecting, Reconnecting, Listening,
+in-page assistant bar shows the same Connecting, Reconnecting, Listening,
 Thinking, or Speaking status as the Home call screen while the call is
 connecting or connected.
-The Home call window stays open as app pages navigate or reload. The
-cross-page assistant bar can focus that window or send its explicit End Call
-command; only End Call ends the client call session. A close/reload attempt on
-the active call window asks for confirmation. The call window must remain open:
-closing it or shutting down the browser ends the page-owned microphone and
-WebSocket.
+The Home document remains the call owner while routes load or refresh inside its
+iframe. Only the explicit End Call control ends the client call session.
+Refreshing or closing the top-level Home document or browser still ends its
+page-owned microphone and WebSocket; browser JavaScript cannot preserve those
+page resources after a top-level document unload.
 
 This client-side reconnect does not replace a healthy voice backend. The AI
 team must keep its server-side voice session valid, accept the existing token
@@ -164,16 +164,16 @@ it returns to the persistent Home voice assistant instead of creating another
 voice connection. The AI can navigate to service routes by voice without
 enabling the other three cards or changing the Home assistant layout.
 
-Active call window
+In-page call shell
 ------------------
-The existing floating assistant popup is the minimized call UI; there is no
-separate minimize window or extra control. Pressing the call screen's Back
+The existing floating assistant bar is the minimized call UI; there is no
+separate window. Pressing the call screen's Back
 button or navigating to another module hides the full call screen, restores the
-same Home layout used before the call, and shows the popup while the call stays
+same Home layout used before the call, and shows the bar while the call stays
 active. Ending or failing a call while minimized does not restore the full call
-screen over Home. The Home AI card and the popup's return/chat control both
-restore the full call screen and hide the popup. A voice route to Home returns
-to the Home layout with the popup still active, and ending from the popup leaves
+screen over Home. The Home AI card and the assistant bar's return/chat control
+both restore the full call screen and hide the bar. A voice route to Home returns
+to the Home layout with the bar still active, and ending from the bar leaves
 the current service page open. Hiding the page also minimizes the screen.
 Unexpected voice disconnects and server call_ended events reuse the current
 token and reconnect indefinitely with backoff; only the End Call control ends

@@ -16,6 +16,8 @@
 
     function keepUnifiedRoute(url) {
         const target = new URL(url, window.location.href);
+        if (target.protocol !== window.location.protocol || target.hostname !== window.location.hostname) return null;
+        if (target.port !== window.location.port) target.port = window.location.port;
         if (target.origin !== window.location.origin) return null;
         if (/^\/FoodDining(?:\/Index)?\/?$/i.test(target.pathname)) {
             target.pathname = "/FoodDining/FoodDining";
