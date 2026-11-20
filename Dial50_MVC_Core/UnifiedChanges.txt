@@ -141,10 +141,12 @@ does not ask users to install the site or add it to the home screen.
 
 My Daily Care
 -------------
-The page keeps its four existing cards: My Library is the only touch-enabled
-card and opens the actual library page; the other three remain visibly disabled.
-The AI can still navigate to their routes by voice without enabling those cards
-or changing the Home assistant layout.
+The page keeps its four existing cards. My Library remains the only
+touch-enabled card. On the standalone page, touching it opens the legacy
+assistant confirmation and starts the page's video assistant; inside Unified AI,
+it returns to the persistent Home voice assistant instead of creating another
+voice connection. The AI can navigate to service routes by voice without
+enabling the other three cards or changing the Home assistant layout.
 
 Tenant and data handling
 ------------------------
@@ -162,11 +164,16 @@ Use:
 
   https://localhost:7116/PreLanding?BedInfo=9330&region=SA&XTenantID=2
 
-There is no local assistant simulation. Start Talk to AI to test the real voice
-service and exercise navigation or non-submitting UI controls. AI actions that
-create requests, change notification state, update a cart, submit feedback, or
-place orders can change application data; only test those against a confirmed
-test database.
+To open the local-only Unified AI action panel, add `UnifiedAITest=1` to the
+Home URL, for example:
+
+  https://localhost:7116/Home/Index?BedInfo=9330&region=SA&XTenantID=2&UnifiedAITest=1
+
+The test panel is available only on localhost and does not create a voice
+connection. Its simulated session exercises page context, navigation, and
+visible app actions. Actions that can change application data require an
+additional confirmation; only run them against a confirmed test database.
+Start Talk to AI separately to test the real voice service and speech round-trip.
 
 The supplied local tenant/database must be verified as test data before writes.
 Exercise each configured tenant and the voice service separately; a local build

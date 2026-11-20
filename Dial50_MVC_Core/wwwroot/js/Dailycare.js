@@ -79,7 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
         if (isAvailable) {
             card.addEventListener("click", function () {
-                openDailyCareItem(item);
+                if (unifiedAI && !window.UnifiedAIChild) openDailyCareItem(item);
+                else GoToChat();
             });
         }
         container.appendChild(card);
@@ -87,6 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function GoToChat() {
+    if (window.UnifiedAIChild) {
+        window.UnifiedAIChild.showChat();
+        return;
+    }
     var overlay = document.getElementById('chatConfirmOverlay');
     if (overlay) overlay.classList.add('show');
 }

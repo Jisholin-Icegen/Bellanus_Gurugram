@@ -1,16 +1,15 @@
 @model BedInfo
 @{
     ViewData["Title"] = ":: Chat AI ::";
-
+    ViewData["UseCustomVoiceAgent"] = true;
 }
 
 <link rel="stylesheet" href="~/fontawesome/css/all.min.css" />
 
-<script src="~/js/voice-agent/config.js"></script>
-
 <link rel="stylesheet" href="~/css/DailyCare.css">
 <link rel="stylesheet" href="~/css/voice-agent/styles.css">
 <link rel="stylesheet" href="~/css/unified-ai.css" asp-append-version="true">
+<script src="~/js/voice-agent/config.js" asp-append-version="true"></script>
 
 <style>
 
@@ -2268,6 +2267,21 @@
             <i class="fa-solid fa-phone-slash" aria-hidden="true"></i>
         </button>
     </div>
+    <button type="button" id="unifiedAiTestLauncher" aria-controls="unifiedAiTestPanel" aria-expanded="false" hidden>Test tools</button>
+    <section id="unifiedAiTestPanel" aria-label="Unified AI local test panel" hidden>
+        <div class="unified-ai-test-heading">
+            <strong>Unified AI action test</strong>
+            <span id="unifiedAiTestStatus" aria-live="polite">Idle</span>
+            <button type="button" id="unifiedAiTestCloseButton" aria-label="Hide local AI test tools">Hide</button>
+        </div>
+        <button type="button" id="unifiedAiTestSessionButton">Start simulated assistant session</button>
+        <p>Suggestions use visible page data. Some actions can change app data; confirm test database access before using them.</p>
+        <label class="unified-ai-test-label" for="unifiedAiTestAction">Describe an action to test</label>
+        <input id="unifiedAiTestAction" type="text" autocomplete="off" placeholder="Type a visible item, request, or dropdown value" />
+        <div id="unifiedAiTestSuggestions" aria-label="Available actions for this screen"></div>
+        <pre id="unifiedAiTestOutput" aria-live="polite"></pre>
+    </section>
+    <script src="~/js/voice-agent/script.js" asp-append-version="true"></script>
     <script>
         var urlParams = new URLSearchParams(window.location.search);
         var bed       = BedContext.get();
@@ -3332,4 +3346,5 @@
 
 <script src="~/js/layout_DailyCare.js"></script>
 <script src="~/js/unified-ai-host.js" asp-append-version="true"></script>
+<script src="~/js/unified-ai-test.js" asp-append-version="true"></script>
 

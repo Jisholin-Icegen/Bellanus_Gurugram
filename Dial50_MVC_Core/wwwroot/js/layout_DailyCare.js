@@ -73,15 +73,20 @@ function GoToAI() {
         return;
     }
 
-    if (window.location.pathname.toLowerCase() === "/home") {
+    if (/^\/home(?:\/index)?\/?$/i.test(window.location.pathname)) {
         var startButton = document.getElementById("idleBtn");
         if (startButton) startButton.click();
         return;
     }
 
+    if (window.BedContext && typeof window.BedContext.url === "function") {
+        window.location.href = window.BedContext.url("AI/Chat");
+        return;
+    }
+
     var bedInfo = sessionStorage.getItem("bedInfo") || "";
-    var url = "/Home?autoStartCall=1";
-    if (bedInfo) url += "&BedInfo=" + encodeURIComponent(bedInfo);
+    var url = "/AI/Chat";
+    if (bedInfo) url += "?BedInfo=" + encodeURIComponent(bedInfo);
     window.location.href = url;
 }
 

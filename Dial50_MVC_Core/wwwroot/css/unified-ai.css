@@ -22,6 +22,11 @@
     display: none !important;
 }
 
+#unifiedAiTestPanel[hidden],
+#unifiedAiTestLauncher[hidden] {
+    display: none !important;
+}
+
 #unifiedAiFloatingBar {
     position: fixed;
     bottom: max(14px, env(safe-area-inset-bottom));
@@ -126,6 +131,130 @@
     background: #dc3545;
 }
 
+#unifiedAiTestLauncher {
+    position: fixed;
+    right: 12px;
+    bottom: 14px;
+    z-index: 100005;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #2563eb;
+    border-radius: 999px;
+    background: #2563eb;
+    color: #ffffff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+#unifiedAiFloatingBar:not([hidden]) ~ #unifiedAiTestLauncher {
+    bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
+#unifiedAiTestPanel {
+    position: fixed;
+    right: 12px;
+    bottom: 104px;
+    z-index: 100004;
+    width: min(420px, calc(100vw - 24px));
+    max-height: min(62vh, 560px);
+    overflow: auto;
+    padding: 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, .24);
+    color: #172b4d;
+    font-family: inherit;
+}
+
+#unifiedAiTestPanel .unified-ai-test-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+#unifiedAiTestStatus {
+    margin-left: auto;
+    color: #15803d;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+}
+
+#unifiedAiTestPanel p {
+    margin: 8px 0;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+#unifiedAiTestAction {
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+}
+
+#unifiedAiTestSuggestions {
+    display: grid;
+    gap: 6px;
+    max-height: min(28vh, 220px);
+    overflow: auto;
+    margin-top: 8px;
+}
+
+#unifiedAiTestPanel .unified-ai-test-suggestion {
+    width: 100%;
+    text-align: left;
+}
+
+#unifiedAiTestPanel .unified-ai-test-empty {
+    margin: 4px 0;
+    color: #64748b;
+}
+
+#unifiedAiTestPanel button {
+    min-height: 34px;
+    padding: 6px 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #172b4d;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#unifiedAiTestPanel #unifiedAiTestSessionButton {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+#unifiedAiTestOutput {
+    max-height: 170px;
+    overflow: auto;
+    margin: 8px 0 0;
+    padding: 8px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #d1fae5;
+    font: 11px/1.4 Consolas, monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+#unifiedAiTestOutput:empty {
+    display: none;
+}
+
 @media (max-width: 480px) {
     #unifiedAiFloatingBar {
         min-height: 68px;
@@ -155,6 +284,17 @@
         height: 38px;
         flex-basis: 38px;
         font-size: 16px;
+    }
+
+    #unifiedAiTestPanel {
+        right: 10px;
+        bottom: calc(86px + env(safe-area-inset-bottom));
+        width: calc(100vw - 20px);
+        max-height: calc(100dvh - 108px);
+    }
+
+    #unifiedAiTestSuggestions {
+        max-height: 25dvh;
     }
 
 }

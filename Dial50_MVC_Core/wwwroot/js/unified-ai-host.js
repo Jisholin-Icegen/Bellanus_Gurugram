@@ -6,9 +6,12 @@
     const barMicButton = document.getElementById("unifiedAiBarMicButton");
     const barChatButton = document.getElementById("unifiedAiBarChatButton");
     const barEndButton = document.getElementById("unifiedAiBarEndButton");
+    const testPanel = document.getElementById("unifiedAiTestPanel");
     if (!frameLayer || !frame) return;
 
     const pageParams = new URLSearchParams(window.location.search);
+    const isLocalTestMode = pageParams.get("UnifiedAITest") === "1"
+        && ["localhost", "127.0.0.1", "::1", "[::1]"].includes(window.location.hostname);
 
     const routes = {
         room_comfort: "/RoomComfort/Index",
@@ -30,6 +33,7 @@
     let activeTarget = null;
     let latestFrameContext = null;
     let lastSentContext = "";
+    let simulatedSession = false;
     let screenWakeLock = null;
     let wakeLockRequestPending = false;
     let suppressReturnClickUntil = 0;
@@ -37,7 +41,17 @@
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
-        return state === "connecting" || state === "connected";
+        return simulatedSession || state === "connecting" || state === "connected";
+    }
+
+    function currentPageContext() {
+        return frameLayer.classList.contains("is-open") ? latestFrameContext : homePageContext();
+    }
+
+    function notifyTestContextChanged() {
+        if (isLocalTestMode) {
+            window.dispatchEvent(new CustomEvent("unified-ai:test-context-changed"));
+        }
     }
 
     function homePageContext() {
@@ -57,7 +71,7 @@
             return value.slice(0, 180);
         };
         const isVisible = function (element) {
-            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiFloatingBar")) return false;
+            if (element.closest("[hidden], [aria-hidden='true'], #unifiedAiFloatingBar, #unifiedAiTestPanel, #unifiedAiTestLauncher")) return false;
             const style = window.getComputedStyle(element);
             if (style.display === "none" || style.visibility === "hidden" || !element.getClientRects().length) return false;
             for (let ancestor = element; ancestor && ancestor !== document.documentElement; ancestor = ancestor.parentElement) {
@@ -180,7 +194,7 @@
     }
 
     function sendCurrentPageContext() {
-        if (document.body.getAttribute("data-state") !== "connected"
+        if (simulatedSession || document.body.getAttribute("data-state") !== "connected"
             || typeof window.sendVoiceAgentMessage !== "function") return;
         const context = frameLayer.classList.contains("is-open") ? latestFrameContext : homePageContext();
         if (frameLayer.classList.contains("is-open") && context && frame.contentWindow) {
@@ -228,8 +242,9 @@
 
     function updateFloatingBar() {
         const state = document.body.getAttribute("data-state");
-        const activeCall = state === "connecting" || state === "connected";
-        syncScreenWakeLock(activeCall);
+        const realCall = state === "connecting" || state === "connected";
+        const activeCall = simulatedSession || realCall;
+        syncScreenWakeLock(realCall);
         if (!activeCall) lastSentContext = "";
         if (floatingBar) {
             floatingBar.hidden = !activeCall;
@@ -237,7 +252,9 @@
             const micButton = document.getElementById("micBtn");
             const statusText = document.getElementById("unifiedAiBarStatus");
             if (statusText) {
-                statusText.textContent = callStatus && callStatus.textContent.trim()
+                statusText.textContent = simulatedSession
+                    ? "Test simulation"
+                    : callStatus && callStatus.textContent.trim()
                     || (state === "connecting" ? "Connecting..." : "Listening...");
             }
             if (barMicButton) {
@@ -247,10 +264,10 @@
                     ? '<i class="fa-solid fa-microphone-slash" aria-hidden="true"></i>'
                     : '<i class="fa-solid fa-microphone" aria-hidden="true"></i>';
                 barMicButton.setAttribute("aria-label", muted ? "Unmute microphone" : "Mute microphone");
-                barMicButton.disabled = state !== "connected";
+                barMicButton.disabled = simulatedSession || state !== "connected";
             }
         }
-        if (state === "connected") sendCurrentPageContext();
+        if (state === "connected" && !simulatedSession) sendCurrentPageContext();
     }
 
     function showChat() {
@@ -268,7 +285,7 @@
             error: error || null
         };
         window.dispatchEvent(new CustomEvent("unified-ai:action-result", { detail: response }));
-        if (document.body.getAttribute("data-state") !== "connected"
+        if (simulatedSession || document.body.getAttribute("data-state") !== "connected"
             || typeof window.sendVoiceAgentMessage !== "function") return;
 
         window.sendVoiceAgentMessage(Object.assign({ type: "app_action_result" }, response));
@@ -290,7 +307,9 @@
 
         frameReady = false;
         updateFloatingBar();
+        if (simulatedSession && testPanel) testPanel.hidden = false;
         frame.src = targetUrl.toString();
+        notifyTestContextChanged();
         return true;
     }
 
@@ -673,6 +692,7 @@
             }, window.location.origin);
         }
         updateFloatingBar();
+        notifyTestContextChanged();
     });
 
     window.addEventListener("voice-agent:app-action", function (event) {
@@ -697,6 +717,7 @@
                 activeTarget = routeTargetForPath(latestFrameContext.route);
             }
             sendCurrentPageContext();
+            notifyTestContextChanged();
         } else if (event.data.type === "unified_ai_show_chat") {
             showChat();
         }
@@ -704,6 +725,13 @@
 
     if (barEndButton) {
         barEndButton.addEventListener("click", function () {
+            if (simulatedSession) {
+                simulatedSession = false;
+                showChat();
+                updateFloatingBar();
+                notifyTestContextChanged();
+                return;
+            }
             if (typeof window.endChat === "function") window.endChat();
             showChat();
             updateFloatingBar();
@@ -719,7 +747,7 @@
         barMicButton.addEventListener("click", function (event) {
             event.stopPropagation();
             const micButton = document.getElementById("micBtn");
-            if (isCallActive() && micButton) micButton.click();
+            if (!simulatedSession && isCallActive() && micButton) micButton.click();
             updateFloatingBar();
         });
     }
@@ -770,7 +798,7 @@
         if (frameLayer.classList.contains("is-open")) return;
         const relevantChanges = records.some(function (record) {
             const target = record.target instanceof Element ? record.target : record.target.parentElement;
-            if (target && target.closest("#unifiedAiFloatingBar")) return false;
+            if (target && target.closest("#unifiedAiFloatingBar, #unifiedAiTestPanel, #unifiedAiTestLauncher")) return false;
             return record.type !== "attributes"
                 || !["data-unified-ai-target", "data-unified-ai-field"].includes(record.attributeName);
         });
@@ -779,6 +807,7 @@
         homeContextTimer = setTimeout(function () {
             lastSentContext = "";
             sendCurrentPageContext();
+            notifyTestContextChanged();
         }, 250);
     });
     homeContextObserver.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
@@ -818,11 +847,35 @@
     window.UnifiedAIHost = {
         openModule: openModule,
         showChat: showChat,
-        handleAction: handleAction
+        handleAction: handleAction,
+        getCurrentContext: currentPageContext,
+        startLocalTestSession: function () {
+            if (!isLocalTestMode || document.body.getAttribute("data-state") === "connecting"
+                || document.body.getAttribute("data-state") === "connected") return false;
+            simulatedSession = true;
+            updateFloatingBar();
+            notifyTestContextChanged();
+            return true;
+        },
+        endLocalTestSession: function () {
+            if (!isLocalTestMode) return false;
+            simulatedSession = false;
+            showChat();
+            updateFloatingBar();
+            notifyTestContextChanged();
+            return true;
+        },
+        isLocalTestSessionActive: function () {
+            return simulatedSession;
+        },
+        isLocalTestMode: isLocalTestMode
     };
 
     const bodyObserver = new MutationObserver(function () {
+        const state = document.body.getAttribute("data-state");
+        if (state === "connecting" || state === "connected") simulatedSession = false;
         updateFloatingBar();
+        notifyTestContextChanged();
     });
     bodyObserver.observe(document.body, { attributes: true, attributeFilter: ["data-state"] });
     const statusElement = document.getElementById("callStatus");
