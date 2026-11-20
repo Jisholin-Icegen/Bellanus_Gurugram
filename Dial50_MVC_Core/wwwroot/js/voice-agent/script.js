@@ -72,6 +72,16 @@ var REGION_DIALECT = {
     AE: "UAE"
 };
 
+function retryAfterMilliseconds(value) {
+    if (!value) return null;
+    var seconds = Number(value);
+    if (Number.isFinite(seconds)) return Math.min(2147483000, Math.max(1000, seconds * 1000));
+    var timestamp = Date.parse(value);
+    return Number.isNaN(timestamp)
+        ? null
+        : Math.min(2147483000, Math.max(1000, timestamp - Date.now()));
+}
+
 var widgetParams = new URLSearchParams(window.location.search);
 
 function getWidgetUserId() {
@@ -236,22 +246,30 @@ async function fetchToken() {
     if (voice) payload.voice = voice;
     if (speed !== undefined && speed !== null && !isNaN(speed)) payload.speed = speed;
 
+    var res;
     try {
-        var res = await fetch(BACKEND_HTTP + "/token", {
+        res = await fetch(BACKEND_HTTP + "/token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) {
-            console.error("/token returned " + res.status);
-            return null;
-        }
-        var data = await res.json();
-        return data.access_token || null;
     } catch (err) {
         console.error("/token unreachable:", err.message);
-        return null;
+        throw err;
     }
+
+    if (!res.ok) {
+        var tokenError = new Error("/token returned " + res.status);
+        tokenError.status = res.status;
+        tokenError.retryAfterMs = retryAfterMilliseconds(res.headers.get("Retry-After"))
+            || (res.status === 429 ? 60000 : null);
+        console.error(tokenError.message);
+        throw tokenError;
+    }
+
+    var data = await res.json();
+    if (!data || !data.access_token) throw new Error("/token response did not contain an access token.");
+    return data.access_token;
 }
 
 // =========================================================
@@ -968,11 +986,12 @@ async function connectToAvatarBackend() {
             endChat();
             return;
         }
-        scheduleVoiceReconnect();
+        scheduleVoiceReconnect(err && err.retryAfterMs,
+            err && err.status === 429 ? "service-busy" : null);
     }
 }
 
-function scheduleVoiceReconnect() {
+function scheduleVoiceReconnect(minimumDelayMs, status) {
     if (!callSessionActive || serverEnding || !body
         || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
         if (callSessionActive) endChat();
@@ -981,9 +1000,10 @@ function scheduleVoiceReconnect() {
 
     reconnectAttempts = Math.min(reconnectAttempts + 1, maxReconnectBackoffStep);
     var delay = Math.min(15000, 1000 * Math.pow(2, reconnectAttempts - 1));
-    setCallStatus("reconnecting");
+    if (Number.isFinite(minimumDelayMs) && minimumDelayMs > delay) delay = minimumDelayMs;
+    setCallStatus(status || "reconnecting");
     window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
-        detail: { connected: false, reconnecting: true, attempt: reconnectAttempts }
+        detail: { connected: false, reconnecting: true, attempt: reconnectAttempts, retryInMs: delay }
     }));
     reconnectTimer = setTimeout(function () {
         if (callSessionActive) connectToAvatarBackend();
@@ -1028,6 +1048,7 @@ function setCallStatus(status) {
         ringing: "Connecting...",
         connecting: "Connecting...",
         reconnecting: "Reconnecting...",
+        "service-busy": "Voice service busy. Retrying shortly...",
         connected: "Connected...",
         listening: "Listening...",
         thinking: "Thinking...",
@@ -1167,6 +1188,9 @@ function initializeAvatarEvents() {
             var state = body.getAttribute("data-state");
 
             if (state === "connecting" || state === "connected") {
+                if (window.UnifiedAIHost && typeof window.UnifiedAIHost.showChat === "function") {
+                    window.UnifiedAIHost.showChat();
+                }
                 return;
             }
 

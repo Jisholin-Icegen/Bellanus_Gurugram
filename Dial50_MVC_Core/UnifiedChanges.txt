@@ -13,12 +13,15 @@ Connection and status
 ---------------------
 The voice client queues current page context and action results during a
 temporary WebSocket outage, then retries with exponential backoff capped at
-15 seconds until the patient or server ends the call. It keeps the call timer
-running and reuses a live microphone stream, reacquiring it if the browser ended
-the track. Calls have no default time limit; a positive SESSION_SECONDS value
-in APP_CONFIG can still set an explicit limit. The persistent assistant bar
-shows the same Connecting, Reconnecting, Listening, Thinking, or Speaking
-status as the Home call screen while the call is connecting or connected.
+15 seconds until the patient or server ends the call. When token requests are
+rate-limited with HTTP 429, it honors Retry-After (or waits 60 seconds when the
+header is absent) and displays a service-busy status instead of retrying at the
+normal short interval. It keeps the call timer running and reuses a live
+microphone stream, reacquiring it if the browser ended the track. Calls have no
+default time limit; a positive SESSION_SECONDS value in APP_CONFIG can still
+set an explicit limit. The persistent assistant bar shows the same Connecting,
+Reconnecting, Listening, Thinking, or Speaking status as the Home call screen
+while the call is connecting or connected.
 The assistant bar remains above the unified page frame. Go to Chat only hides
 that frame and returns to the Home call screen; it must not end or recreate the
 voice socket. Only the explicit End Call control or a valid server call_ended
@@ -27,8 +30,9 @@ event should end the session.
 This client-side retry does not replace a healthy voice backend. The AI team
 must keep its server-side voice session valid, accept a fresh token during a
 reconnect, and send/receive the JSON action messages below over the existing
-socket. A successful connection and full speech round-trip must be verified
-against the configured voice service.
+socket. A successful token response or health check does not prove that the
+WebSocket and audio session are stable; a full speech round-trip must be
+verified against the configured voice service.
 
 WebSocket contract
 ------------------
@@ -152,12 +156,12 @@ Active call window
 ------------------
 The existing floating assistant popup is the minimized call UI; there is no
 separate minimize window or extra control. Pressing the call screen's Back
-button or navigating to another module hides the full call screen and shows the
-popup while the call stays active. Selecting the popup's return/chat control
-restores the full call screen and hides the popup. Hiding the page also
-minimizes the screen, and returning to the Home screen restores it. The call
-stays active until the user selects End Call; remote disconnects trigger
-reconnection.
+button or navigating to another module hides the full call screen, restores the
+normal Home layout, and shows the popup while the call stays active. The Home AI
+card and the popup's return/chat control both restore the full call screen and
+hide the popup. A voice route to Home returns to the Home layout with the popup
+still active. Hiding the page also minimizes the screen. The call stays active
+until the user selects End Call; remote disconnects trigger reconnection.
 
 Tenant and data handling
 ------------------------

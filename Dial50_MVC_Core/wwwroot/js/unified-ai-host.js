@@ -7,7 +7,7 @@
     const barChatButton = document.getElementById("unifiedAiBarChatButton");
     const barEndButton = document.getElementById("unifiedAiBarEndButton");
     const testPanel = document.getElementById("unifiedAiTestPanel");
-    const interactiveCard = document.getElementById("interactiveCard");
+    const callLayer = document.getElementById("callLayer");
     if (!frameLayer || !frame) return;
 
     const pageParams = new URLSearchParams(window.location.search);
@@ -40,8 +40,8 @@
     let suppressReturnClickUntil = 0;
     let dragState = null;
     let callPresentation = "full";
-    const originalCardDisplay = interactiveCard ? interactiveCard.style.getPropertyValue("display") : "";
-    const originalCardDisplayPriority = interactiveCard ? interactiveCard.style.getPropertyPriority("display") : "";
+    const originalCallLayerDisplay = callLayer ? callLayer.style.getPropertyValue("display") : "";
+    const originalCallLayerDisplayPriority = callLayer ? callLayer.style.getPropertyPriority("display") : "";
 
     function isCallActive() {
         const state = document.body.getAttribute("data-state");
@@ -60,14 +60,14 @@
         callPresentation = presentation;
         if (presentation === "minimized") {
             document.body.setAttribute("data-call-presentation", "minimized");
-            if (interactiveCard) interactiveCard.style.setProperty("display", "none", "important");
+            if (callLayer) callLayer.style.setProperty("display", "none", "important");
         } else {
             document.body.removeAttribute("data-call-presentation");
-            if (interactiveCard) {
-                if (originalCardDisplay) {
-                    interactiveCard.style.setProperty("display", originalCardDisplay, originalCardDisplayPriority);
+            if (callLayer) {
+                if (originalCallLayerDisplay) {
+                    callLayer.style.setProperty("display", originalCallLayerDisplay, originalCallLayerDisplayPriority);
                 } else {
-                    interactiveCard.style.removeProperty("display");
+                    callLayer.style.removeProperty("display");
                 }
             }
         }
@@ -313,6 +313,13 @@
         updateFloatingBar();
     }
 
+    function showHomeWithCallPopup() {
+        frameLayer.classList.remove("is-open");
+        frameLayer.setAttribute("aria-hidden", "true");
+        setCallPresentation(isRealCallActive() ? "minimized" : "full");
+        updateFloatingBar();
+    }
+
     function reportResult(action, success, result, error) {
         if (!action || !action.request_id) return;
         const response = {
@@ -376,6 +383,10 @@
 
     function openAppPage(page, extra) {
         const url = new URL(window.BedContext.url(page, extra), window.location.origin);
+        if (/^\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(url.pathname)) {
+            showHomeWithCallPopup();
+            return true;
+        }
         if (/^\/FoodDining(?:\/Index)?\/?$/i.test(url.pathname)) {
             url.pathname = "/FoodDining/FoodDining";
         }
@@ -405,7 +416,7 @@
             targetUrl.pathname = "/FoodDining/FoodDining";
         }
         if (/\/(?:home(?:\/index)?|ai\/chat)\/?$/i.test(targetUrl.pathname)) {
-            showChat();
+            showHomeWithCallPopup();
             return { target: "home" };
         }
 
@@ -916,10 +927,28 @@
         isLocalTestMode: isLocalTestMode
     };
 
+    let endedStateTimer = null;
     const bodyObserver = new MutationObserver(function () {
         const state = document.body.getAttribute("data-state");
-        if (state === "connecting" || state === "connected") simulatedSession = false;
-        else if (callPresentation === "minimized") setCallPresentation("full");
+        if (state === "connecting" || state === "connected") {
+            simulatedSession = false;
+            clearTimeout(endedStateTimer);
+            endedStateTimer = null;
+        } else {
+            if (callPresentation === "minimized") setCallPresentation("full");
+            if (state === "ended") {
+                clearTimeout(endedStateTimer);
+                endedStateTimer = setTimeout(function () {
+                    endedStateTimer = null;
+                    if (document.body.getAttribute("data-state") === "ended") {
+                        document.body.setAttribute("data-state", "idle");
+                    }
+                }, 1800);
+            } else {
+                clearTimeout(endedStateTimer);
+                endedStateTimer = null;
+            }
+        }
         updateFloatingBar();
         notifyTestContextChanged();
     });
