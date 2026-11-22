@@ -126,6 +126,9 @@
         const actionElements = Array.from(document.querySelectorAll(
             "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .navBtn, .service-card, .food-card, .order-card, .selection-card, .timing-card"
         ))
+            // The notification bell is user-owned: never publish it as an AI-clickable control.
+            // The AI reads notifications with notification.list, which does not open the drawer.
+            .filter(function (element) { return element.id !== "mobileNotificationTrigger"; })
             .filter(isVisible)
             .slice(0, 180);
         const actions = actionElements

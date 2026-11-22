@@ -996,11 +996,11 @@
         function refreshMobileNotifications() {
             if (!window.currentRoomNo) return;
 
+            // Only refresh the counts here. The notification list is loaded when the user opens
+            // the drawer; polling it on every tab navigation fills a closed drawer with stale
+            // "could not be loaded" errors and hammers the API during AI navigation.
             if (typeof window.getMobileUnreadCount === 'function') {
                 window.getMobileUnreadCount();
-            }
-            if (typeof window.loadMobileNotifications === 'function') {
-                window.loadMobileNotifications();
             }
             if (typeof window.getActiveCount === 'function') {
                 window.getActiveCount();

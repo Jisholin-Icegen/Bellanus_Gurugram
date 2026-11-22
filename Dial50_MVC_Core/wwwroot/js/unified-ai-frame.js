@@ -327,7 +327,9 @@
             "button, a[href], [role='button'], [role='tab'], summary, input[type='button'], input[type='submit'], input[type='reset'], [onclick], [data-action], [data-route], .service-card, .order-card, .selection-card, .timing-card, .food-card, .menu-card-v2, .rec-card, .meal-select-pill, .meal-tab-box"
         ))
             .filter(function (element) {
-                return !element.closest("#unifiedAiFloatingBar");
+                // The notification bell opens a user-owned drawer and must only be clicked by the user.
+                return !element.closest("#unifiedAiFloatingBar")
+                    && element.id !== "mobileNotificationTrigger";
             })
             .filter(isVisible)
             .slice(0, 150);

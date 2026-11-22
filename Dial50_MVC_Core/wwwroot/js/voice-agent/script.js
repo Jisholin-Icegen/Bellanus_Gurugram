@@ -308,6 +308,11 @@ var forceTokenRefresh = false;
 var lastTokenFetchAt = 0;
 var AUTH_CLOSE_CODES = [1008, 4001, 4003, 4401, 4403];
 
+// A clean 1000 close right after opening is the voice service ending the session. One is normal
+// when navigating; several in a row is a dead session and must not become an endless retry loop.
+var shortCloseStreak = 0;
+var MAX_SHORT_CLOSES = 3;
+
 function tokenExpiresInMs(token) {
     try {
         var part = String(token).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
@@ -980,7 +985,10 @@ async function connectToAvatarBackend() {
             connectionInProgress = false;
             clearTimeout(stableResetTimer);
             stableResetTimer = setTimeout(function () {
-                if (ws === socket && socket.readyState === WebSocket.OPEN) reconnectAttempts = 0;
+                if (ws === socket && socket.readyState === WebSocket.OPEN) {
+                    reconnectAttempts = 0;
+                    shortCloseStreak = 0;
+                }
             }, 10000);
             goConnected();
             window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
@@ -1094,6 +1102,8 @@ async function connectToAvatarBackend() {
             var aliveMs = openedAt ? Date.now() - openedAt : 0;
             window.__voiceOpenedAt = 0;
             if (!openedAt) failedOpenStreak += 1;                       // never reached an open socket
+            if (event.code === 1000 && openedAt && aliveMs < 5000) shortCloseStreak += 1;
+            else shortCloseStreak = 0;
             if (AUTH_CLOSE_CODES.indexOf(event.code) !== -1) forceTokenRefresh = true;
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason",
                 "wasClean:", event.wasClean, "| openForMs:", aliveMs,
@@ -1147,6 +1157,12 @@ function scheduleVoiceReconnect(reason) {
     }
     if (!callAccessToken) {
         setCallStatus(tokenRequestAttemptedForSession ? "token-unavailable" : "connection-failed");
+        return;
+    }
+    if (shortCloseStreak >= MAX_SHORT_CLOSES) {
+        console.warn("Voice call: the voice service closed the socket immediately "
+            + shortCloseStreak + " times in a row; stopping the reconnect loop.");
+        endChat("disconnected");
         return;
     }
 
@@ -1245,6 +1261,7 @@ function endChat(finalStatus) {
     statusTransitionTimer = null;
     serverEndTimer = null;
     reconnectAttempts = 0;
+    shortCloseStreak = 0;
     elapsedSeconds = 0;
     pendingVoiceMessages = [];
 

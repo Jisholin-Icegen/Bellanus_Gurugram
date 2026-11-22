@@ -45,6 +45,12 @@ builder.Services.AddScoped<IFoodRepository, FoodRepository>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Unified AI bridge: sessions, published screens and SSE subscribers live in memory and must be
+// shared by every request (the browser's PUT /screen and long-lived GET /events are different
+// requests). Without this registration every AiBridgeController endpoint throws at activation
+// with "Unable to resolve service for type AiBridgeService" and returns HTTP 500.
+builder.Services.AddSingleton<AiBridgeService>();
 builder.Services.AddHttpClient<IGuestApiService, GuestApiService>();
 builder.Services.AddScoped<ISmsService, LogSmsService>();
 builder.Services.AddHttpClient<ISmsService, TextBeeSmsService>();

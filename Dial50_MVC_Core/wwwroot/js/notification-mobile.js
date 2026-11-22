@@ -13,6 +13,16 @@
         });
     }
 
+    // The notification endpoints are tenant-aware. Pass XTenantID in the query string so they keep
+    // working when a tab was opened without the tenant id in its URL and the session has not been
+    // populated yet (otherwise the server throws and the drawer shows the connection error).
+    function apiUrl(path) {
+        var tenantId = (window.BedContext && window.BedContext.get
+            ? window.BedContext.get().tenantId : '')
+            || sessionStorage.getItem('XTenantID') || '';
+        return tenantId ? path + '?XTenantID=' + encodeURIComponent(tenantId) : path;
+    }
+
     function isNotificationRead(value) {
         return value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true' || String(value).toLowerCase() === 'read';
     }
@@ -79,6 +89,9 @@
     }
 
     function showNotificationError() {
+        // Background refreshes must not fill a closed drawer with a stale error. When the user
+        // actually opens the drawer we reload, so a transient failure is retried then.
+        if (!$('#mobileDrawer').hasClass('open')) return;
         lastNotificationsSig = null;
         $('#mobileNotificationList').html(
             '<div class="drawer-empty">' +
@@ -96,7 +109,7 @@
         }
 
         $.ajax({
-            url: '/api/Notification/GetTotalCount',
+            url: apiUrl('/api/Notification/GetTotalCount'),
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo }),
@@ -246,7 +259,7 @@
         if (notificationRequest) notificationRequest.abort();
 
         var request = $.ajax({
-            url: '/api/Notification/GetNotifications',
+            url: apiUrl('/api/Notification/GetNotifications'),
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo, MaxCount: 100 }),
@@ -272,7 +285,7 @@
         if (unreadCountRequest) unreadCountRequest.abort();
 
         var request = $.ajax({
-            url: '/api/Notification/GetUnreadCount',
+            url: apiUrl('/api/Notification/GetUnreadCount'),
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo }),
@@ -301,7 +314,7 @@
             return $.Deferred().reject(new Error('A notification and room are required.')).promise();
         }
         return $.ajax({
-            url: '/api/Notification/MarkAsRead',
+            url: apiUrl('/api/Notification/MarkAsRead'),
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo, NotificationId: String(notificationId) }),
@@ -333,7 +346,7 @@
         $btn.addClass('loading').prop('disabled', true);
 
         return $.ajax({
-            url: '/api/Notification/MarkAllAsRead',
+            url: apiUrl('/api/Notification/MarkAllAsRead'),
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ RoomNo: currentRoomNo }),
@@ -424,7 +437,8 @@
 
         currentRoomNo = currentRoomNo || resolveRoomNo();
         if (action.action === 'notification.list') {
-            openMobileDrawer(true);
+            // Loading the list for the assistant must never change the UI by itself.
+            // The drawer is user-owned: only the bell button opens it.
             loadMobileNotifications().done(function () {
                 finish(true, {
                     unreadCount: parseInt($('#mobileBadgeCount').text(), 10) || 0,
@@ -618,7 +632,7 @@
 
                                 getMobileUnreadCount();
 
-                                loadMobileNotifications();
+                                if ($('#mobileDrawer').hasClass('open')) loadMobileNotifications();
 
                             }
                         });
