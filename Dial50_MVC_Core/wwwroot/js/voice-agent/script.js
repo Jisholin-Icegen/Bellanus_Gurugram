@@ -1560,6 +1560,15 @@ window.setCallStatus = setCallStatus;
 window.connectToAvatarBackend = connectToAvatarBackend;
 window.endChat = endChat;
 window.sendVoiceAgentMessage = function (message) {
+    // The voice backend only understands audio frames, ping/pong and its own protocol.
+    // Unified-AI app_context / app_action_result messages are opt-in (config.js:
+    // SEND_APP_MESSAGES: true) — a backend that does not know these types closes the
+    // socket ~1s after open. Page context and action results already reach the AI
+    // through /api/ai-bridge, so nothing is lost while this stays off.
+    if (!CFG.SEND_APP_MESSAGES && message
+        && (message.type === "app_context" || message.type === "app_action_result")) {
+        return false;
+    }
     var socket = ws;
     if (!socket) {
         if (!callSessionActive) return false;
