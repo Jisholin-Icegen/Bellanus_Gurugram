@@ -1,65 +1,50 @@
 =====================================================================
   UNIFIED AI BRIDGE - API CONTRACT  ("UI Response Triggers")
 =====================================================================
-Base URL (same site as the app):
+You only need TWO calls in normal use:
+
+    1 GET  -> ask the app "what is on the screen right now?"
+    2 POST -> tell the app "do this" (the AI response triggers the UI)
+
+(There is also a GET .../results you poll ONLY if you want to confirm
+each action succeeded - optional.)
+
+BASE URL
+--------
     https://<your-host>/api/ai-bridge
 
-AI-TEAM AUTH
-------------
-Every AI-team endpoint requires the header:
+AUTH
+----
+AI-team endpoints need this header on EVERY request:
     X-Api-Key: <AiBridge:ApiKey from server appsettings.json>
 
-Device endpoints (browser) need NO key - the random session_id IS the
-credential. Get the session_id from the device screen publish response
-or ask the front-end team; it is stored per browser tab.
+The session_id itself is the device credential - no login needed.
 
 ---------------------------------------------------------------------
-1. LIST OPEN SCREENS (devices) OF A BED
+STEP 1 - GET  (one call: everything the AI needs to decide)
 ---------------------------------------------------------------------
 GET /api/ai-bridge/sessions?bed_id=9330
-Headers: X-Api-Key: <key>
+    -> which device(s) belong to this bed (pick session_id from here)
 
-200 OK
-{
-  "sessions": [
-    {
-      "session_id": "9f2c1e8a-....",
-      "bed_id": "9330",
-      "device_id": "4f84ed4b-81f8-4381-80ac-4da1834ac9bb",
-      "route": "/Home/Index",
-      "title": ":: Chat AI ::",
-      "call_active": true,
-      "connected": true,
-      "screen_version": 71,
-      "last_seen_seconds_ago": 3
-    }
-  ]
-}
-
----------------------------------------------------------------------
-2. GET ALL CONTROLS ON THE CURRENT SCREEN  ("getalloptions")
----------------------------------------------------------------------
 GET /api/ai-bridge/sessions/{session_id}/options
-     ?include_raw=true          (optional: returns the raw screen JSON)
 Headers: X-Api-Key: <key>
 
-200 OK
+Response - this is the FULL payload the AI works from:
+
 {
   "session_id": "9f2c1e8a-....",
   "bed_id": "9330",
-  "device_id": "4f84ed4b-...",
+  "device_id": "4f84ed4b-81f8-4381-80ac-4da1834ac9bb",
   "call_active": true,
   "route": "/FoodDining/MenuItems",
-  "title": "...",
+  "title": "Menu Items",
   "screen_version": 72,
-  "updated_utc": "2026-11-22T10:00:00.0000000Z",
   "headings": ["Today's Menu", "Starters"],
   "options": [
     {
       "id": "nav:/FoodDining/FoodOrdering",
       "type": "navigate",
       "label": "Order Food",
-      "route": "/FoodDining/FoodOrdering",
       "action": { "action": "navigate", "path": "/FoodDining/FoodOrdering" }
     },
     {
@@ -80,26 +65,36 @@ Headers: X-Api-Key: <key>
       "type": "fill",
       "label": "Special instructions",
       "needs_value": true,
-      "action": { "action": "ui.fill", "targetId": "unified-field-xyz", "value": "<text the patient said>" }
+      "action": { "action": "ui.fill", "targetId": "unified-field-xyz", "value": "<patient's words>" }
     }
   ],
   "items": []
 }
 
-TIP FOR POSTMAN: call this BEFORE posting actions - the "action" object
-inside each option is exactly what you send back in step 3.
+WHAT EACH FIELD MEANS (what you send the AI / what it reads):
+  route/title/headings : where the patient is and what the page says
+  options[].label      : the visible button/control text (patient words map to this)
+  options[].action     : READY-MADE command - copy it into the POST body as-is
+  items[]              : list rows on the page (menu items, orders, notifications)
+  call_active          : true while a voice call is live
+
+PARAMETERS YOU CONTROL:
+  bed_id        -> which patient's device (from your system / QR)
+  session_id    -> which screen/tab (from step "sessions" list)
+  include_raw=1 -> (optional) adds the untouched screen JSON
 
 ---------------------------------------------------------------------
-3. POST ACTIONS + SUGGESTIONS  (the AI "triggers" the UI)
+STEP 2 - POST  (the response that TRIGGERS the application)
 ---------------------------------------------------------------------
 POST /api/ai-bridge/sessions/{session_id}/actions
 Headers: X-Api-Key: <key>
          Content-Type: application/json
-Body (max 64 KB, <=10 actions, <=8 suggestions):
+
+Body - put the action objects from step 1 inside "actions":
 
 {
-  "request_id": "req-123",              // optional, generated if omitted
-  "transcript": "I am hungry, show me food",
+  "request_id": "req-123",               // optional tracking id
+  "transcript": "I am hungry",           // what the patient said (optional)
   "actions": [
     { "action": "navigate", "path": "/FoodDining/FoodDining" },
     { "action": "ui.click",   "targetId": "unified-action-abc", "label": "Paneer Tikka" },
@@ -108,19 +103,26 @@ Body (max 64 KB, <=10 actions, <=8 suggestions):
     { "action": "ui.fill",    "targetId": "unified-field-xyz", "value": "less spicy" },
     { "action": "food.add_item", "foodId": "123", "meal": "Lunch", "quantity": 1 },
     { "action": "food.submit_order" },
-    { "action": "request.create", "module": "room_comfort", "category": "...", "details": "..." },
+    { "action": "request.create", "module": "room_comfort", "details": "extra pillow" },
     { "action": "notification.mark_all_read" },
-    { "action": "feedback.answer", "...": "..." },
+    { "action": "feedback.answer" },
     { "action": "video.play" },
     { "action": "video.stop" }
   ],
   "suggestions": [
-    {
-      "label": "Order again",
-      "action": { "action": "navigate", "path": "/FoodDining/FoodOrdering" }
-    }
+    { "label": "Order again",
+      "action": { "action": "navigate", "path": "/FoodDining/FoodOrdering" } }
   ]
 }
+
+RULES:
+  - <=10 actions, <=8 suggestions, body <=64 KB per POST.
+  - action names allowed: navigate | ui.* | video.* | food.* |
+    request.* | notification.* | feedback.*   (anything else -> 400)
+  - navigate.path must be a SAME-SITE path like "/FoodDining/FoodDining".
+  - ui.* targetId/controlId/optionValue come straight from step 1 options[].
+  - ui.fill "value" = the text the patient actually said.
+  - suggestions show as tappable chips on the patient's screen.
 
 202 Accepted
 {
@@ -130,77 +132,52 @@ Body (max 64 KB, <=10 actions, <=8 suggestions):
   "suggestions": 1,
   "delivered_to_streams": 1
 }
-If delivered_to_streams = 0 the device is offline; events are replayed
-for ~10 s when it reconnects.
-
-ALLOWED action names (anything else -> 400):
-    navigate | ui.* | video.* | food.* | request.* | notification.* | feedback.*
-
-navigate: "path" must be a SAME-SITE path ("/FoodDining/FoodDining").
-          External URLs and "//host" are rejected.
-ui.click / ui.fill / ui.set_choice: use the targetId from /options.
-ui.select: controlId + optionValue from /options.
-ui.fill: "value" = the text the patient said (max 2000 chars on device).
+delivered_to_streams = 0 -> device offline; it replays for ~10 s.
 
 ---------------------------------------------------------------------
-4. READ WHAT THE DEVICE DID  (poll after posting actions)
+STEP 3 (OPTIONAL) - GET results = did the device actually do it?
 ---------------------------------------------------------------------
 GET /api/ai-bridge/sessions/{session_id}/results?after=0
 Headers: X-Api-Key: <key>
 
-200 OK
 {
-  "session_id": "9f2c1e8a-....",
+  "session_id": "...",
   "last_seq": 5,
   "results": [
-    {
-      "seq": 1,
-      "request_id": "req-123-1",
-      "action": "navigate",
-      "success": true,
-      "error": "",
-      "at_utc": "2026-11-22T10:00:01.0000000Z",
-      "result": { }
-    },
-    {
-      "seq": 2,
-      "request_id": "req-123-2",
-      "action": "ui.click",
-      "success": false,
-      "error": "The selected visible action is no longer available."
-    }
+    { "seq": 1, "request_id": "req-123-1", "action": "navigate",
+      "success": true, "error": "", "at_utc": "..." },
+    { "seq": 2, "request_id": "req-123-2", "action": "ui.click",
+      "success": false, "error": "The selected visible action is no longer available." }
   ]
 }
-Poll with after=<last_seq> to get only new results.
+Poll with after=<last_seq> for only new results.
 
 =====================================================================
-HOW THE PIECES CONNECT (for the AI team)
+POSTMAN - EXACT REQUESTS TO PASTE
 =====================================================================
-Patient speaks -> voice service -> AI team
-   1. GET /sessions?bed_id=..            find the patient's device
-   2. GET /sessions/{id}/options         what can be tapped NOW
-   3. POST /sessions/{id}/actions        run it (actions) + show chips (suggestions)
-   4. GET /sessions/{id}/results?after=N confirm each action succeeded
+A) Find the device:
+   GET https://localhost:7116/api/ai-bridge/sessions?bed_id=9330
+   Header: X-Api-Key: <key>
 
-The device ALSO pushes its screen automatically (PUT .../screen) every
-~25 s and on every page change, so /options is always current.
+B) Get the screen controls (the one GET you need):
+   GET https://localhost:7116/api/ai-bridge/sessions/{session_id}/options
+   Header: X-Api-Key: <key>
 
-SERVER-SENT EVENTS (device side, for reference):
-    GET /api/ai-bridge/sessions/{id}/events
-    event: action       -> one action to run now
-    event: suggestions  -> tappable chips to show the patient
-    : ping every 15 s keeps the stream alive
+C) Trigger the UI (the one POST you need):
+   POST https://localhost:7116/api/ai-bridge/sessions/{session_id}/actions
+   Headers: X-Api-Key: <key>, Content-Type: application/json
+   Body:  { "actions": [ <copy any "action" object from B> ] }
 
-POSTMAN CHECKLIST
------------------
-1. GET  /api/ai-bridge/health                     -> {"ok":true,...}
-2. GET  /api/ai-bridge/sessions?bed_id=9330       -> needs X-Api-Key
-3. GET  /api/ai-bridge/sessions/{id}/options      -> the "controls" payload
-4. POST /api/ai-bridge/sessions/{id}/actions      -> paste an "action" object from step 3
-5. GET  /api/ai-bridge/sessions/{id}/results      -> watch the device react
+D) (optional) confirm:
+   GET https://localhost:7116/api/ai-bridge/sessions/{session_id}/results?after=0
+   Header: X-Api-Key: <key>
 
-If step 2 returns 401 -> X-Api-Key missing/wrong (or AiBridge:ApiKey
-not configured on the server -> 503 outside Development).
-If step 3 returns empty options -> the device has not published a screen
-yet (open the app page first and wait ~2 s).
+ERRORS YOU MAY SEE
+------------------
+401  -> missing/wrong X-Api-Key
+503  -> AiBridge:ApiKey not configured in appsettings.json (outside Dev)
+404  -> session_id unknown: device has not opened its screen yet
+400  -> bad action name / navigate to external URL / empty body
+empty options[] -> wait ~2 s after the page loads; the device publishes
+                   its screen automatically every ~25 s and on changes
 =====================================================================

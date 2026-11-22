@@ -987,20 +987,13 @@ async function connectToAvatarBackend() {
             failedOpenStreak = 0;
             clearTimeout(connectionTimeoutTimer);
             connectionTimeoutTimer = null;
+            // No client-initiated ping: the voice backend closes the socket when it
+            // receives a {"type":"ping"} it did not ask for (~16 s after open, right
+            // after the first 15 s heartbeat). The server pings us and we pong back;
+            // that is the whole keepalive contract.
             clearInterval(voiceHeartbeatTimer);
+            voiceHeartbeatTimer = null;
             lastVoicePongAt = null;
-            voiceHeartbeatTimer = setInterval(function () {
-                if (ws !== socket || socket.readyState !== WebSocket.OPEN) {
-                    clearInterval(voiceHeartbeatTimer);
-                    voiceHeartbeatTimer = null;
-                    return;
-                }
-                try {
-                    socket.send(JSON.stringify({ type: "ping" }));
-                } catch (error) {
-                    console.warn("Could not send voice WebSocket keepalive:", error && error.message ? error.message : error);
-                }
-            }, 15000);
             connectionInProgress = false;
             clearTimeout(stableResetTimer);
             stableResetTimer = setTimeout(function () {
