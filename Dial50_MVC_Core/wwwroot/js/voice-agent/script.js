@@ -903,6 +903,7 @@ async function connectToAvatarBackend() {
         reconnectAttempts = 0;
         elapsedSeconds = 0;
         tokenRequestAttemptedForSession = false;
+        try { sessionStorage.setItem("dial50_voice_call_active", "1"); } catch (e) { /* ignore */ }
     }
     var tokenRequestAttempted = false;
     var sessionGeneration = callSessionGeneration;
@@ -1270,6 +1271,8 @@ function endChat(finalStatus) {
     clearResumableCall();
     releaseCallOwnership();
     callSessionActive = false;
+    try { sessionStorage.removeItem("dial50_voice_call_active"); } catch (e) { /* ignore */ }
+    try { sessionStorage.removeItem("dial50_voice_call_active"); } catch (e) { /* ignore */ }
     callAccessToken = null;
     tokenRequestAttemptedForSession = false;
     callSessionGeneration += 1;

@@ -610,6 +610,15 @@
         return window.currentRoomNo || '';
     }
 
+    // While a voice call is live the Home shell owns notifications: unified child
+    // pages load inside iframes and must not each fire GetUnreadCount/GetTotalCount
+    // on every navigation. sessionStorage is shared with same-origin iframes, so the
+    // flag set by voice-agent/script.js is visible here. The drawer still loads on
+    // demand when the user (or notification.* action) opens it.
+    function voiceCallActive() {
+        try { return sessionStorage.getItem('dial50_voice_call_active') === '1'; } catch (e) { return false; }
+    }
+
     $(function () {
 
         setTimeout(function () {
@@ -619,7 +628,7 @@
                 window.trackOrderUrl = '/FoodDining/OrderSuccess';
             }
 
-            if (currentRoomNo) {
+            if (currentRoomNo && !voiceCallActive()) {
                 getMobileUnreadCount();
                 getActiveCount();
                 if (window.PushClient && currentRoomNo) {

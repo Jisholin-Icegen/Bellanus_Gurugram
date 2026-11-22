@@ -1014,7 +1014,9 @@
         setTimeout(refreshMobileNotifications, 200);
          setInterval(function () {
             var st = document.body.getAttribute('data-state');
-            if (document.hidden || st === 'connecting' || st === 'connected') return;
+            var callFlag = false;
+            try { callFlag = sessionStorage.getItem('dial50_voice_call_active') === '1'; } catch (e) {}
+            if (document.hidden || callFlag || st === 'connecting' || st === 'connected') return;
             refreshMobileNotifications();
         }, 5000);
     })();
