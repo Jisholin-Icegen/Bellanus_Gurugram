@@ -54,6 +54,7 @@ if (!window.APP_CONFIG) {
 var CFG = window.APP_CONFIG || {};
 
 var SAMPLE_RATE = 24000;
+var PLAYBACK_LEAD_SECONDS = 0.05;   // jitter buffer for the first chunk after silence
 var MIC_FRAME_SAMPLES = 480;
 
 var BACKEND_HTTP = CFG.BACKEND_HTTP || '';
@@ -231,6 +232,11 @@ async function fetchToken() {
     var dialect = widgetParams.get("dialect") || CFG.DIALECT || REGION_DIALECT[currentRegionCode];
 
     var payload = { user_id: widgetUserId };
+    // opt-in (config.js: SEND_SESSION_ID: true) once the voice backend accepts these two fields
+    if (CFG.SEND_SESSION_ID && window.UnifiedAIBridge) {
+        payload.session_id = window.UnifiedAIBridge.sessionId;
+        payload.device_id = window.UnifiedAIBridge.deviceId;
+    }
     if (currentLanguage) payload.language = currentLanguage.name;
     if (dialect) payload.dialect = dialect;
     if (voice) payload.voice = voice;
@@ -288,6 +294,64 @@ var speakerGainNode = null;
 var nextPlayTime = 0;
 var activeSources = [];
 var drainTimer = null;
+var stableResetTimer = null;
+
+// =========================================================
+// TOKEN REFRESH ON RECONNECT
+// The /token access token is a short-lived JWT. Reconnecting forever with the SAME
+// token fails once it has expired (or was single-use), which looks like endless
+// "Reconnecting...". Fetch a fresh one when it is about to expire, was refused, or
+// the last attempt never got as far as an open socket.
+// =========================================================
+var failedOpenStreak = 0;
+var forceTokenRefresh = false;
+var lastTokenFetchAt = 0;
+var AUTH_CLOSE_CODES = [1008, 4001, 4003, 4401, 4403];
+
+function tokenExpiresInMs(token) {
+    try {
+        var part = String(token).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+        part += "=".repeat((4 - part.length % 4) % 4);
+        var payload = JSON.parse(atob(part));
+        return payload && payload.exp ? payload.exp * 1000 - Date.now() : Infinity;
+    } catch (e) {
+        return Infinity;
+    }
+}
+
+// =========================================================
+// SINGLE CALL OWNER
+// Two voice clients for the same bed (a second tab, or an app page loaded inside
+// the Home iframe without ?UnifiedAI=1) open a second /voice-assistant socket. Most
+// voice backends keep one live session per user, so the two sockets evict each
+// other and both "Reconnect" forever. Only ONE window may own the call.
+// =========================================================
+var callOwnerRelease = null;
+var callOwnerPending = false;
+
+function isEmbeddedInUnifiedHost() {
+    try { return window.parent !== window && !!window.parent.UnifiedAIHost; } catch (e) { return false; }
+}
+
+function claimCallOwnership() {
+    if (isEmbeddedInUnifiedHost()) return Promise.resolve(false);   // the Home page owns the call
+    if (callOwnerRelease) return Promise.resolve(true);             // already ours
+    if (!navigator.locks || !navigator.locks.request) return Promise.resolve(true);   // needs HTTPS/localhost
+    return new Promise(function (resolve) {
+        navigator.locks.request("dial50-voice-call", { ifAvailable: true }, function (lock) {
+            if (!lock) { resolve(false); return; }
+            // hold the lock until End Call; the browser frees it automatically if the tab closes
+            return new Promise(function (release) { callOwnerRelease = release; resolve(true); });
+        }).catch(function () { resolve(true); });
+    });
+}
+
+function releaseCallOwnership() {
+    if (!callOwnerRelease) return;
+    var release = callOwnerRelease;
+    callOwnerRelease = null;
+    release();
+}
 
 // =========================================================
 // SILERO NEURAL VAD — browser-side ONNX Runtime Web
@@ -315,7 +379,11 @@ function loadExternalScriptOnce(src) {
         script.onload = function () {
             window.ort ? resolve(window.ort) : reject(new Error("ONNX Runtime script loaded but window.ort is unavailable."));
         };
-        script.onerror = function () { reject(new Error("Failed to load ONNX Runtime Web from " + src)); };
+        script.onerror = function () {
+            window.__dial50OrtLoading = null;        // let the next attempt try again
+            script.remove();
+            reject(new Error("Failed to load ONNX Runtime Web from " + src));
+        };
         document.head.appendChild(script);
     });
     return window.__dial50OrtLoading;
@@ -360,7 +428,12 @@ class SileroVoiceActivityDetector {
         this.isLoading = true;
         this.loadPromise = (async () => {
             try {
-                var ort = await loadExternalScriptOnce(this.ortScriptUrl);
+                var ort = await Promise.race([
+                    loadExternalScriptOnce(this.ortScriptUrl),
+                    new Promise(function (_, reject) {
+                        setTimeout(function () { reject(new Error("ONNX Runtime load timed out")); }, 12000);
+                    })
+                ]);
                 if (ort.env && ort.env.wasm) {
                     ort.env.wasm.wasmPaths = this.wasmPaths;
                     ort.env.wasm.numThreads = 1;
@@ -395,6 +468,7 @@ class SileroVoiceActivityDetector {
                 return false;
             } finally {
                 this.isLoading = false;
+                if (!this.isReady) this.loadPromise = null;   // allow a later retry instead of caching the failure
             }
         })();
         return this.loadPromise;
@@ -546,17 +620,25 @@ class SileroVoiceActivityDetector {
 }
 
 var localVad = new SileroVoiceActivityDetector({
-    threshold: typeof vadCfg.threshold === "number" ? vadCfg.threshold : 0.50,
-    negativeThreshold: typeof vadCfg.negativeThreshold === "number" ? vadCfg.negativeThreshold : 0.35,
-    bargeInThreshold: typeof vadCfg.bargeInThreshold === "number" ? vadCfg.bargeInThreshold : 0.65,
-    silenceDurationMs: typeof vadCfg.silenceDurationMs === "number" ? vadCfg.silenceDurationMs : 420,
-    speechStartDurationMs: typeof vadCfg.speechStartDurationMs === "number" ? vadCfg.speechStartDurationMs : 96,
-    bargeInStartDurationMs: typeof vadCfg.bargeInStartDurationMs === "number" ? vadCfg.bargeInStartDurationMs : 220,
+    threshold: typeof vadCfg.threshold === "number" ? vadCfg.threshold : 0.45,
+    negativeThreshold: typeof vadCfg.negativeThreshold === "number" ? vadCfg.negativeThreshold : 0.30,
+    bargeInThreshold: typeof vadCfg.bargeInThreshold === "number" ? vadCfg.bargeInThreshold : 0.55,
+    silenceDurationMs: typeof vadCfg.silenceDurationMs === "number" ? vadCfg.silenceDurationMs : 380,
+    speechStartDurationMs: typeof vadCfg.speechStartDurationMs === "number" ? vadCfg.speechStartDurationMs : 64,
+    bargeInStartDurationMs: typeof vadCfg.bargeInStartDurationMs === "number" ? vadCfg.bargeInStartDurationMs : 128,
     modelPath: vadCfg.modelPath,
     ortScriptUrl: vadCfg.ortScriptUrl,
     wasmPaths: vadCfg.wasmPaths
 });
 var localBargeIn = vadCfg.localBargeIn !== false;
+
+// Warm the VAD up while the page is idle, so it is ready from the very first word of the first call.
+(function preloadVad() {
+    if (isEmbeddedInUnifiedHost()) return;
+    var warm = function () { localVad.load().catch(function () { /* logged inside load() */ }); };
+    if (window.requestIdleCallback) window.requestIdleCallback(warm, { timeout: 4000 });
+    else setTimeout(warm, 1500);
+})();
 
 function processLocalVADFrame(buffer) {
     if (!localVad || micMuted || !buffer) return;
@@ -652,7 +734,7 @@ function playPCM16(buffer) {
     source.connect(speakerGainNode);
 
     var currentTime = audioContext.currentTime;
-    if (nextPlayTime < currentTime) nextPlayTime = currentTime;
+    if (nextPlayTime < currentTime) nextPlayTime = currentTime + PLAYBACK_LEAD_SECONDS;
     source.start(nextPlayTime);
     nextPlayTime += audioBuffer.duration;
 
@@ -713,7 +795,9 @@ async function startMicrophone() {
             sampleRate: SAMPLE_RATE,
             echoCancellation: true,
             noiseSuppression: true,
-            autoGainControl: true
+            autoGainControl: true,
+            latency: { ideal: 0.01 },
+            voiceIsolation: { ideal: true }
         }
     });
 
@@ -791,6 +875,22 @@ async function connectToAvatarBackend() {
         || connectionInProgress || ws && (ws.readyState === WebSocket.CONNECTING || ws.readyState === WebSocket.OPEN)) return;
 
     if (!callSessionActive) {
+        if (callOwnerPending) return;
+        callOwnerPending = true;
+        var ownsCall = false;
+        try { ownsCall = await claimCallOwnership(); } finally { callOwnerPending = false; }
+        if (!ownsCall) {
+            console.warn("Voice call not started: another window already owns the call.");
+            setState("idle");
+            setCallStatus("call-in-other-window");
+            return;
+        }
+        if (!body || !["connecting", "connected"].includes(body.getAttribute("data-state"))) {
+            releaseCallOwnership();
+            return;
+        }
+    }
+    if (!callSessionActive) {
         callSessionActive = true;
         callSessionGeneration += 1;
         reconnectAttempts = 0;
@@ -810,13 +910,33 @@ async function connectToAvatarBackend() {
     try {
         await languageReady;
         if (!sessionIsCurrent()) return;
-        await localVad.load();
-        if (!sessionIsCurrent()) return;
+        // The neural VAD only drives local barge-in. Load it in the BACKGROUND: a slow or blocked
+        // CDN must never delay the call or send it into a reconnect loop before the socket exists.
+        localVad.load().catch(function () { /* logged inside load() */ });
         await startMicrophone();
         if (!sessionIsCurrent()) return;
         setCallStatus(reconnectAttempts ? "reconnecting" : "ringing");
 
         var token = callAccessToken;
+        if (token && reconnectAttempts > 0
+            && (forceTokenRefresh || failedOpenStreak >= 1 || tokenExpiresInMs(token) < 60000)
+            && Date.now() - lastTokenFetchAt > 5000) {
+            lastTokenFetchAt = Date.now();
+            try {
+                var freshToken = await fetchToken();
+                if (freshToken) {
+                    token = freshToken;
+                    callAccessToken = freshToken;
+                    forceTokenRefresh = false;
+                    failedOpenStreak = 0;
+                    console.info("Voice call: reconnecting with a fresh access token.");
+                }
+            } catch (refreshError) {
+                console.warn("Voice call: token refresh failed, trying the previous token.",
+                    refreshError && refreshError.message ? refreshError.message : refreshError);
+            }
+            if (!sessionIsCurrent()) return;
+        }
         if (!token) {
             if (tokenRequestAttemptedForSession) {
                 connectionInProgress = false;
@@ -830,21 +950,38 @@ async function connectToAvatarBackend() {
         if (!sessionIsCurrent()) return;
         if (!token) throw new Error("No token — cannot open /voice-assistant.");
         callAccessToken = token;
+        saveResumableCall(token);
+        var tokenTtlMs = tokenExpiresInMs(token);
+        console.info("Voice call token lifetime:", isFinite(tokenTtlMs) ? Math.round(tokenTtlMs / 1000) + " s" : "no expiry in token");
 
-        var socket = new WebSocket(BACKEND_WS + "/voice-assistant?token=" + encodeURIComponent(token));
+        var wsUrl = BACKEND_WS + "/voice-assistant?token=" + encodeURIComponent(token);
+        var bridgeSession = window.UnifiedAIBridge;
+        if (bridgeSession && bridgeSession.sessionId) {
+            wsUrl += "&session_id=" + encodeURIComponent(bridgeSession.sessionId)
+                + "&device_id=" + encodeURIComponent(bridgeSession.deviceId || "");
+        }
+        var socket = new WebSocket(wsUrl);
         socket.binaryType = "arraybuffer";
         ws = socket;
+        var openedAt = 0;
         connectionTimeoutTimer = setTimeout(function () {
             if (ws === socket && socket.readyState === WebSocket.CONNECTING) {
                 socket.close(4000, "Connection timed out");
             }
-        }, 15000);
+        }, 45000);   // a scaled-to-zero backend can need 20-40 s to accept the first connection
 
         socket.onopen = function () {
             if (ws !== socket) return;
+            openedAt = Date.now();
+            window.__voiceOpenedAt = openedAt;
+            failedOpenStreak = 0;
             clearTimeout(connectionTimeoutTimer);
             connectionTimeoutTimer = null;
             connectionInProgress = false;
+            clearTimeout(stableResetTimer);
+            stableResetTimer = setTimeout(function () {
+                if (ws === socket && socket.readyState === WebSocket.OPEN) reconnectAttempts = 0;
+            }, 10000);
             goConnected();
             window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
                 detail: { connected: true, reconnecting: reconnectAttempts > 0 }
@@ -947,14 +1084,28 @@ async function connectToAvatarBackend() {
 
         socket.onclose = function (event) {
             if (ws !== socket) return;
+            clearTimeout(stableResetTimer);
             clearTimeout(connectionTimeoutTimer);
             clearTimeout(serverEndTimer);
             connectionTimeoutTimer = null;
             serverEndTimer = null;
             connectionInProgress = false;
             ws = null;
+            var aliveMs = openedAt ? Date.now() - openedAt : 0;
+            window.__voiceOpenedAt = 0;
+            if (!openedAt) failedOpenStreak += 1;                       // never reached an open socket
+            if (AUTH_CLOSE_CODES.indexOf(event.code) !== -1) forceTokenRefresh = true;
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason",
-                "wasClean:", event.wasClean);
+                "wasClean:", event.wasClean, "| openForMs:", aliveMs,
+                "| tokenLeftMs:", callAccessToken ? Math.round(tokenExpiresInMs(callAccessToken)) : "n/a",
+                "| attempts:", reconnectAttempts);
+            // paste JSON.stringify(window.__voiceDiag) in the console to share the last drops
+            window.__voiceDiag = (window.__voiceDiag || []).slice(-19).concat([{
+                at: new Date().toISOString(), code: event.code, reason: event.reason || "",
+                wasClean: event.wasClean, openForMs: aliveMs, openedFirst: !!openedAt,
+                tokenLeftMs: callAccessToken ? Math.round(tokenExpiresInMs(callAccessToken)) : null,
+                attempts: reconnectAttempts
+            }]);
             scheduleVoiceReconnect("WebSocket close " + event.code);
         };
 
@@ -1000,7 +1151,8 @@ function scheduleVoiceReconnect(reason) {
     }
 
     reconnectAttempts += 1;
-    var delay = Math.min(15000, 1000 * Math.pow(2, Math.min(reconnectAttempts - 1, 4)));
+    // 250 ms, 1 s, 2 s, 4 s, 8 s, then every 10 s: the first retry is nearly instant
+    var delay = reconnectAttempts === 1 ? 250 : Math.min(10000, 1000 * Math.pow(2, Math.min(reconnectAttempts - 2, 4)));
     setCallStatus("reconnecting");
     console.warn("Voice call reconnect scheduled after " + (reason || "connection loss")
         + " in " + delay + "ms; reusing the existing access token.");
@@ -1060,7 +1212,8 @@ function setCallStatus(status) {
         ended: "Call ended.",
         "remote-ended": "Voice service ended the call.",
         disconnected: "Connection lost. Please restart.",
-        "microphone-required": "Allow microphone access to start."
+        "microphone-required": "Allow microphone access to start.",
+        "call-in-other-window": "A voice call is already active in another window."
     };
     callStatus.textContent = labels[status] || "Listening...";
 
@@ -1072,6 +1225,9 @@ function setCallStatus(status) {
 }
 
 function endChat(finalStatus) {
+    clearTimeout(stableResetTimer);
+    clearResumableCall();
+    releaseCallOwnership();
     callSessionActive = false;
     callAccessToken = null;
     tokenRequestAttemptedForSession = false;
@@ -1246,7 +1402,104 @@ function initializeAvatarEvents() {
 }
 
 
-if (document.readyState === "loading") {
+// =========================================================
+// LIVE DIAGNOSTICS: open the Home URL with  &VoiceDebug=1  to see the real connection state on screen.
+// A screenshot of this box tells us exactly why the call drops. Add  &VoiceDebug=0  to turn it off.
+// =========================================================
+(function voiceDebugOverlay() {
+    if (isEmbeddedInUnifiedHost()) return;
+    var enabled = false;
+    try {
+        if (/[?&]VoiceDebug=0\b/i.test(window.location.search)) sessionStorage.removeItem("voiceDebug");
+        else if (/[?&]VoiceDebug=1\b/i.test(window.location.search)) sessionStorage.setItem("voiceDebug", "1");
+        enabled = sessionStorage.getItem("voiceDebug") === "1";
+    } catch (e) { /* ignore */ }
+    if (!enabled) return;
+
+    function start() {
+        var box = document.createElement("pre");
+        box.style.cssText = "position:fixed;top:6px;left:6px;z-index:2147483647;margin:0;padding:6px 8px;max-width:340px;" +
+            "background:rgba(0,0,0,.78);color:#8dffa8;font:11px/1.35 ui-monospace,Consolas,monospace;border-radius:8px;" +
+            "pointer-events:none;white-space:pre-wrap";
+        document.body.appendChild(box);
+        var names = ["CONNECTING", "OPEN", "CLOSING", "CLOSED"];
+        setInterval(function () {
+            var last = (window.__voiceDiag || []).slice(-1)[0];
+            var layer = document.getElementById("callLayer");
+            var left = callAccessToken ? tokenExpiresInMs(callAccessToken) : null;
+            var vad = localVad && localVad.getState ? localVad.getState() : {};
+            box.textContent =
+                "VOICE DEBUG\n" +
+                "state: " + (document.body.getAttribute("data-state") || "-") + " / " + (layer ? layer.getAttribute("data-status") : "-") + "\n" +
+                "socket: " + (ws ? names[ws.readyState] : "none") +
+                (window.__voiceOpenedAt ? " (up " + Math.round((Date.now() - window.__voiceOpenedAt) / 1000) + "s)" : "") + "\n" +
+                "reconnect attempts: " + reconnectAttempts + "\n" +
+                "token left: " + (left === null ? "n/a" : isFinite(left) ? Math.round(left / 1000) + "s" : "no expiry") + "\n" +
+                "network: " + (navigator.onLine ? "online" : "OFFLINE") + "\n" +
+                "vad: " + (vad.modelReady ? "ready" : vad.isLoading ? "loading" : (vad.error ? "error" : "idle")) + "\n" +
+                (last ? "last close: " + last.code + " \"" + last.reason + "\" after " + last.openForMs + "ms" +
+                    (last.openedFirst ? "" : " (never opened)") : "last close: none");
+        }, 500);
+    }
+    if (document.body) start(); else window.addEventListener("DOMContentLoaded", start);
+})();
+
+// A returning network connection should reconnect at once, not after the next backoff step.
+window.addEventListener("online", function () {
+    if (!callSessionActive || connectionInProgress) return;
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+    connectToAvatarBackend();
+});
+
+// =========================================================
+// SAME CALL, SAME TOKEN, UNTIL "END CALL"
+// While a call is live its token is kept for this tab. A page refresh resumes the call with that
+// same token. Only the End Call button clears it. A heartbeat keeps the entry fresh so an old,
+// abandoned entry (closed tab, logout) never auto-starts a call later.
+// =========================================================
+var RESUME_KEY = "dial50_voice_call";
+var RESUME_MAX_AGE_MS = 90000;
+var resumeHeartbeat = null;
+
+function saveResumableCall(token) {
+    try { sessionStorage.setItem(RESUME_KEY, JSON.stringify({ token: token, at: Date.now() })); } catch (e) { /* ignore */ }
+    if (!resumeHeartbeat) {
+        resumeHeartbeat = setInterval(function () {
+            if (callSessionActive && callAccessToken) saveResumableCall(callAccessToken);
+        }, 15000);
+    }
+}
+
+function clearResumableCall() {
+    clearInterval(resumeHeartbeat);
+    resumeHeartbeat = null;
+    try { sessionStorage.removeItem(RESUME_KEY); } catch (e) { /* ignore */ }
+}
+
+(function resumeCallAfterRefresh() {
+    if (isEmbeddedInUnifiedHost()) return;
+    var saved = null;
+    try { saved = JSON.parse(sessionStorage.getItem(RESUME_KEY) || "null"); } catch (e) { /* ignore */ }
+    if (!saved || !saved.token || Date.now() - (saved.at || 0) > RESUME_MAX_AGE_MS) return;
+    if (!/\/home(?:\/index)?\/?$/i.test(window.location.pathname)) return;   // only the Home shell owns the call
+    window.addEventListener("load", function () {
+        setTimeout(function () {
+            var current = document.body && document.body.getAttribute("data-state");
+            if (current && current !== "idle") return;
+            // an expired token is useless: let the normal flow request a new one
+            callAccessToken = tokenExpiresInMs(saved.token) > 60000 ? saved.token : null;
+            setState("connecting");
+            setCallStatus("dialing");
+            connectToAvatarBackend();
+        }, 900);
+    });
+})();
+
+if (isEmbeddedInUnifiedHost()) {
+    console.warn("Voice client not started inside the Unified AI frame; the Home page owns the call.");
+} else if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", function () {
         initializeAvatarUI();
         initializeAvatarEvents();

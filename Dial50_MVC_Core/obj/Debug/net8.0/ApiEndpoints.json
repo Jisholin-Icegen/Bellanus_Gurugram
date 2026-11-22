@@ -1,5 +1,158 @@
 [
   {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "Health",
+    "RelativePath": "api/ai-bridge/health",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "ListSessions",
+    "RelativePath": "api/ai-bridge/sessions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "bed_id",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "PostActions",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/actions",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "body",
+        "Type": "Dial50_MVC_Core.Controllers.AiActionsPost",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "Events",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/events",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "GetOptions",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/options",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "include_raw",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "GetResults",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/results",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "after",
+        "Type": "System.Int64",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "PostResult",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/results",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "body",
+        "Type": "Dial50_MVC_Core.Controllers.AiResultPost",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Dial50_MVC_Core.Controllers.AiBridgeController",
+    "Method": "PutScreen",
+    "RelativePath": "api/ai-bridge/sessions/{sessionId}/screen",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "sessionId",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "body",
+        "Type": "Dial50_MVC_Core.Controllers.AiScreenPush",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "Dial50_MVC_Core.Controllers.FeedbackController",
     "Method": "GetActiveDepartments",
     "RelativePath": "api/Feedback/GetActiveDepartments",

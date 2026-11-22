@@ -267,6 +267,11 @@
             padding: 0 4px;
         }
     </style>
+    @if (Context.Request.Query["UnifiedAI"] == "1" || Context.Request.Query["Unified"] == "1")
+    {
+        <script>document.documentElement.classList.add('uai-entering'); setTimeout(function () { document.documentElement.classList.remove('uai-entering'); }, 950);</script>
+        <link rel="stylesheet" href="~/css/unified-ai-transitions.css" asp-append-version="true" />
+    }
 </head>
 <body>
 
