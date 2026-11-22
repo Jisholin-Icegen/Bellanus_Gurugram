@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2dddb1d650aa8e66803622956d663e27f824e0e0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb3712810e4b5fd3fc5dd3e1e9945cf5d1cc936d")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dial50_MVC_Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
