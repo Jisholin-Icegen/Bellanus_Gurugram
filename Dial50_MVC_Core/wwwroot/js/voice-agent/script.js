@@ -1184,9 +1184,17 @@ function scheduleVoiceReconnect(reason) {
         return;
     }
     if (shortCloseStreak >= MAX_SHORT_CLOSES) {
+        // The voice service keeps closing the socket right after open. The call must stay
+        // alive until the user presses End, so keep retrying slowly instead of giving up.
         console.warn("Voice call: the voice service closed the socket immediately "
-            + shortCloseStreak + " times in a row; stopping the reconnect loop.");
-        endChat("disconnected");
+            + shortCloseStreak + " times in a row; still retrying every 15 s.");
+        setCallStatus("reconnecting");
+        window.dispatchEvent(new CustomEvent("voice-agent:connection-state", {
+            detail: { connected: false, reconnecting: true, attempt: reconnectAttempts, retryInMs: 15000 }
+        }));
+        reconnectTimer = setTimeout(function () {
+            if (callSessionActive) connectToAvatarBackend();
+        }, 15000);
         return;
     }
 
