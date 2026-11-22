@@ -760,11 +760,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
+      "projectUniqueName": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
       "projectName": "Hospital.API",
-      "projectPath": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
+      "projectPath": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
       "packagesPath": "C:\\Users\\JISHOLIN\\.nuget\\packages\\",
-      "outputPath": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Hospital.API\\obj\\",
+      "outputPath": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Hospital.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\JISHOLIN\\AppData\\Roaming\\NuGet\\NuGet.Config"

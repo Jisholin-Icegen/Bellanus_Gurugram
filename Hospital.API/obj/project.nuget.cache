@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uXYwIXh5fXs=",
+  "dgSpecHash": "vv4J/n/n/Uo=",
   "success": true,
-  "projectFilePath": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
+  "projectFilePath": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Hospital.API\\Hospital.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\JISHOLIN\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\8.0.24\\microsoft.aspnetcore.authentication.jwtbearer.8.0.24.nupkg.sha512",
     "C:\\Users\\JISHOLIN\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
