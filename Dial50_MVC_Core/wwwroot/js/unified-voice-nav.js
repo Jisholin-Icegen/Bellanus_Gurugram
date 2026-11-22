@@ -377,7 +377,11 @@
     function setLinkDown(down) {
         if (linkDown === down) return;
         linkDown = down;
-        if (down) { if (callOpen()) startFallback(); } else { stopFallback(); }
+        // Never grab the microphone automatically while a real call is live: the AI
+        // socket drops into "reconnecting" on every brief blip, and auto-starting
+        // speech recognition here made the Voice panel flash open/closed and could
+        // fight the call's own audio. The fallback only starts on an explicit tap.
+        if (!down) stopFallback();
     }
 
     window.addEventListener("voice-agent:connection-state", function (event) {
