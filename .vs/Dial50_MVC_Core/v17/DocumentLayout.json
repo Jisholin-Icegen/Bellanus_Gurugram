@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\",
+  "WorkspaceRootPath": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|e:\\unified_voice_app\\qr_unified_voice_fixes_v5\\dial50_mvc_core\\wwwroot\\js\\dailycare.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "AbsoluteMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|e:\\unified_voice_app\\experiment\\qr_unified_voice_fixes_v5\\dial50_mvc_core\\wwwroot\\js\\dailycare.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{0593005A-50DE-40C9-945F-67DB2F2373F0}|Dial50_MVC_Core\\Dial50_MVC_Core.csproj|solutionrelative:dial50_mvc_core\\wwwroot\\js\\dailycare.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     }
   ],
@@ -20,9 +20,9 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Dailycare.js",
-              "DocumentMoniker": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
+              "DocumentMoniker": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
               "RelativeDocumentMoniker": "Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
-              "ToolTip": "E:\\UNIFIED_VOICE_APP\\QR_unified_voice_fixes_v5\\Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
+              "ToolTip": "E:\\UNIFIED_VOICE_APP\\Experiment\\QR_unified_voice_fixes_v5\\Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
               "RelativeToolTip": "Dial50_MVC_Core\\wwwroot\\js\\Dailycare.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAwwA8AAAA1AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",

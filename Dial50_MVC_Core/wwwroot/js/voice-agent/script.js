@@ -962,7 +962,10 @@ async function connectToAvatarBackend() {
         console.info("Voice call token lifetime:", isFinite(tokenTtlMs) ? Math.round(tokenTtlMs / 1000) + " s" : "no expiry in token");
 
         var wsUrl = BACKEND_WS + "/voice-assistant?token=" + encodeURIComponent(token);
-        var bridgeSession = window.UnifiedAIBridge;
+        // Same opt-in as the token payload: the voice backend closes the socket ~1s after open
+        // when it sees session_id/device_id it does not understand, so only send them when
+        // config.js sets SEND_SESSION_ID: true.
+        var bridgeSession = CFG.SEND_SESSION_ID && window.UnifiedAIBridge;
         if (bridgeSession && bridgeSession.sessionId) {
             wsUrl += "&session_id=" + encodeURIComponent(bridgeSession.sessionId)
                 + "&device_id=" + encodeURIComponent(bridgeSession.deviceId || "");

@@ -300,8 +300,10 @@
                 count = response[0].unreaD_COUNT || response[0].UNREAD_COUNT || 0;
             }
             updateUnreadBadges(count);
-        }).fail(function () {
-            console.warn('Could not refresh notification unread count.');
+        }).fail(function (xhr, status) {
+            if (status === 'abort') return;
+            console.warn('Could not refresh notification unread count.',
+                'HTTP', xhr && xhr.status, status);
         }).always(function () {
             if (unreadCountRequest === request) unreadCountRequest = null;
         });
@@ -601,9 +603,11 @@
     function resolveRoomNo() {
         if (window.BedContext) {
             var bc = BedContext.get();
-            return bc.roomBed || bc.roomNumber || '';
+            return bc.roomBed || bc.roomNumber
+                || (typeof BedContext.taskBedNumber === 'function' ? BedContext.taskBedNumber() : '')
+                || '';
         }
-        return '';
+        return window.currentRoomNo || '';
     }
 
     $(function () {
