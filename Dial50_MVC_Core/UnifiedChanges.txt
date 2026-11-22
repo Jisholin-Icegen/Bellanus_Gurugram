@@ -25,10 +25,11 @@ handshake, using the existing token without another token request. The voice
 service must keep its session valid for reconnects. Reconnect logs include the
 close code, clean-close flag, cause, and retry delay. Notification unread-count
 and notification-list requests are independent HTTP calls and do not close or
-reopen the voice socket. The client replies to JSON ping messages with pong,
-preserving the ping payload. It keeps the call timer running and reuses a live
-microphone stream, reacquiring it if the browser ended the track. Calls have no
-default time limit; a positive
+reopen the voice socket. The client sends a JSON ping every 15 seconds and
+replies to server pings with pong, preserving the ping payload. It records the
+last pong time in close diagnostics. It keeps the call timer running and reuses
+a live microphone stream, reacquiring it if the browser ended the track. Calls
+have no default time limit; a positive
 SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
 in-page assistant bar shows the same Connecting, Reconnecting, Listening,
 Thinking, or Speaking status as the Home call screen while the call is

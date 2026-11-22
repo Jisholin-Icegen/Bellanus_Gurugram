@@ -274,8 +274,10 @@ var ws = null;
 var pendingVoiceMessages = [];
 var reconnectTimer = null;
 var connectionTimeoutTimer = null;
+var voiceHeartbeatTimer = null;
 var statusTransitionTimer = null;
 var serverEndTimer = null;
+var lastVoicePongAt = null;
 var connectionInProgress = false;
 var callSessionActive = false;
 var callAccessToken = null;
@@ -982,6 +984,20 @@ async function connectToAvatarBackend() {
             failedOpenStreak = 0;
             clearTimeout(connectionTimeoutTimer);
             connectionTimeoutTimer = null;
+            clearInterval(voiceHeartbeatTimer);
+            lastVoicePongAt = null;
+            voiceHeartbeatTimer = setInterval(function () {
+                if (ws !== socket || socket.readyState !== WebSocket.OPEN) {
+                    clearInterval(voiceHeartbeatTimer);
+                    voiceHeartbeatTimer = null;
+                    return;
+                }
+                try {
+                    socket.send(JSON.stringify({ type: "ping" }));
+                } catch (error) {
+                    console.warn("Could not send voice WebSocket keepalive:", error && error.message ? error.message : error);
+                }
+            }, 15000);
             connectionInProgress = false;
             clearTimeout(stableResetTimer);
             stableResetTimer = setTimeout(function () {
@@ -1069,6 +1085,7 @@ async function connectToAvatarBackend() {
                     break;
 
                 case "pong":
+                    lastVoicePongAt = Date.now();
                     break;
 
                 case "call_ended": {
@@ -1094,8 +1111,10 @@ async function connectToAvatarBackend() {
             if (ws !== socket) return;
             clearTimeout(stableResetTimer);
             clearTimeout(connectionTimeoutTimer);
+            clearInterval(voiceHeartbeatTimer);
             clearTimeout(serverEndTimer);
             connectionTimeoutTimer = null;
+            voiceHeartbeatTimer = null;
             serverEndTimer = null;
             connectionInProgress = false;
             ws = null;
@@ -1108,13 +1127,15 @@ async function connectToAvatarBackend() {
             console.warn("Voice WebSocket closed:", event.code, event.reason || "No close reason",
                 "wasClean:", event.wasClean, "| openForMs:", aliveMs,
                 "| tokenLeftMs:", callAccessToken ? Math.round(tokenExpiresInMs(callAccessToken)) : "n/a",
-                "| attempts:", reconnectAttempts);
+                "| attempts:", reconnectAttempts,
+                "| last pong age ms:", lastVoicePongAt === null ? "none" : Date.now() - lastVoicePongAt);
             // paste JSON.stringify(window.__voiceDiag) in the console to share the last drops
             window.__voiceDiag = (window.__voiceDiag || []).slice(-19).concat([{
                 at: new Date().toISOString(), code: event.code, reason: event.reason || "",
                 wasClean: event.wasClean, openForMs: aliveMs, openedFirst: !!openedAt,
                 tokenLeftMs: callAccessToken ? Math.round(tokenExpiresInMs(callAccessToken)) : null,
-                attempts: reconnectAttempts
+                attempts: reconnectAttempts,
+                lastPongAgeMs: lastVoicePongAt === null ? null : Date.now() - lastVoicePongAt
             }]);
             scheduleVoiceReconnect("WebSocket close " + event.code);
         };
@@ -1251,6 +1272,8 @@ function endChat(finalStatus) {
     connectionInProgress = false;
     clearInterval(countdownTimer);
     countdownTimer = null;
+    clearInterval(voiceHeartbeatTimer);
+    voiceHeartbeatTimer = null;
     clearTimeout(drainTimer);
     clearTimeout(reconnectTimer);
     clearTimeout(connectionTimeoutTimer);
