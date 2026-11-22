@@ -50,28 +50,9 @@ namespace Dial50_MVC_Core.Controllers
             return Ok(new Dictionary<string, object> { ["ok"] = true, ["sessions"] = _bridge.List(null).Count });
         }
 
-        [HttpGet("sessions")]
-        public IActionResult ListSessions([FromQuery(Name = "bed_id")] string bedId)
-        {
-            var denied = RequireApiKey();
-            if (denied != null) return denied;
-
-            var now = DateTime.UtcNow;
-            var rows = _bridge.List(bedId).Select(s => new Dictionary<string, object>
-            {
-                ["session_id"] = s.SessionId,
-                ["bed_id"] = s.BedId,
-                ["device_id"] = s.DeviceId,
-                ["route"] = s.Route,
-                ["title"] = s.Title,
-                ["call_active"] = s.CallActive,
-                ["connected"] = s.SubscriberCount > 0,
-                ["screen_version"] = s.ScreenVersion,
-                ["last_seen_seconds_ago"] = (int)(now - s.LastSeenUtc).TotalSeconds
-            }).ToList();
-
-            return Ok(new Dictionary<string, object> { ["sessions"] = rows });
-        }
+        // ---- THE ONLY TWO AI-FACING CALLS (both keyed by bed_id, no session id needed) ----
+        //   GET  /api/ai-bridge/bed/{bedId}/options   -> screen controls + session_id + device_id + recent results
+        //   POST /api/ai-bridge/bed/{bedId}/actions   -> run actions / show suggestions (echo session_id+device_id back to pin one tab)
 
         /// <summary>"getalloptions": every button / control the patient's CURRENT screen, found by bed_id alone.</summary>
         [HttpGet("bed/{bedId}/options")]
@@ -85,7 +66,7 @@ namespace Dial50_MVC_Core.Controllers
             return OptionsFor(session, includeRaw);
         }
 
-        /// <summary>Post actions for a bed without knowing the session id - resolves the active device.</summary>
+        /// <summary>Post actions for a bed. Echo session_id + device_id from the GET response to pin ONE tab/device; omit them to auto-resolve.</summary>
         [HttpPost("bed/{bedId}/actions")]
         [RequestSizeLimit(65536)]
         public IActionResult BedActions(string bedId, [FromBody] AiActionsPost body)
@@ -93,40 +74,33 @@ namespace Dial50_MVC_Core.Controllers
             var denied = RequireApiKey();
             if (denied != null) return denied;
 
-            var session = ResolveBedSession(bedId);
+            AiBridgeSession? session = null;
+            if (body != null && AiBridgeService.IsValidSessionId(body.SessionId))
+            {
+                session = _bridge.Find(body.SessionId.Trim());
+                if (session != null && !string.IsNullOrWhiteSpace(session.BedId)
+                    && !string.IsNullOrWhiteSpace(bedId) && session.BedId != bedId)
+                {
+                    return Conflict(new Dictionary<string, object> { ["error"] = "session_id belongs to bed_id " + session.BedId + ", not " + bedId + "." });
+                }
+            }
+            session ??= ResolveBedSession(bedId);
             if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "No device has published a screen for bed_id " + bedId + " yet." });
             return ActionsFor(session, body);
         }
 
-        /// <summary>Action results for a bed without knowing the session id.</summary>
-        [HttpGet("bed/{bedId}/results")]
-        public IActionResult BedResults(string bedId, [FromQuery] long after)
-        {
-            var denied = RequireApiKey();
-            if (denied != null) return denied;
-
-            var session = ResolveBedSession(bedId);
-            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "No device has published a screen for bed_id " + bedId + " yet." });
-            return ResultsFor(session, after);
-        }
-
-        /// <summary>Picks the device to drive for a bed: prefer one with a live event stream, else the most recently seen.</summary>
+        /// <summary>
+        /// Picks the ONE device to drive for a bed when the caller only knows bed_id:
+        /// the tab with a live voice call first, then any connected screen, then the
+        /// most recently seen. With two tabs open, actions land on the call's tab.
+        /// </summary>
         private AiBridgeSession? ResolveBedSession(string bedId)
         {
             var sessions = _bridge.List(bedId);
-            return sessions.FirstOrDefault(s => s.SubscriberCount > 0) ?? sessions.FirstOrDefault();
-        }
-
-        /// <summary>"getalloptions": every button / control the patient can use on the device's CURRENT screen.</summary>
-        [HttpGet("sessions/{sessionId}/options")]
-        public IActionResult GetOptions(string sessionId, [FromQuery(Name = "include_raw")] bool includeRaw)
-        {
-            var denied = RequireApiKey();
-            if (denied != null) return denied;
-
-            var session = _bridge.Find(sessionId);
-            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id." });
-            return OptionsFor(session, includeRaw);
+            return sessions.FirstOrDefault(s => s.CallActive && s.SubscriberCount > 0)
+                ?? sessions.FirstOrDefault(s => s.SubscriberCount > 0)
+                ?? sessions.FirstOrDefault(s => s.CallActive)
+                ?? sessions.FirstOrDefault();
         }
 
         private IActionResult OptionsFor(AiBridgeSession session, bool includeRaw)
@@ -144,6 +118,11 @@ namespace Dial50_MVC_Core.Controllers
             using var doc = JsonDocument.Parse(screenJson);
             var screen = doc.RootElement;
 
+            // the ONE GET also returns what the device did with earlier actions,
+            // so the AI team never needs a third call
+            var allResults = BuildResultRows(session, 0);
+            var recentResults = allResults.Count > 20 ? allResults.GetRange(allResults.Count - 20, 20) : allResults;
+
             var response = new Dictionary<string, object>
             {
                 ["session_id"] = session.SessionId,
@@ -156,25 +135,14 @@ namespace Dial50_MVC_Core.Controllers
                 ["updated_utc"] = updated == default ? "" : updated.ToString("o"),
                 ["headings"] = ReadArrayOrEmpty(screen, "headings"),
                 ["options"] = BuildOptions(screen),
-                ["items"] = ReadArrayOrEmpty(screen, "items")
+                ["items"] = ReadArrayOrEmpty(screen, "items"),
+                ["results"] = recentResults,
+                ["last_seq"] = session.NextResultSeq
             };
             if (includeRaw) response["raw_screen"] = screen;
 
             // serialise here, while the JsonDocument is still alive
             return Content(JsonSerializer.Serialize(response), "application/json");
-        }
-
-        /// <summary>The AI posts what the patient asked for (actions to run now) plus optional suggestions to show.</summary>
-        [HttpPost("sessions/{sessionId}/actions")]
-        [RequestSizeLimit(65536)]
-        public IActionResult PostActions(string sessionId, [FromBody] AiActionsPost body)
-        {
-            var denied = RequireApiKey();
-            if (denied != null) return denied;
-
-            var session = _bridge.Find(sessionId);
-            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id. The device has not opened its screen yet." });
-            return ActionsFor(session, body);
         }
 
         private IActionResult ActionsFor(AiBridgeSession session, AiActionsPost body)
@@ -240,22 +208,9 @@ namespace Dial50_MVC_Core.Controllers
             return StatusCode(202, result);
         }
 
-        /// <summary>What the device did with the actions (so the AI can confirm or retry).</summary>
-        [HttpGet("sessions/{sessionId}/results")]
-        public IActionResult GetResults(string sessionId, [FromQuery] long after)
-        {
-            var denied = RequireApiKey();
-            if (denied != null) return denied;
-
-            var session = _bridge.Find(sessionId);
-            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id." });
-            return ResultsFor(session, after);
-        }
-
-        private IActionResult ResultsFor(AiBridgeSession session, long after)
+        private List<Dictionary<string, object>> BuildResultRows(AiBridgeSession session, long after)
         {
             var rows = new List<Dictionary<string, object>>();
-            long lastSeq = after;
             foreach (var r in _bridge.GetResults(session, after))
             {
                 var row = new Dictionary<string, object>
@@ -272,10 +227,8 @@ namespace Dial50_MVC_Core.Controllers
                     try { row["result"] = JsonSerializer.Deserialize<JsonElement>(r.ResultJson); } catch (JsonException) { }
                 }
                 rows.Add(row);
-                if (r.Seq > lastSeq) lastSeq = r.Seq;
             }
-
-            return Ok(new Dictionary<string, object> { ["session_id"] = session.SessionId, ["results"] = rows, ["last_seq"] = lastSeq });
+            return rows;
         }
 
         // =============================================================================================
@@ -601,6 +554,9 @@ namespace Dial50_MVC_Core.Controllers
     {
         [JsonPropertyName("request_id")] public string RequestId { get; set; }
         [JsonPropertyName("transcript")] public string Transcript { get; set; }
+        // optional: echo these back from the GET response to pin ONE tab/device
+        [JsonPropertyName("session_id")] public string SessionId { get; set; }
+        [JsonPropertyName("device_id")] public string DeviceId { get; set; }
         [JsonPropertyName("actions")] public List<JsonElement> Actions { get; set; }
         [JsonPropertyName("suggestions")] public List<AiSuggestionPost> Suggestions { get; set; }
     }
