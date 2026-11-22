@@ -17,8 +17,8 @@ Connection and status
 The voice client requests one access token per explicit call start. A failed
 token request, including HTTP 429, leaves the call pending and is never retried
 automatically; only an explicit End Call followed by a new start requests a
-new token. WebSocket reconnects reuse the call's existing token and retry
-indefinitely with exponential backoff capped at 15 seconds. A server call_ended
+new token. WebSocket reconnects reuse the call's existing token and retry with
+exponential backoff capped at 10 seconds. A server call_ended
 message no longer closes the socket; after queued audio drains, the client
 returns to listening. A peer or transport close still requires a new WebSocket
 handshake, using the existing token without another token request. The voice
@@ -27,7 +27,9 @@ close code, clean-close flag, cause, and retry delay. Notification unread-count
 and notification-list requests are independent HTTP calls and do not close or
 reopen the voice socket. The client sends a JSON ping every 15 seconds and
 replies to server pings with pong, preserving the ping payload. It records the
-last pong time in close diagnostics. It keeps the call timer running and reuses
+last pong time in close diagnostics. Three clean 1000 closes within five
+seconds of opening stop the reconnect loop: that is the voice service ending
+the session, not a transport failure. It keeps the call timer running and reuses
 a live microphone stream, reacquiring it if the browser ended the track. Calls
 have no default time limit; a positive
 SESSION_SECONDS value in APP_CONFIG can still set an explicit limit. The
