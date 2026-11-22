@@ -21,12 +21,18 @@ AI-team endpoints need this header on EVERY request:
 The session_id itself is the device credential - no login needed.
 
 ---------------------------------------------------------------------
+=====================================================================
+YOU ONLY NEED bed_id - NO session_id REQUIRED
+=====================================================================
+The AI team does NOT need to know the session id. Pass bed_id (the
+BedInfo number, e.g. 9330) and the API picks the patient's active device
+automatically (prefers a device with a live connection, else the most
+recently seen screen).
+
 STEP 1 - GET  (one call: everything the AI needs to decide)
 ---------------------------------------------------------------------
-GET /api/ai-bridge/sessions?bed_id=9330
-    -> which device(s) belong to this bed (pick session_id from here)
-
-GET /api/ai-bridge/sessions/{session_id}/options
+GET /api/ai-bridge/bed/{bed_id}/options
+     e.g. GET https://localhost:7116/api/bed/9330/options
 Headers: X-Api-Key: <key>
 
 Response - this is the FULL payload the AI works from:
@@ -86,7 +92,8 @@ PARAMETERS YOU CONTROL:
 ---------------------------------------------------------------------
 STEP 2 - POST  (the response that TRIGGERS the application)
 ---------------------------------------------------------------------
-POST /api/ai-bridge/sessions/{session_id}/actions
+POST /api/ai-bridge/bed/{bed_id}/actions
+     e.g. POST https://localhost:7116/api/bed/9330/actions
 Headers: X-Api-Key: <key>
          Content-Type: application/json
 
@@ -137,7 +144,8 @@ delivered_to_streams = 0 -> device offline; it replays for ~10 s.
 ---------------------------------------------------------------------
 STEP 3 (OPTIONAL) - GET results = did the device actually do it?
 ---------------------------------------------------------------------
-GET /api/ai-bridge/sessions/{session_id}/results?after=0
+GET /api/ai-bridge/bed/{bed_id}/results?after=0
+     e.g. GET https://localhost:7116/api/bed/9330/results?after=0
 Headers: X-Api-Key: <key>
 
 {
@@ -155,22 +163,26 @@ Poll with after=<last_seq> for only new results.
 =====================================================================
 POSTMAN - EXACT REQUESTS TO PASTE
 =====================================================================
-A) Find the device:
-   GET https://localhost:7116/api/ai-bridge/sessions?bed_id=9330
+The simple flow (bed_id only):
+
+A) Get the screen controls (the one GET you need):
+   GET https://localhost:7116/api/ai-bridge/bed/9330/options
    Header: X-Api-Key: <key>
 
-B) Get the screen controls (the one GET you need):
-   GET https://localhost:7116/api/ai-bridge/sessions/{session_id}/options
-   Header: X-Api-Key: <key>
-
-C) Trigger the UI (the one POST you need):
-   POST https://localhost:7116/api/ai-bridge/sessions/{session_id}/actions
+B) Trigger the UI (the one POST you need):
+   POST https://localhost:7116/api/ai-bridge/bed/9330/actions
    Headers: X-Api-Key: <key>, Content-Type: application/json
-   Body:  { "actions": [ <copy any "action" object from B> ] }
+   Body:  { "actions": [ <copy any "action" object from A> ] }
 
-D) (optional) confirm:
-   GET https://localhost:7116/api/ai-bridge/sessions/{session_id}/results?after=0
+C) (optional) confirm:
+   GET https://localhost:7116/api/ai-bridge/bed/9330/results?after=0
    Header: X-Api-Key: <key>
+
+ADVANCED (only if you need a specific device/session):
+   GET  /api/ai-bridge/sessions?bed_id=9330                    list devices
+   GET  /api/ai-bridge/sessions/{session_id}/options           per-session
+   POST /api/ai-bridge/sessions/{session_id}/actions           per-session
+   GET  /api/ai-bridge/sessions/{session_id}/results           per-session
 
 ERRORS YOU MAY SEE
 ------------------

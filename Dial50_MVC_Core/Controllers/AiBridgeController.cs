@@ -73,6 +73,50 @@ namespace Dial50_MVC_Core.Controllers
             return Ok(new Dictionary<string, object> { ["sessions"] = rows });
         }
 
+        /// <summary>"getalloptions": every button / control the patient's CURRENT screen, found by bed_id alone.</summary>
+        [HttpGet("bed/{bedId}/options")]
+        public IActionResult BedOptions(string bedId, [FromQuery(Name = "include_raw")] bool includeRaw)
+        {
+            var denied = RequireApiKey();
+            if (denied != null) return denied;
+
+            var session = ResolveBedSession(bedId);
+            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "No device has published a screen for bed_id " + bedId + " yet." });
+            return OptionsFor(session, includeRaw);
+        }
+
+        /// <summary>Post actions for a bed without knowing the session id - resolves the active device.</summary>
+        [HttpPost("bed/{bedId}/actions")]
+        [RequestSizeLimit(65536)]
+        public IActionResult BedActions(string bedId, [FromBody] AiActionsPost body)
+        {
+            var denied = RequireApiKey();
+            if (denied != null) return denied;
+
+            var session = ResolveBedSession(bedId);
+            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "No device has published a screen for bed_id " + bedId + " yet." });
+            return ActionsFor(session, body);
+        }
+
+        /// <summary>Action results for a bed without knowing the session id.</summary>
+        [HttpGet("bed/{bedId}/results")]
+        public IActionResult BedResults(string bedId, [FromQuery] long after)
+        {
+            var denied = RequireApiKey();
+            if (denied != null) return denied;
+
+            var session = ResolveBedSession(bedId);
+            if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "No device has published a screen for bed_id " + bedId + " yet." });
+            return ResultsFor(session, after);
+        }
+
+        /// <summary>Picks the device to drive for a bed: prefer one with a live event stream, else the most recently seen.</summary>
+        private AiBridgeSession? ResolveBedSession(string bedId)
+        {
+            var sessions = _bridge.List(bedId);
+            return sessions.FirstOrDefault(s => s.SubscriberCount > 0) ?? sessions.FirstOrDefault();
+        }
+
         /// <summary>"getalloptions": every button / control the patient can use on the device's CURRENT screen.</summary>
         [HttpGet("sessions/{sessionId}/options")]
         public IActionResult GetOptions(string sessionId, [FromQuery(Name = "include_raw")] bool includeRaw)
@@ -82,7 +126,11 @@ namespace Dial50_MVC_Core.Controllers
 
             var session = _bridge.Find(sessionId);
             if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id." });
+            return OptionsFor(session, includeRaw);
+        }
 
+        private IActionResult OptionsFor(AiBridgeSession session, bool includeRaw)
+        {
             string screenJson;
             long version;
             DateTime updated;
@@ -126,6 +174,11 @@ namespace Dial50_MVC_Core.Controllers
 
             var session = _bridge.Find(sessionId);
             if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id. The device has not opened its screen yet." });
+            return ActionsFor(session, body);
+        }
+
+        private IActionResult ActionsFor(AiBridgeSession session, AiActionsPost body)
+        {
             if (body == null) return BadRequest(new Dictionary<string, object> { ["error"] = "A JSON body is required." });
 
             var actions = body.Actions ?? new List<JsonElement>();
@@ -196,7 +249,11 @@ namespace Dial50_MVC_Core.Controllers
 
             var session = _bridge.Find(sessionId);
             if (session == null) return NotFound(new Dictionary<string, object> { ["error"] = "Unknown session_id." });
+            return ResultsFor(session, after);
+        }
 
+        private IActionResult ResultsFor(AiBridgeSession session, long after)
+        {
             var rows = new List<Dictionary<string, object>>();
             long lastSeq = after;
             foreach (var r in _bridge.GetResults(session, after))
